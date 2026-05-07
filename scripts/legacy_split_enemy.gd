@@ -76,8 +76,8 @@ func take_damage(amount: int, attacker_position: Vector2) -> void:
 
 	if hp <= 0:
 		if can_split:
-			split()
-		queue_free()
+			call_deferred("split")
+		call_deferred("queue_free")
 
 
 func split() -> void:

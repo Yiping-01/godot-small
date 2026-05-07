@@ -45,10 +45,10 @@ signal respawned
 @export var charge_recoil_velocity: float = 260.0
 @export var charge_move_speed_multiplier: float = 0.45
 @export var far_attack_damage: int = 1
-@export var far_attack_speed: float = 640.0
-@export var far_attack_duration: float = 0.55
+@export var far_attack_speed: float = 500.0
+@export var far_attack_duration: float = 0.3
 @export var far_attack_hit_radius: float = 22.0
-@export var far_attack_effect_scale := Vector2(0.35, 0.35)
+@export var far_attack_effect_scale := Vector2(0.2, 0.2)
 
 @export_category("Camera")
 @export var camera_follow_position := Vector2(80.0, -40.0)
@@ -454,7 +454,7 @@ func _spawn_far_attack_projectile() -> void:
 
 	var projectile := FAR_ATTACK_PROJECTILE.new()
 	get_parent().add_child(projectile)
-	projectile.global_position = global_position + Vector2(46.0 * facing_direction, -6.0)
+	projectile.global_position = global_position + Vector2(100.0 * facing_direction, -6.0)
 	projectile.setup(
 		far_attack_frames,
 		facing_direction,

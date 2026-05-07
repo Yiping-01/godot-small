@@ -248,8 +248,8 @@ func _sync_facing() -> void:
 
 
 func _set_damage_area_enabled(enabled: bool) -> void:
-	damage_area.monitoring = enabled
-	damage_shape.disabled = not enabled
+	damage_area.set_deferred("monitoring", enabled)
+	damage_shape.set_deferred("disabled", not enabled)
 
 
 func _flash(color: Color = Color(1.0, 0.35, 0.35), hold_time: float = 0.04, recover_time: float = 0.12) -> void:
@@ -264,13 +264,13 @@ func _die() -> void:
 	collision_layer = 0
 	collision_mask = 1
 	collision_shape.set_deferred("disabled", true)
-	hurtbox.monitoring = false
-	hurtbox.monitorable = false
-	damage_area.monitoring = false
-	damage_area.monitorable = false
+	hurtbox.set_deferred("monitoring", false)
+	hurtbox.set_deferred("monitorable", false)
+	damage_area.set_deferred("monitoring", false)
+	damage_area.set_deferred("monitorable", false)
 	_play_audio(death_audio)
 	sprite.modulate = Color(1.0, 0.25, 0.25, 0.75)
-	_drop_coins()
+	call_deferred("_drop_coins")
 
 	await get_tree().create_timer(death_delay).timeout
 	queue_free()
