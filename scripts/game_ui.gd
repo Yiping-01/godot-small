@@ -252,7 +252,10 @@ func _advance_dialogue() -> void:
 func _open_shop(npc: Node) -> void:
 	dialogue_panel.hide()
 
-	shop_items.assign(npc.shop_items)
+	if npc.has_method("get_shop_items"):
+		shop_items.assign(npc.get_shop_items())
+	else:
+		shop_items.assign(npc.shop_items)
 	shop_title_label.text = "%s 的商店" % npc.display_name
 
 	shop_panel.show()
@@ -278,6 +281,12 @@ func _update_shop() -> void:
 		var price := int(item["price"])
 		var description := String(item["description"])
 		var owned := GameState.has_item(item_name)
+		if GameState.is_health_potion_item(item_name):
+			owned = GameState.has_bought_scene_health_potion()
+			if not GameState.can_add_health_potion():
+				owned = true
+		elif GameState.is_rough_charm_item(item_name):
+			owned = GameState.has_bought_scene_rough_charm()
 
 		button.show()
 		button.disabled = owned
@@ -417,8 +426,23 @@ func _on_shop_item_pressed(index: int) -> void:
 	var item := shop_items[index]
 	var item_name := String(item["name"])
 	var price := int(item["price"])
+	var is_health_potion := GameState.is_health_potion_item(item_name)
+	var is_rough_charm := GameState.is_rough_charm_item(item_name)
+	var purchase_item_name := GameState.HEALTH_POSITION_ITEM if is_health_potion else item_name
 
-	if GameState.has_item(item_name):
+	if is_health_potion and GameState.has_bought_scene_health_potion():
+		show_toast("已擁有：%s" % GameState.get_item_display_name(purchase_item_name))
+		return
+
+	if is_health_potion and not GameState.can_add_health_potion():
+		show_toast("回復藥水已達上限")
+		return
+
+	if is_rough_charm and GameState.has_bought_scene_rough_charm():
+		show_toast("已擁有：%s" % GameState.get_item_display_name(item_name))
+		return
+
+	if not is_health_potion and not is_rough_charm and GameState.has_item(item_name):
 		show_toast("已擁有：%s" % GameState.get_item_display_name(item_name))
 		return
 
@@ -426,10 +450,17 @@ func _on_shop_item_pressed(index: int) -> void:
 		show_toast("金錢不足")
 		return
 
-	GameState.add_item(item_name)
+	if is_health_potion:
+		GameState.add_health_potions(1)
+		GameState.mark_scene_health_potion_bought()
+	elif is_rough_charm:
+		GameState.add_item(item_name)
+		GameState.mark_scene_rough_charm_bought()
+	else:
+		GameState.add_item(item_name)
 	GameState.save_game()
 
-	show_toast("取得：%s" % GameState.get_item_display_name(item_name))
+	show_toast("取得：%s" % GameState.get_item_display_name(purchase_item_name))
 	_update_shop()
 
 
@@ -489,7 +520,7 @@ func _add_inventory_row(item_name: String, amount: int) -> void:
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = Vector2(45, 45)
 
-	if item_name == GameState.HEALTH_POTION_ITEM:
+	if GameState.is_health_potion_item(item_name):
 		icon.texture = preload("res://assets/some/Health_Potion.png")
 	else:
 		icon.texture = preload("res://assets/enemy/enemy2.png")

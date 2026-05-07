@@ -2,12 +2,12 @@
 
 [ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="2_health_ui"]
-[ext_resource type="Script" path="res://scripts/respawn_point.gd" id="3_respawn_point"]
-[ext_resource type="PackedScene" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="Script" uid="uid://hid4uidnrebp" path="res://scripts/respawn_point.gd" id="3_respawn_point"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="4_game_ui"]
 [ext_resource type="Script" uid="uid://cjg0ursmhf37w" path="res://scripts/room_manager.gd" id="5_room_manager"]
 [ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="6_area_title"]
 [ext_resource type="PackedScene" path="res://scenes/room_transition.tscn" id="7_transition"]
-[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="8_enemy"]
+[ext_resource type="PackedScene" uid="uid://0jam8o6gwigo" path="res://scenes/enemy.tscn" id="8_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/npc_shopkeeper.tscn" id="9_shopkeeper"]
 [ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="10_floor"]
 [ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="11_platform"]
@@ -17,7 +17,7 @@
 [ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="15_passage"]
 [ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="16_v10j6"]
 [ext_resource type="PackedScene" path="res://scenes/bench.tscn" id="17_oqwvp"]
-[ext_resource type="Script" path="res://scripts/exit_menu.gd" id="18_exit_menu"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="18_exit_menu"]
 
 [node name="UpperRouteRoom" type="Node2D" unique_id=1241468937]
 script = ExtResource("5_room_manager")

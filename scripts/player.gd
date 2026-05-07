@@ -681,14 +681,14 @@ func _try_use_health_potion() -> bool:
 	if is_dead or GameState.input_locked or _has_visible_interaction_prompt():
 		return false
 	if current_health >= float(max_health):
-		_show_game_toast("Health is full")
+		_show_game_toast("血量是滿的")
 		return false
 	if not GameState.use_health_potion():
-		_show_game_toast("No Health Potion")
+		_show_game_toast("沒有回血飲料了")
 		return false
 
 	heal(health_potion_heal_amount)
-	_show_game_toast("Used Health Potion")
+	_show_game_toast("使用回血飲料")
 	return true
 
 

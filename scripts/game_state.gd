@@ -11,7 +11,9 @@ const SAVE_PATH := "user://save.cfg"
 const CONTINUE_SCENE_SAVE_PATH := "user://continue_scene.cfg"
 const DEFAULT_START_SCENE := "res://scenes/test_level.tscn"
 const HEALTH_POTION_ITEM := "Health Potion"
+const HEALTH_POSITION_ITEM := "health_position"
 const STARTING_HEALTH_POTIONS := 3
+const MAX_HEALTH_POTIONS := 5
 const STARTER_ITEM := "旅行者筆記"
 
 var demo_start_fresh := true
@@ -20,11 +22,15 @@ var load_save_on_start := false
 var currency: int = 0
 var inventory: Dictionary = {
 	STARTER_ITEM: 1,
-	HEALTH_POTION_ITEM: STARTING_HEALTH_POTIONS,
+	HEALTH_POSITION_ITEM: STARTING_HEALTH_POTIONS,
 }
 var item_database: Dictionary = {
 	HEALTH_POTION_ITEM: {
-		"display_name": "生命藥水",
+		"display_name": "回復藥水",
+		"description": "按下E鍵回復生命",
+	},
+	HEALTH_POSITION_ITEM: {
+		"display_name": "回復藥水",
 		"description": "按下E鍵回復生命",
 	},
 	STARTER_ITEM: {
@@ -55,6 +61,8 @@ var current_map_scene := ""
 var current_map_room := ""
 var map_rooms: Dictionary = {}
 var visited_rooms: Dictionary = {}
+var scene_health_potion_purchases: Dictionary = {}
+var scene_rough_charm_purchases: Dictionary = {}
 var continue_scene_path := DEFAULT_START_SCENE
 var continue_player_position := Vector2.ZERO
 var has_continue_player_position := false
@@ -67,6 +75,7 @@ func _ready() -> void:
 	if demo_start_fresh:
 		reset_demo_state()
 		load_game()
+	merge_health_potion_items()
 	currency_changed.emit(currency)
 	inventory_changed.emit(inventory)
 	health_potions_changed.emit(get_health_potion_count())
@@ -78,7 +87,7 @@ func reset_demo_state() -> void:
 
 	inventory = {
 		STARTER_ITEM: 1,
-		HEALTH_POTION_ITEM: STARTING_HEALTH_POTIONS,
+		HEALTH_POSITION_ITEM: STARTING_HEALTH_POTIONS,
 	}
 	has_saved_respawn = false
 	saved_respawn_position = Vector2.ZERO
@@ -91,6 +100,8 @@ func reset_demo_state() -> void:
 	current_map_room = ""
 	map_rooms.clear()
 	visited_rooms.clear()
+	scene_health_potion_purchases.clear()
+	scene_rough_charm_purchases.clear()
 	inventory_changed.emit(inventory)
 	health_potions_changed.emit(get_health_potion_count())
 
@@ -120,11 +131,12 @@ func spend_currency(amount: int) -> bool:
 
 
 func add_item(item_name: String, amount: int = 1) -> void:
+	item_name = get_inventory_item_name(item_name)
 	var was_empty := inventory.is_empty()
 	var had_item := has_item(item_name)
 	inventory[item_name] = int(inventory.get(item_name, 0)) + amount
 	inventory_changed.emit(inventory)
-	if item_name == HEALTH_POTION_ITEM:
+	if is_health_potion_item(item_name):
 		health_potions_changed.emit(get_health_potion_count())
 
 	if was_empty or not had_item:
@@ -132,20 +144,123 @@ func add_item(item_name: String, amount: int = 1) -> void:
 
 
 func has_item(item_name: String) -> bool:
+	item_name = get_inventory_item_name(item_name)
 	return int(inventory.get(item_name, 0)) > 0
 
 
 func get_health_potion_count() -> int:
-	return int(inventory.get(HEALTH_POTION_ITEM, 0))
+	return int(inventory.get(HEALTH_POSITION_ITEM, 0)) + int(inventory.get(HEALTH_POTION_ITEM, 0))
+
+
+func can_add_health_potion() -> bool:
+	return get_health_potion_count() < MAX_HEALTH_POTIONS
 
 
 func add_health_potions(amount: int) -> void:
 	if amount <= 0:
 		return
 
-	add_item(HEALTH_POTION_ITEM, amount)
+	var current_amount := get_health_potion_count()
+	var added_amount := mini(amount, MAX_HEALTH_POTIONS - current_amount)
+	if added_amount <= 0:
+		return
+
+	add_item(HEALTH_POSITION_ITEM, added_amount)
+
+
+func is_health_potion_item(item_name: String) -> bool:
+	var normalized := item_name.strip_edges().to_lower()
+	return item_name == HEALTH_POTION_ITEM or normalized == "health_potion" or normalized == HEALTH_POSITION_ITEM or item_name == "回復藥水"
+
+
+func is_rough_charm_item(item_name: String) -> bool:
+	return item_name == "粗糙護符"
+
+
+func get_inventory_item_name(item_name: String) -> String:
+	if is_health_potion_item(item_name):
+		return HEALTH_POSITION_ITEM
+
+	return item_name
+
+
+func merge_health_potion_items() -> void:
+	var total := 0
+	var found_health_potion_item := false
+
+	for item_name in inventory.keys():
+		if is_health_potion_item(String(item_name)):
+			total += int(inventory[item_name])
+			found_health_potion_item = true
+
+	if not found_health_potion_item:
+		return
+
+	for item_name in inventory.keys():
+		if is_health_potion_item(String(item_name)):
+			inventory.erase(item_name)
+
+	inventory[HEALTH_POSITION_ITEM] = mini(total, MAX_HEALTH_POTIONS)
+
+
+func get_scene_purchase_key(scene_path: String = "") -> String:
+	if scene_path != "":
+		return scene_path
+
+	var tree := get_tree()
+	if tree == null or tree.current_scene == null:
+		return ""
+
+	return tree.current_scene.scene_file_path
+
+
+func has_bought_scene_health_potion(scene_path: String = "") -> bool:
+	var purchase_key := get_scene_purchase_key(scene_path)
+	if purchase_key == "":
+		return false
+
+	return bool(scene_health_potion_purchases.get(purchase_key, false))
+
+
+func mark_scene_health_potion_bought(scene_path: String = "") -> void:
+	var purchase_key := get_scene_purchase_key(scene_path)
+	if purchase_key == "":
+		return
+
+	scene_health_potion_purchases[purchase_key] = true
+	save_game()
+
+
+func clear_scene_health_potion_purchase(scene_path: String = "") -> void:
+	var purchase_key := get_scene_purchase_key(scene_path)
+	if purchase_key == "":
+		return
+
+	scene_health_potion_purchases.erase(purchase_key)
+	scene_rough_charm_purchases.erase(purchase_key)
+
+
+func has_bought_scene_rough_charm(scene_path: String = "") -> bool:
+	var purchase_key := get_scene_purchase_key(scene_path)
+	if purchase_key == "":
+		return false
+
+	return bool(scene_rough_charm_purchases.get(purchase_key, false))
+
+
+func mark_scene_rough_charm_bought(scene_path: String = "") -> void:
+	var purchase_key := get_scene_purchase_key(scene_path)
+	if purchase_key == "":
+		return
+
+	scene_rough_charm_purchases[purchase_key] = true
+	save_game()
+
+
 func refill_health_potions() -> void:
-	inventory[HEALTH_POTION_ITEM] = STARTING_HEALTH_POTIONS
+	var current_amount := get_health_potion_count()
+	inventory[HEALTH_POSITION_ITEM] = mini(maxi(current_amount, STARTING_HEALTH_POTIONS), MAX_HEALTH_POTIONS)
+	inventory.erase(HEALTH_POTION_ITEM)
 	inventory_changed.emit(inventory)
 	health_potions_changed.emit(get_health_potion_count())
 
@@ -155,11 +270,20 @@ func use_health_potion() -> bool:
 	if amount <= 0:
 		return false
 
-	amount -= 1
-	if amount <= 0:
-		inventory.erase(HEALTH_POTION_ITEM)
+	if int(inventory.get(HEALTH_POSITION_ITEM, 0)) > 0:
+		var health_position_amount := int(inventory.get(HEALTH_POSITION_ITEM, 0)) - 1
+		if health_position_amount <= 0:
+			inventory.erase(HEALTH_POSITION_ITEM)
+		else:
+			inventory[HEALTH_POSITION_ITEM] = health_position_amount
 	else:
-		inventory[HEALTH_POTION_ITEM] = amount
+		var health_potion_amount := int(inventory.get(HEALTH_POTION_ITEM, 0)) - 1
+		if health_potion_amount <= 0:
+			inventory.erase(HEALTH_POTION_ITEM)
+		else:
+			inventory[HEALTH_POTION_ITEM] = health_potion_amount
+
+	amount = get_health_potion_count()
 
 	inventory_changed.emit(inventory)
 	health_potions_changed.emit(amount)
@@ -248,6 +372,8 @@ func save_game() -> void:
 	var config := ConfigFile.new()
 	config.set_value("player", "currency", currency)
 	config.set_value("player", "inventory", inventory)
+	config.set_value("player", "scene_health_potion_purchases", scene_health_potion_purchases)
+	config.set_value("player", "scene_rough_charm_purchases", scene_rough_charm_purchases)
 	config.set_value("player", "has_respawn", has_saved_respawn)
 	config.set_value("player", "respawn_position", saved_respawn_position)
 	config.save(SAVE_PATH)
@@ -328,6 +454,15 @@ func load_game() -> void:
 	var loaded_inventory: Variant = config.get_value("player", "inventory", inventory)
 	if loaded_inventory is Dictionary:
 		inventory = loaded_inventory
+		merge_health_potion_items()
+
+	var loaded_scene_health_potion_purchases: Variant = config.get_value("player", "scene_health_potion_purchases", scene_health_potion_purchases)
+	if loaded_scene_health_potion_purchases is Dictionary:
+		scene_health_potion_purchases = loaded_scene_health_potion_purchases
+
+	var loaded_scene_rough_charm_purchases: Variant = config.get_value("player", "scene_rough_charm_purchases", scene_rough_charm_purchases)
+	if loaded_scene_rough_charm_purchases is Dictionary:
+		scene_rough_charm_purchases = loaded_scene_rough_charm_purchases
 
 	has_saved_respawn = bool(config.get_value("player", "has_respawn", false))
 	var loaded_position: Variant = config.get_value("player", "respawn_position", Vector2.ZERO)

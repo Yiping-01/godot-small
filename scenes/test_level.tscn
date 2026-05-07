@@ -136,6 +136,10 @@ position = Vector2(2725, 1046)
 prompt_text = "按 E 商店"
 dialogue_lines = Array[String](["你可以用金錢購買測試物品。", "按 I 可以打開背包查看。"])
 shop_items = Array[Dictionary]([{
+"description": "Restores one Health Potion.",
+"name": "health_position",
+"price": 1
+}, {
 "description": "測試用商店物品。",
 "name": "生命碎片",
 "price": 1
