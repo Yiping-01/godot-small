@@ -281,19 +281,24 @@ func _update_shop() -> void:
 		var price := int(item["price"])
 		var description := String(item["description"])
 		var owned := GameState.has_item(item_name)
+		var status_text := "（已擁有）" if owned else ""
 		if GameState.is_health_potion_item(item_name):
 			owned = GameState.has_bought_scene_health_potion()
 			if not GameState.can_add_health_potion():
 				owned = true
+				status_text = "（已達到購買上限）"
+			elif owned:
+				status_text = "（已擁有）"
 		elif GameState.is_rough_charm_item(item_name):
 			owned = GameState.has_bought_scene_rough_charm()
+			status_text = "（已擁有）" if owned else ""
 
 		button.show()
 		button.disabled = owned
 		button.text = "%s - %d 金錢%s\n%s" % [
 			GameState.get_item_display_name(item_name),
 			price,
-			"（已擁有）" if owned else "",
+			status_text,
 			description,
 		]
 
