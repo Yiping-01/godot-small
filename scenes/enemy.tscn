@@ -158,5 +158,7 @@ target_position = Vector2(0, 34)
 
 [node name="DamageAudio" type="AudioStreamPlayer2D" parent="." unique_id=95204893]
 stream = ExtResource("4_enemy_damage")
+bus = &"SFX"
 
 [node name="DeathAudio" type="AudioStreamPlayer2D" parent="." unique_id=331813264]
+bus = &"SFX"

@@ -20,6 +20,9 @@
 [ext_resource type="Texture2D" uid="uid://b1j544fx7axuk" path="res://assets/Temporary_Art/Effect and FX Pixel All Free/Free/Part 2/62.png" id="18_hit_fx"]
 [ext_resource type="AudioStream" uid="uid://dbjq85wpakrxh" path="res://assets/audio/sword_hit_window_1.wav" id="19_sword_hit"]
 [ext_resource type="AudioStream" uid="uid://c5emh117ix4mu" path="res://assets/audio/hero_damage.wav" id="20_hero_damage"]
+[ext_resource type="AudioStream" path="res://scores/jump.wav" id="21_jump_sfx"]
+[ext_resource type="AudioStream" path="res://scores/attack1.wav" id="22_far_attack_sfx"]
+[ext_resource type="AudioStream" path="res://scores/attack2.wav" id="23_attack_sfx"]
 [ext_resource type="Texture2D" uid="uid://cy68rucrisocn" path="res://assets/player/Jump/sea0_jump_1.png" id="21_jump_1"]
 [ext_resource type="Texture2D" uid="uid://o1sebvsscb78" path="res://assets/player/Jump/sea0_jump_2.png" id="22_jump_2"]
 [ext_resource type="Texture2D" uid="uid://ds2b5faotev8r" path="res://assets/player/Jump/sea0_jump_3.png" id="23_jump_3"]
@@ -394,13 +397,25 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
 [node name="JumpAudio" type="AudioStreamPlayer2D" parent="." unique_id=1632853381]
+stream = ExtResource("21_jump_sfx")
+bus = &"SFX"
 
 [node name="DoubleJumpAudio" type="AudioStreamPlayer2D" parent="." unique_id=1081622854]
+stream = ExtResource("21_jump_sfx")
+bus = &"SFX"
 
 [node name="AttackAudio" type="AudioStreamPlayer2D" parent="." unique_id=2127639950]
+stream = ExtResource("23_attack_sfx")
+bus = &"SFX"
+
+[node name="FarAttackAudio" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("22_far_attack_sfx")
+bus = &"SFX"
 
 [node name="HitAudio" type="AudioStreamPlayer2D" parent="." unique_id=448333012]
 stream = ExtResource("19_sword_hit")
+bus = &"SFX"
 
 [node name="HurtAudio" type="AudioStreamPlayer2D" parent="." unique_id=1740789835]
 stream = ExtResource("20_hero_damage")
+bus = &"SFX"

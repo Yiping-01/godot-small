@@ -82,6 +82,7 @@ const FAR_ATTACK_PROJECTILE := preload("res://scripts/far_attack_projectile.gd")
 @onready var jump_audio: AudioStreamPlayer2D = $JumpAudio
 @onready var double_jump_audio: AudioStreamPlayer2D = $DoubleJumpAudio
 @onready var attack_audio: AudioStreamPlayer2D = $AttackAudio
+@onready var far_attack_audio: AudioStreamPlayer2D = $FarAttackAudio
 @onready var hit_audio: AudioStreamPlayer2D = $HitAudio
 @onready var hurt_audio: AudioStreamPlayer2D = $HurtAudio
 
@@ -351,7 +352,7 @@ func _try_far_attack() -> void:
 	is_attacking = true
 	active_attack_type = &"far"
 	_spawn_far_attack_projectile()
-	_play_audio(attack_audio)
+	_play_audio(far_attack_audio)
 	_play_player_attack_animation(&"side")
 
 
