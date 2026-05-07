@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/room_cut_gate.gd" id="1_room_cut_gate"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_cut_gate"]
+size = Vector2(56, 420)
+
+[node name="RoomCutGate" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_room_cut_gate")
+
+[node name="Visual" type="Polygon2D" parent="."]
+visible = false
+z_index = 30
+color = Color(0.15, 0.7, 1, 0.35)
+polygon = PackedVector2Array(-28, -210, 28, -210, 28, 210, -28, 210)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_room_cut_gate")

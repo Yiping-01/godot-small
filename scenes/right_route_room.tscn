@@ -1,0 +1,222 @@
+[gd_scene format=3 uid="uid://6nfolsnafxhm"]
+
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="2_health_ui"]
+[ext_resource type="Script" uid="uid://hid4uidnrebp" path="res://scripts/respawn_point.gd" id="3_respawn_point"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="Script" uid="uid://cjg0ursmhf37w" path="res://scripts/room_manager.gd" id="5_room_manager"]
+[ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="6_area_title"]
+[ext_resource type="PackedScene" path="res://scenes/room_transition.tscn" id="7_transition"]
+[ext_resource type="PackedScene" uid="uid://0jam8o6gwigo" path="res://scenes/enemy.tscn" id="8_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/npc_shopkeeper.tscn" id="9_shopkeeper"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="10_floor"]
+[ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="11_platform"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="12_wall"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall_jump.tscn" id="13_wall_jump"]
+[ext_resource type="PackedScene" uid="uid://uj0vu7eph4ga" path="res://scenes/map_ceiling.tscn" id="14_ceiling"]
+[ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="15_passage"]
+[ext_resource type="PackedScene" path="res://scenes/enemy2.tscn" id="16_enemy2"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="17_exit_menu"]
+[ext_resource type="PackedScene" path="res://scenes/legacy_split_enemy.tscn" id="18_split_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/squid_monster.tscn" id="19_squid_monster"]
+[ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="20_tutorial"]
+
+
+[node name="RightRouteRoom" type="Node2D" unique_id=1829796952]
+script = ExtResource("5_room_manager")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1752120297]
+script = ExtResource("2_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=243769284]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=1093251091]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=291437904]
+process_mode = 3
+layer = 20
+script = ExtResource("17_exit_menu")
+
+[node name="ExitPanel" type="Panel" parent="ExitMenu" unique_id=1768329402]
+process_mode = 3
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ExitMenu/ExitPanel" unique_id=1663529332]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -97.0
+offset_top = 19.0
+offset_right = 81.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "確認退出?"
+horizontal_alignment = 1
+
+[node name="NoButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=127145829]
+process_mode = 3
+layout_mode = 0
+offset_left = 293.0
+offset_top = 117.0
+offset_right = 352.0
+offset_bottom = 167.0
+theme_override_font_sizes/font_size = 30
+text = "NO"
+
+[node name="YesButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=1509514133]
+process_mode = 3
+layout_mode = 0
+offset_left = 120.0
+offset_top = 112.0
+offset_right = 179.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 30
+text = "YES"
+
+[node name="GameUI" parent="." unique_id=747558084 instance=ExtResource("4_game_ui")]
+
+[node name="Background" type="Polygon2D" parent="." unique_id=49389748]
+z_index = -10
+position = Vector2(-403, -106)
+color = Color(0.045, 0.045, 0.065, 1)
+polygon = PackedVector2Array(-900, -260, -137.66089, -260.00003, 1900, -260, 1900, 820, -900, 820)
+
+[node name="AreaTitleTrigger" parent="." unique_id=642024928 instance=ExtResource("6_area_title")]
+position = Vector2(211, -87)
+main_title = "Right Route"
+sub_title = "Prototype room"
+
+[node name="Player" parent="." unique_id=208967714 instance=ExtResource("1_player")]
+position = Vector2(210, -104)
+
+[node name="RespawnPoint" type="Marker2D" parent="." unique_id=348304717]
+position = Vector2(-650, 360)
+script = ExtResource("3_respawn_point")
+[node name="MonsterGatheringTutorial" parent="." instance=ExtResource("20_tutorial")]
+position = Vector2(160, 385)
+scale = Vector2(3.2, 1.35)
+tutorial_text = "怪物聚集地,請試著打敗他們"
+
+[node name="MapPieces" type="Node2D" parent="." unique_id=1601582521]
+
+[node name="MainFloor" parent="MapPieces" unique_id=143576143 instance=ExtResource("10_floor")]
+position = Vector2(119, 519)
+scale = Vector2(8, 1)
+
+[node name="LeftWall" parent="MapPieces" unique_id=2047037371 instance=ExtResource("12_wall")]
+position = Vector2(-920, 228)
+scale = Vector2(1, 3.2)
+
+[node name="RightWall" parent="MapPieces" unique_id=1139635296 instance=ExtResource("12_wall")]
+position = Vector2(1143, 243)
+scale = Vector2(1, 3.2)
+
+[node name="Ceiling" parent="MapPieces" unique_id=1661411833 instance=ExtResource("14_ceiling")]
+position = Vector2(108, -613)
+scale = Vector2(7.7, 1)
+
+[node name="WallJumpWall" parent="MapPieces" unique_id=1429451640 instance=ExtResource("13_wall_jump")]
+position = Vector2(-80, 260)
+scale = Vector2(1, 1.8)
+
+[node name="PlatformA" parent="MapPieces" unique_id=1095682119 instance=ExtResource("11_platform")]
+position = Vector2(240, 355)
+scale = Vector2(1.2, 1)
+
+[node name="PlatformB" parent="MapPieces" unique_id=639466142 instance=ExtResource("11_platform")]
+position = Vector2(720, 245)
+scale = Vector2(1.1, 1)
+
+[node name="BackDoorVisual" parent="MapPieces" unique_id=419329287 instance=ExtResource("15_passage")]
+position = Vector2(215, -284)
+
+[node name="SpawnFromAreaB" type="Marker2D" parent="MapPieces" unique_id=469624804 groups=["spawn_marker"]]
+position = Vector2(216, -108)
+
+[node name="SpawnFromLeftRoute" type="Marker2D" parent="MapPieces" unique_id=1108709010 groups=["spawn_marker"]]
+position = Vector2(-720, 413)
+
+[node name="FutureRoomDoor" parent="MapPieces" unique_id=1073442251 instance=ExtResource("15_passage")]
+position = Vector2(-838, 400)
+
+[node name="EnemyA" parent="." unique_id=2077421326 instance=ExtResource("8_enemy")]
+position = Vector2(180, 448)
+patrol_speed = 90.0
+
+[node name="EnemyB" parent="." unique_id=321413004 instance=ExtResource("8_enemy")]
+position = Vector2(760, 448)
+patrol_speed = 65.0
+
+[node name="Enemy2Melee" parent="." unique_id=1838970843 instance=ExtResource("16_enemy2")]
+position = Vector2(-265, 435)
+patrol_speed = 45.0
+
+[node name="Enemy2Ranged" parent="." unique_id=1751925998 instance=ExtResource("16_enemy2")]
+position = Vector2(-557, 428)
+behavior_mode = "ranged"
+patrol_speed = 30.0
+
+[node name="SplitEnemy" parent="." unique_id=1417756996 instance=ExtResource("18_split_enemy")]
+position = Vector2(607, 463)
+scale = Vector2(0.28, 0.28)
+speed = 55.0
+patrol_distance = 90.0
+
+[node name="SquidSlammer" parent="." unique_id=1966132719 instance=ExtResource("19_squid_monster")]
+position = Vector2(-423, 436)
+scale = Vector2(0.5, 0.5)
+detect_range = 360.0
+patrol_speed = 60.0
+patrol_distance = 120.0
+
+[node name="Shopkeeper" parent="." unique_id=2076228519 instance=ExtResource("9_shopkeeper")]
+position = Vector2(1080, 470)
+
+[node name="Transitions" type="Node2D" parent="." unique_id=1697368536]
+
+[node name="BackToAreaB" parent="Transitions" unique_id=1504170718 instance=ExtResource("7_transition")]
+position = Vector2(215, -284)
+target_scene = "res://scenes/test_area_b.tscn"
+target_spawn_marker_name = "SpawnFromRightRoute"
+message = "Returning"
+
+[node name="RouteLabel" type="Label" parent="Transitions/BackToAreaB" unique_id=1948245610]
+offset_left = -72.0
+offset_top = -124.0
+offset_right = 72.0
+offset_bottom = -88.0
+theme_override_font_sizes/font_size = 18
+text = "回去"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FutureRoomDoorTransition" parent="Transitions" unique_id=2084531583 instance=ExtResource("7_transition")]
+position = Vector2(-838, 400)
+target_scene = "res://scenes/left_route_room.tscn"
+target_spawn_marker_name = "SpawnFromRightRoute"
+enabled = true
+prompt_text = "按 E 進入新場景"

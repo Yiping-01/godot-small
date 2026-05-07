@@ -1,0 +1,290 @@
+[gd_scene format=3 uid="uid://dgcm5rlgbtx5k"]
+
+[ext_resource type="Script" uid="uid://dmh6bxvs50tj2" path="res://scripts/game_ui.gd" id="1_game_ui"]
+[ext_resource type="Texture2D" uid="uid://c5axbp8qpfwym" path="res://assets/Temporary_Art/kenney_ui-pack-pixel-adventure/Tiles/Large tiles/Thick outline/tile_0031.png" id="2_ui_corner"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prompt"]
+bg_color = Color(0.12, 0.16, 0.2, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.82, 0.42, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_panel"]
+bg_color = Color(0.0470588, 0.0588235, 0.0784314, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.69, 0.79, 0.86, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_area"]
+bg_color = Color(0.02, 0.025, 0.035, 0.78)
+border_width_bottom = 2
+border_color = Color(0.95, 0.82, 0.42, 1)
+
+[node name="GameUI" type="CanvasLayer" unique_id=1166697026]
+script = ExtResource("1_game_ui")
+
+[node name="PromptLabel" type="Label" parent="." unique_id=1718663739]
+offset_left = 440.0
+offset_top = 438.0
+offset_right = 776.0
+offset_bottom = 474.0
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_prompt")
+text = "按 E 互動"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ToastLabel" type="Label" parent="." unique_id=871566487]
+offset_left = 330.0
+offset_top = 96.0
+offset_right = 890.0
+offset_bottom = 142.0
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_prompt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CurrencyLabel" type="Label" parent="." unique_id=1971029866]
+offset_left = 930.0
+offset_top = 18.0
+offset_right = 1135.0
+offset_bottom = 54.0
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_prompt")
+text = "金錢：0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DialoguePanel" type="Panel" parent="." unique_id=1965653372]
+offset_left = 108.0
+offset_top = 462.0
+offset_right = 1068.0
+offset_bottom = 680.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark_panel")
+
+[node name="CornerIcon" type="TextureRect" parent="DialoguePanel" unique_id=1978718238]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 12.0
+offset_right = 46.0
+offset_bottom = 44.0
+texture = ExtResource("2_ui_corner")
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DialoguePanel" unique_id=887732489]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 18.0
+offset_right = 936.0
+offset_bottom = 198.0
+theme_override_constants/separation = 8
+
+[node name="NameLabel" type="Label" parent="DialoguePanel/VBoxContainer" unique_id=695882370]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "NPC"
+
+[node name="DialogueLabel" type="Label" parent="DialoguePanel/VBoxContainer" unique_id=258515903]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Dialogue"
+autowrap_mode = 3
+
+[node name="HintLabel" type="Label" parent="DialoguePanel/VBoxContainer" unique_id=1062539515]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "E：下一句 / Esc：關閉"
+horizontal_alignment = 2
+
+[node name="InventoryPanel" type="Panel" parent="." unique_id=19673269]
+offset_left = 748.0
+offset_top = 88.0
+offset_right = 1120.0
+offset_bottom = 426.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark_panel")
+
+[node name="CornerIcon" type="TextureRect" parent="InventoryPanel" unique_id=1336128634]
+layout_mode = 0
+offset_left = 318.0
+offset_top = 16.0
+offset_right = 350.0
+offset_bottom = 48.0
+texture = ExtResource("2_ui_corner")
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InventoryPanel" unique_id=1849282388]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 18.0
+offset_right = 350.0
+offset_bottom = 318.0
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="InventoryPanel/VBoxContainer" unique_id=1747025821]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "背包"
+
+[node name="CurrencyLabel" type="Label" parent="InventoryPanel/VBoxContainer" unique_id=1155244398]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "金錢：0"
+
+[node name="InventoryScroll" type="ScrollContainer" parent="InventoryPanel/VBoxContainer" unique_id=596442341]
+custom_minimum_size = Vector2(0, 190)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InventoryList" type="VBoxContainer" parent="InventoryPanel/VBoxContainer/InventoryScroll" unique_id=2141800356]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="CloseHintLabel" type="Label" parent="InventoryPanel/VBoxContainer" unique_id=1594903895]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "I 或 Esc：關閉"
+horizontal_alignment = 2
+
+[node name="ShopPanel" type="Panel" parent="." unique_id=1497807299]
+offset_left = 280.0
+offset_top = 118.0
+offset_right = 900.0
+offset_bottom = 572.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark_panel")
+
+[node name="CornerIcon" type="TextureRect" parent="ShopPanel" unique_id=687443696]
+layout_mode = 0
+offset_left = 568.0
+offset_top = 16.0
+offset_right = 600.0
+offset_bottom = 48.0
+texture = ExtResource("2_ui_corner")
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ShopPanel" unique_id=785486795]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = 598.0
+offset_bottom = 434.0
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="ShopPanel/VBoxContainer" unique_id=2021345409]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "商店"
+
+[node name="CurrencyLabel" type="Label" parent="ShopPanel/VBoxContainer" unique_id=193580269]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "金錢：0"
+
+[node name="ShopItem0" type="Button" parent="ShopPanel/VBoxContainer" unique_id=409122719]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Item 0"
+
+[node name="ShopItem1" type="Button" parent="ShopPanel/VBoxContainer" unique_id=456127145]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Item 1"
+
+[node name="ShopItem2" type="Button" parent="ShopPanel/VBoxContainer" unique_id=1439718459]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Item 2"
+
+[node name="CloseHintLabel" type="Label" parent="ShopPanel/VBoxContainer" unique_id=1737695030]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "點選購買 / I 或 Esc：關閉"
+horizontal_alignment = 2
+
+[node name="MapPanel" type="Panel" parent="." unique_id=1853996418]
+offset_left = 282.0
+offset_top = 82.0
+offset_right = 998.0
+offset_bottom = 590.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark_panel")
+
+[node name="CornerIcon" type="TextureRect" parent="MapPanel" unique_id=2120838275]
+layout_mode = 0
+offset_left = 664.0
+offset_top = 16.0
+offset_right = 696.0
+offset_bottom = 48.0
+texture = ExtResource("2_ui_corner")
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MapPanel" unique_id=364567894]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 18.0
+offset_right = 694.0
+offset_bottom = 488.0
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MapPanel/VBoxContainer" unique_id=815441179]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "區域地圖"
+
+[node name="MapCanvas" type="Control" parent="MapPanel/VBoxContainer" unique_id=1082915005]
+custom_minimum_size = Vector2(672, 380)
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="MapPanel/VBoxContainer" unique_id=1241300945]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "M 或 Esc：關閉"
+horizontal_alignment = 2
+
+[node name="AreaTitlePanel" type="Panel" parent="." unique_id=98173262]
+offset_left = 304.0
+offset_top = 86.0
+offset_right = 876.0
+offset_bottom = 186.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_area")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="AreaTitlePanel" unique_id=1971211139]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 548.0
+offset_bottom = 84.0
+
+[node name="SubTitleLabel" type="Label" parent="AreaTitlePanel/VBoxContainer" unique_id=251899707]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Prototype route"
+horizontal_alignment = 1
+
+[node name="MainTitleLabel" type="Label" parent="AreaTitlePanel/VBoxContainer" unique_id=712127997]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Forgotten Test Path"
+horizontal_alignment = 1
+
+[node name="FadeRect" type="ColorRect" parent="." unique_id=1989580094]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

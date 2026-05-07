@@ -1,0 +1,196 @@
+[gd_scene format=3 uid="uid://dyb73vxuvsilx"]
+
+[ext_resource type="Script" uid="uid://6df8hhstawla" path="res://main_menu.gd" id="1_2wh52"]
+[ext_resource type="Texture2D" uid="uid://ejy2h5onxyvy" path="res://assets/gamebg.png" id="2_ow34m"]
+[ext_resource type="Texture2D" uid="uid://cjk4441d25nx1" path="res://assets/useicon.png" id="3_l72w3"]
+[ext_resource type="FontFile" uid="uid://b6ccjvy4kce2u" path="res://fonts/DelaGothicOne-Regular.ttf" id="3_ow34m"]
+[ext_resource type="VideoStream" uid="uid://ctsia0f7yvjpq" path="res://assets/videos/newbg1_menu.ogv" id="4_newbg"]
+[ext_resource type="Texture2D" uid="uid://dw42skti743su" path="res://assets/bgtitle_cropped.png" id="5_title"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_menu_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2wh52"]
+bg_color = Color(0.99607843, 0.9843137, 0.95686275, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ow34m"]
+bg_color = Color(0.050980393, 0, 0, 1)
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l72w3"]
+bg_color = Color(0.06666667, 0.007843138, 0.02745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_826wr"]
+bg_color = Color(0.019607844, 0.039215688, 0.039215688, 1)
+
+[node name="MainMenu" type="Control" unique_id=1100919666]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2wh52")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=691179938]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="VideoStreamPlayer" parent="." unique_id=1227003275]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stream = ExtResource("4_newbg")
+autoplay = true
+expand = true
+buffering_msec = 1000
+
+[node name="StartButton" type="Button" parent="." unique_id=1464409435]
+layout_mode = 0
+offset_left = 362.0
+offset_top = 286.0
+offset_right = 662.0
+offset_bottom = 346.0
+theme_override_colors/font_color = Color(0.72, 0.86, 0.96, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.78, 0.9, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.01, 0.17, 0.34, 0.85)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_ow34m")
+theme_override_font_sizes/font_size = 38
+theme_override_styles/normal = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_menu_button")
+text = "開始新篇章"
+flat = true
+
+[node name="ContinueButton" type="Button" parent="." unique_id=1826477223]
+layout_mode = 0
+offset_left = 362.0
+offset_top = 366.0
+offset_right = 662.0
+offset_bottom = 426.0
+theme_override_colors/font_color = Color(0.42, 0.62, 0.78, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.78, 0.9, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.01, 0.17, 0.34, 0.85)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_ow34m")
+theme_override_font_sizes/font_size = 38
+theme_override_styles/normal = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_menu_button")
+text = "繼續遊戲"
+flat = true
+
+[node name="QuitButton" type="Button" parent="." unique_id=1507074415]
+layout_mode = 0
+offset_left = 362.0
+offset_top = 446.0
+offset_right = 662.0
+offset_bottom = 506.0
+theme_override_colors/font_color = Color(0.42, 0.62, 0.78, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.78, 0.9, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.01, 0.17, 0.34, 0.85)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_ow34m")
+theme_override_font_sizes/font_size = 38
+theme_override_styles/normal = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_menu_button")
+text = "離開遊戲"
+flat = true
+
+[node name="TitleImage" type="TextureRect" parent="." unique_id=1787231883]
+layout_mode = 0
+offset_left = 104.99999
+offset_top = 27.0
+offset_right = 1185.0
+offset_bottom = 327.0
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("5_title")
+
+[node name="SettingsButton" type="Button" parent="." unique_id=1411559680]
+layout_mode = 0
+offset_left = 922.0
+offset_top = -5.0
+offset_right = 994.0
+offset_bottom = 46.0
+scale = Vector2(4, 4)
+icon = ExtResource("3_l72w3")
+flat = true
+
+[node name="SettingsPanel" type="Panel" parent="." unique_id=1712750936]
+visible = false
+modulate = Color(0.9764706, 0.99215686, 0.98039216, 1)
+self_modulate = Color(0.972549, 0.96862745, 0.96862745, 1)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -250.0
+offset_right = 400.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2wh52")
+
+[node name="TextureRect" type="TextureRect" parent="SettingsPanel" unique_id=1582431168]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_ow34m")
+
+[node name="Label" type="Label" parent="SettingsPanel" unique_id=157332602]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 179.0
+offset_right = 182.0
+offset_bottom = 242.0
+theme_override_colors/font_color = Color(0.019607844, 0.043137256, 0.043137256, 1)
+theme_override_font_sizes/font_size = 45
+text = "音量"
+
+[node name="HSlider" type="HSlider" parent="SettingsPanel" unique_id=551488419]
+modulate = Color(0.98039216, 0.96862745, 0.9607843, 1)
+self_modulate = Color(0.019607844, 0, 0.007843138, 1)
+layout_mode = 0
+offset_left = 209.0
+offset_top = 204.0
+offset_right = 668.0
+offset_bottom = 220.0
+theme_override_styles/slider = SubResource("StyleBoxFlat_ow34m")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_l72w3")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_826wr")
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Button" type="Button" parent="SettingsPanel" unique_id=1941935754]
+layout_mode = 0
+offset_left = 285.0
+offset_top = 381.0
+offset_right = 482.0
+offset_bottom = 463.0
+theme_override_font_sizes/font_size = 32
+text = "返回"

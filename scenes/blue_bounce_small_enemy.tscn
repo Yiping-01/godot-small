@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/blue_bounce_small_enemy.gd" id="2_script"]
+[node name="BlueBounceSmallEnemy" instance=ExtResource("1_enemy")]
+script = ExtResource("2_script")
+coin_drop_amount = 1
+bounce_min = Vector2(-640, 90)
+bounce_max = Vector2(295, 370)
+[node name="Sprite2D" parent="." index="0"]
+modulate = Color(0.45, 0.78, 1, 1)

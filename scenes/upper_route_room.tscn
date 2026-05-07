@@ -1,0 +1,219 @@
+[gd_scene format=3 uid="uid://dcnmdunvdpd7o"]
+
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="2_health_ui"]
+[ext_resource type="Script" path="res://scripts/respawn_point.gd" id="3_respawn_point"]
+[ext_resource type="PackedScene" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="Script" uid="uid://cjg0ursmhf37w" path="res://scripts/room_manager.gd" id="5_room_manager"]
+[ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="6_area_title"]
+[ext_resource type="PackedScene" path="res://scenes/room_transition.tscn" id="7_transition"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="8_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/npc_shopkeeper.tscn" id="9_shopkeeper"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="10_floor"]
+[ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="11_platform"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="12_wall"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall_jump.tscn" id="13_wall_jump"]
+[ext_resource type="PackedScene" uid="uid://uj0vu7eph4ga" path="res://scenes/map_ceiling.tscn" id="14_ceiling"]
+[ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="15_passage"]
+[ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="16_v10j6"]
+[ext_resource type="PackedScene" path="res://scenes/bench.tscn" id="17_oqwvp"]
+[ext_resource type="Script" path="res://scripts/exit_menu.gd" id="18_exit_menu"]
+
+[node name="UpperRouteRoom" type="Node2D" unique_id=1241468937]
+script = ExtResource("5_room_manager")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1326435961]
+script = ExtResource("2_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=371676420]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=1532978904]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=807031334]
+process_mode = 3
+layer = 20
+script = ExtResource("18_exit_menu")
+
+[node name="ExitPanel" type="Panel" parent="ExitMenu" unique_id=214160055]
+process_mode = 3
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ExitMenu/ExitPanel" unique_id=1063229214]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -97.0
+offset_top = 19.0
+offset_right = 81.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "確認退出?"
+horizontal_alignment = 1
+
+[node name="NoButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=1476810590]
+process_mode = 3
+layout_mode = 0
+offset_left = 293.0
+offset_top = 117.0
+offset_right = 352.0
+offset_bottom = 167.0
+theme_override_font_sizes/font_size = 30
+text = "NO"
+
+[node name="YesButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=972392907]
+process_mode = 3
+layout_mode = 0
+offset_left = 120.0
+offset_top = 112.0
+offset_right = 179.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 30
+text = "YES"
+
+[node name="GameUI" parent="." unique_id=1912710595 instance=ExtResource("4_game_ui")]
+
+[node name="Background" type="Polygon2D" parent="." unique_id=728941759]
+z_index = -10
+color = Color(0.035, 0.052, 0.068, 1)
+polygon = PackedVector2Array(-900, -260, 1700, -260, 1700, 760, -900, 760)
+
+[node name="AreaTitleTrigger" parent="." unique_id=1365218763 instance=ExtResource("6_area_title")]
+position = Vector2(-650, 330)
+main_title = "Upper Route"
+sub_title = "Prototype room"
+
+[node name="Player" parent="." unique_id=15038745 instance=ExtResource("1_player")]
+position = Vector2(-650, 330)
+
+[node name="RespawnPoint" type="Marker2D" parent="." unique_id=1823104080]
+position = Vector2(-650, 330)
+script = ExtResource("3_respawn_point")
+
+[node name="SpawnFromAreaB" type="Marker2D" parent="." unique_id=1789555388 groups=["spawn_marker"]]
+position = Vector2(-650, 330)
+
+[node name="MapPieces" type="Node2D" parent="." unique_id=10646351]
+
+[node name="MainFloor" parent="MapPieces" unique_id=17672690 instance=ExtResource("10_floor")]
+position = Vector2(58, 472)
+scale = Vector2(6.5, 1)
+
+[node name="LeftWall" parent="MapPieces" unique_id=1725581500 instance=ExtResource("12_wall")]
+position = Vector2(-798, 166)
+scale = Vector2(1, 3)
+
+[node name="RightWall" parent="MapPieces" unique_id=1054272252 instance=ExtResource("12_wall")]
+position = Vector2(1637, 148)
+scale = Vector2(1, 3)
+
+[node name="Ceiling" parent="MapPieces" unique_id=573076279 instance=ExtResource("14_ceiling")]
+position = Vector2(165, -434)
+scale = Vector2(7, 1)
+
+[node name="WallJumpWall" parent="MapPieces" unique_id=1572510159 instance=ExtResource("13_wall_jump")]
+position = Vector2(1377, -601)
+scale = Vector2(1, 1.6)
+
+[node name="PlatformA" parent="MapPieces" unique_id=502052974 instance=ExtResource("11_platform")]
+position = Vector2(535, -435)
+scale = Vector2(1.2, 1)
+
+[node name="PlatformB" parent="MapPieces" unique_id=475891989 instance=ExtResource("11_platform")]
+position = Vector2(996, 463)
+scale = Vector2(1.1, 1)
+
+[node name="BackDoorVisual" parent="MapPieces" unique_id=1392800201 instance=ExtResource("15_passage")]
+position = Vector2(-737, 368)
+
+[node name="PlatformB2" parent="MapPieces" unique_id=1272438793 instance=ExtResource("11_platform")]
+position = Vector2(1424, 463)
+scale = Vector2(2, 1)
+
+[node name="Enemy" parent="." unique_id=1453808210 instance=ExtResource("8_enemy")]
+position = Vector2(656, 987)
+patrol_speed = 80.0
+
+[node name="GuideNpc2" parent="." unique_id=1698787943 instance=ExtResource("9_shopkeeper")]
+position = Vector2(706, 410)
+display_name = "旅人"
+prompt_text = "按 E 對話"
+opens_shop = false
+dialogue_lines = Array[String](["前面會開始會有敵人，可以善用前面學到的技巧", "Z是跳躍，X是攻擊，順帶一提 按下C可進行衝刺！", "小心尖刺陷阱，碰到了可是會扣血的。"])
+
+[node name="GuideNpc" parent="." unique_id=1698212651 instance=ExtResource("9_shopkeeper")]
+position = Vector2(421, 412)
+display_name = "旅人"
+prompt_text = "按 E 對話"
+opens_shop = false
+dialogue_lines = Array[String](["前面會開始會有敵人，可以善用前面學到的技巧", "Z是跳躍，X是攻擊，順帶一提 按下C可進行衝刺！", "小心尖刺陷阱，碰到了可是會扣血的。"])
+
+[node name="Shopkeeper" parent="." unique_id=2033117886 instance=ExtResource("9_shopkeeper")]
+position = Vector2(136, 414)
+
+[node name="Transitions" type="Node2D" parent="." unique_id=2063469550]
+
+[node name="BackToAreaB" parent="Transitions" unique_id=1674285347 instance=ExtResource("7_transition")]
+position = Vector2(-736, 350)
+target_scene = "res://scenes/test_area_b.tscn"
+target_position = Vector2(2150, 6)
+target_spawn_marker_name = "SpawnFromUpperRoute"
+message = "Returning"
+
+[node name="RouteLabel" type="Label" parent="Transitions/BackToAreaB" unique_id=945888797]
+offset_left = -72.0
+offset_top = -124.0
+offset_right = 72.0
+offset_bottom = -88.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightExitVisual" parent="Transitions/BackToAreaB/RouteLabel" unique_id=1975747526 instance=ExtResource("15_passage")]
+position = Vector2(1974, 341)
+
+[node name="ShopTutorial" parent="." unique_id=1556699506 instance=ExtResource("16_v10j6")]
+position = Vector2(156, 330)
+scale = Vector2(2.4586859, 1.4628489)
+tutorial_text = "商人可以購買物品。按 I 可以打開背包。"
+
+[node name="PathToRightRoom" parent="ShopTutorial" unique_id=2097866661 instance=ExtResource("7_transition")]
+position = Vector2(407.5348, 198.24329)
+target_scene = "res://scenes/right_route_room.tscn"
+target_spawn_marker_name = "SpawnFromAreaB"
+prompt_text = "前往右側房間（之後製作）"
+
+[node name="RouteLabel" type="Label" parent="ShopTutorial/PathToRightRoom" unique_id=1279935109]
+offset_left = -92.0
+offset_top = -124.0
+offset_right = 92.0
+offset_bottom = -88.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Bench" parent="." unique_id=278616665 instance=ExtResource("17_oqwvp")]
+position = Vector2(1444, 411)

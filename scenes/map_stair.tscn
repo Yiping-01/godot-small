@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://ct4e7sjlcrca"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_step"]
+size = Vector2(96, 28)
+
+[node name="MapStair" type="Node2D" unique_id=1510111164]
+
+[node name="Step0" type="StaticBody2D" parent="." unique_id=1974455573]
+position = Vector2(0, 84)
+collision_mask = 0
+
+[node name="Visual" type="Polygon2D" parent="Step0" unique_id=299986105]
+color = Color(0.24, 0.31, 0.3, 1)
+polygon = PackedVector2Array(-48, -14, 48, -14, 48, 14, -48, 14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Step0" unique_id=1558577056]
+shape = SubResource("RectangleShape2D_step")

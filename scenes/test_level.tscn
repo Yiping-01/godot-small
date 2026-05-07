@@ -1,0 +1,403 @@
+[gd_scene format=3 uid="uid://mb8lu872ndo7"]
+
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="1_player_scene"]
+[ext_resource type="PackedScene" uid="uid://0jam8o6gwigo" path="res://scenes/enemy.tscn" id="2_enemy_scene"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="3_health_ui"]
+[ext_resource type="Script" uid="uid://hid4uidnrebp" path="res://scripts/respawn_point.gd" id="4_respawn_point"]
+[ext_resource type="PackedScene" path="res://scenes/game_ui.tscn" id="5_game_ui"]
+[ext_resource type="PackedScene" path="res://scenes/npc_shopkeeper.tscn" id="6_npc"]
+[ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="7_area_title"]
+[ext_resource type="PackedScene" path="res://scenes/breakable_wall.tscn" id="8_breakable_wall"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="9_floor"]
+[ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="10_platform"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="11_wall"]
+[ext_resource type="PackedScene" uid="uid://ct4e7sjlcrca" path="res://scenes/map_stair.tscn" id="12_stair"]
+[ext_resource type="PackedScene" path="res://scenes/spike_hazard.tscn" id="13_spike"]
+[ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="14_tutorial"]
+[ext_resource type="Script" uid="uid://cjg0ursmhf37w" path="res://scripts/room_manager.gd" id="15_room_manager"]
+[ext_resource type="PackedScene" uid="uid://uj0vu7eph4ga" path="res://scenes/map_ceiling.tscn" id="16_ceiling"]
+[ext_resource type="PackedScene" path="res://scenes/bench.tscn" id="17_bench"]
+[ext_resource type="PackedScene" path="res://scenes/room_transition.tscn" id="18_transition"]
+[ext_resource type="PackedScene" path="res://scenes/camera_room_zone.tscn" id="19_camera_room"]
+[ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="20_passage"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="21_map_room"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall_jump.tscn" id="22_wall_jump"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="23_exit_menu"]
+
+[node name="TestLevel" type="Node2D" unique_id=915038012]
+script = ExtResource("15_room_manager")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=961800230]
+script = ExtResource("3_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=1940667592]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=290972961]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=1653733188]
+process_mode = 3
+layer = 20
+script = ExtResource("23_exit_menu")
+
+[node name="ExitPanel" type="Panel" parent="ExitMenu" unique_id=1562778182]
+process_mode = 3
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ExitMenu/ExitPanel" unique_id=932422154]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -97.0
+offset_top = 19.0
+offset_right = 81.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "確認退出?"
+horizontal_alignment = 1
+
+[node name="NoButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=629981882]
+process_mode = 3
+layout_mode = 0
+offset_left = 293.0
+offset_top = 117.0
+offset_right = 352.0
+offset_bottom = 167.0
+theme_override_font_sizes/font_size = 30
+text = "NO"
+
+[node name="YesButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=1888868381]
+process_mode = 3
+layout_mode = 0
+offset_left = 120.0
+offset_top = 112.0
+offset_right = 179.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 30
+text = "YES"
+
+[node name="GameUI" parent="." unique_id=378265555 instance=ExtResource("5_game_ui")]
+
+[node name="Background" type="Polygon2D" parent="." unique_id=1432587064]
+z_index = -10
+position = Vector2(181, 300)
+scale = Vector2(1.8938315, -1.4037557)
+color = Color(0.055, 0.075, 0.11, 1)
+polygon = PackedVector2Array(-900, -620, 3600, -620, 3600, 900, 1361.3906, 900.0001, -900, 900)
+
+[node name="AreaTitleTrigger" parent="." unique_id=1400893370 instance=ExtResource("7_area_title")]
+position = Vector2(-512, 417)
+main_title = "遺忘小徑"
+sub_title = "教學區域"
+
+[node name="Player" parent="." unique_id=1665882994 instance=ExtResource("1_player_scene")]
+position = Vector2(-702, 97)
+
+[node name="RespawnPoint" type="Marker2D" parent="." unique_id=1899706415]
+position = Vector2(-430, 428)
+script = ExtResource("4_respawn_point")
+
+[node name="GuideNpc" parent="." unique_id=1090816064 instance=ExtResource("6_npc")]
+position = Vector2(4611, 129)
+display_name = "旅人"
+prompt_text = "按 E 對話"
+opens_shop = false
+dialogue_lines = Array[String](["前面會開始會有敵人，可以善用前面學到的技巧", "Z是跳躍，X是攻擊，順帶一提 按下C可進行衝刺！", "小心尖刺陷阱，碰到了可是會扣血的。"])
+
+[node name="Enemy" parent="." unique_id=523172079 instance=ExtResource("2_enemy_scene")]
+position = Vector2(6141, 120)
+patrol_speed = 90.0
+
+[node name="MerchantNpc" parent="." unique_id=692672395 instance=ExtResource("6_npc")]
+position = Vector2(2725, 1046)
+prompt_text = "按 E 商店"
+dialogue_lines = Array[String](["你可以用金錢購買測試物品。", "按 I 可以打開背包查看。"])
+shop_items = Array[Dictionary]([{
+"description": "測試用商店物品。",
+"name": "生命碎片",
+"price": 1
+}, {
+"description": "測試用移動物品。",
+"name": "迅捷徽章",
+"price": 2
+}, {
+"description": "測試用地圖物品。",
+"name": "地圖筆記",
+"price": 3
+}])
+
+[node name="Bench" parent="." unique_id=1853480713 instance=ExtResource("17_bench")]
+position = Vector2(3632, 449)
+
+[node name="SecondRoomEnemy" parent="." unique_id=367524631 instance=ExtResource("2_enemy_scene")]
+position = Vector2(5154, -61)
+patrol_speed = 80.0
+
+[node name="MapPieces" type="Node2D" parent="." unique_id=146510037]
+
+[node name="LeftBoundaryWall" parent="MapPieces" unique_id=810335717 instance=ExtResource("11_wall")]
+position = Vector2(-773, 261)
+scale = Vector2(1, 2.7029095)
+
+[node name="LeftBoundaryWall" parent="MapPieces/LeftBoundaryWall" unique_id=1564225776 instance=ExtResource("11_wall")]
+position = Vector2(7631, -173.14676)
+scale = Vector2(1, 2.7029095)
+
+[node name="StartFloor" parent="MapPieces" unique_id=699961654 instance=ExtResource("9_floor")]
+position = Vector2(-340, 533)
+scale = Vector2(3.2, 1)
+
+[node name="JumpStair" parent="MapPieces" unique_id=297405747 instance=ExtResource("12_stair")]
+position = Vector2(-701, 411)
+
+[node name="WallApproachFloor" parent="MapPieces" unique_id=342635182 instance=ExtResource("9_floor")]
+position = Vector2(237, 533)
+scale = Vector2(1.75, 1)
+
+[node name="BreakableWall2" parent="MapPieces" unique_id=885578957 instance=ExtResource("8_breakable_wall")]
+position = Vector2(1131, 408.99997)
+scale = Vector2(0.7343143, 1.4933697)
+
+[node name="BreakableWall" parent="MapPieces" unique_id=700437248 instance=ExtResource("8_breakable_wall")]
+position = Vector2(307.00003, 407)
+scale = Vector2(-0.8578347, 1.3375707)
+
+[node name="GuideFloor" parent="MapPieces" unique_id=2115117984 instance=ExtResource("9_floor")]
+position = Vector2(616, 533)
+scale = Vector2(1.2, 1)
+
+[node name="CombatFloor" parent="MapPieces" unique_id=1581215316 instance=ExtResource("9_floor")]
+position = Vector2(1071, 533)
+scale = Vector2(2.35, 1)
+
+[node name="CombatLeftWall" parent="MapPieces" unique_id=667646359 instance=ExtResource("11_wall")]
+position = Vector2(2202, 1120)
+
+[node name="CombatRightLowWall" parent="MapPieces" unique_id=188220515 instance=ExtResource("11_wall")]
+position = Vector2(2314, 1215)
+scale = Vector2(1, 0.65)
+
+[node name="SpikeExample" parent="MapPieces" unique_id=1039597245 instance=ExtResource("13_spike")]
+position = Vector2(5020, 136)
+
+[node name="SpikeExample" parent="MapPieces/SpikeExample" unique_id=983620650 instance=ExtResource("13_spike")]
+position = Vector2(163, 1)
+
+[node name="SpikeExample" parent="MapPieces/SpikeExample/SpikeExample" unique_id=598783024 instance=ExtResource("13_spike")]
+position = Vector2(163, 1)
+
+[node name="MerchantFloor" parent="MapPieces" unique_id=83288862 instance=ExtResource("9_floor")]
+position = Vector2(1640, 533)
+scale = Vector2(2.15, 1)
+
+[node name="SameMapPassageFloor" parent="MapPieces" unique_id=2078384523 instance=ExtResource("9_floor")]
+position = Vector2(2070, 573)
+scale = Vector2(1.25, 1)
+
+[node name="SecondRoomFloor" parent="MapPieces" unique_id=1379490519 instance=ExtResource("9_floor")]
+position = Vector2(2348, 505)
+scale = Vector2(-0.92577404, 3.846349)
+
+[node name="SecondRoomFloor" parent="MapPieces/SecondRoomFloor" unique_id=547713664 instance=ExtResource("9_floor")]
+position = Vector2(-248.44077, -23.658798)
+scale = Vector2(-0.92577404, 1.9909544)
+
+[node name="ExitFloor" parent="MapPieces" unique_id=465296227 instance=ExtResource("9_floor")]
+position = Vector2(3124, 574)
+scale = Vector2(3.4, 1)
+
+[node name="ExitFloor" parent="MapPieces/ExitFloor" unique_id=973619619 instance=ExtResource("9_floor")]
+position = Vector2(256.4706, 0)
+
+[node name="WallJumpPracticeWall" parent="MapPieces" unique_id=1255545658 instance=ExtResource("22_wall_jump")]
+position = Vector2(5632, 378)
+scale = Vector2(50, 2)
+
+[node name="UpperPlatform" parent="MapPieces" unique_id=1091960224 instance=ExtResource("10_platform")]
+position = Vector2(3633.0002, 513)
+scale = Vector2(1.7592763, 2.351108)
+
+[node name="UpperPlatform" parent="MapPieces/UpperPlatform" unique_id=1085097966 instance=ExtResource("10_platform")]
+position = Vector2(1160.1359, 256.90012)
+
+[node name="FloatingPlatformExample" parent="MapPieces" unique_id=1627150681 instance=ExtResource("10_platform")]
+position = Vector2(2810, 764)
+
+[node name="FloatingPlatformExample" parent="MapPieces/FloatingPlatformExample" unique_id=1382507180 instance=ExtResource("10_platform")]
+position = Vector2(2351, -758)
+scale = Vector2(1.7199903, 1)
+
+[node name="LoadingDoorVisual" parent="MapPieces" unique_id=241054014 instance=ExtResource("20_passage")]
+position = Vector2(5024, 1075)
+
+[node name="SecondRoomRightWall" parent="MapPieces" unique_id=2029591030 instance=ExtResource("11_wall")]
+position = Vector2(5267, 1052)
+scale = Vector2(1, 1.05)
+
+[node name="Ceilings" type="Node2D" parent="MapPieces" unique_id=393989255]
+
+[node name="CeilingA" parent="MapPieces/Ceilings" unique_id=307349499 instance=ExtResource("16_ceiling")]
+position = Vector2(1677, 475)
+scale = Vector2(-1.8639951, -1.3828799)
+
+[node name="CeilingB" parent="MapPieces/Ceilings" unique_id=955763838 instance=ExtResource("16_ceiling")]
+position = Vector2(-104, 78)
+scale = Vector2(1.4244201, 3.768108)
+
+[node name="CeilingB" parent="MapPieces/Ceilings/CeilingB" unique_id=2088948770 instance=ExtResource("16_ceiling")]
+position = Vector2(99.68969, 9.81925)
+scale = Vector2(-1.4580525, -1.5218396)
+
+[node name="CeilingB" parent="MapPieces/Ceilings/CeilingB/CeilingB" unique_id=1978005448 instance=ExtResource("16_ceiling")]
+position = Vector2(-3212.994, 76.380394)
+scale = Vector2(-1.4580525, -1.5218396)
+
+[node name="CeilingB" parent="MapPieces/Ceilings/CeilingB/CeilingB/CeilingB" unique_id=818915938 instance=ExtResource("16_ceiling")]
+position = Vector2(-243.37923, -24.98017)
+scale = Vector2(-0.8991537, -0.8995916)
+
+[node name="CeilingB" parent="MapPieces/Ceilings/CeilingB/CeilingB/CeilingB/CeilingB" unique_id=67213876 instance=ExtResource("16_ceiling")]
+position = Vector2(60.471893, 4.2165585)
+scale = Vector2(-0.46151114, -0.878425)
+
+[node name="CeilingC" parent="MapPieces/Ceilings" unique_id=166174938 instance=ExtResource("16_ceiling")]
+position = Vector2(401.99997, 151)
+scale = Vector2(-2.3948088, 7.2225356)
+
+[node name="CeilingC" parent="MapPieces/Ceilings/CeilingC" unique_id=1507929224 instance=ExtResource("16_ceiling")]
+position = Vector2(-271.00278, -0.96918863)
+scale = Vector2(-1.1198477, -0.9573917)
+
+[node name="CeilingD" parent="MapPieces/Ceilings" unique_id=927889483 instance=ExtResource("16_ceiling")]
+position = Vector2(1905, 1007)
+scale = Vector2(2, 1)
+
+[node name="CeilingE" parent="MapPieces/Ceilings" unique_id=1454890487 instance=ExtResource("16_ceiling")]
+position = Vector2(1915, 1135)
+scale = Vector2(2, 1)
+
+[node name="SecondRoomCeilingA" parent="MapPieces/Ceilings" unique_id=234276398 instance=ExtResource("16_ceiling")]
+position = Vector2(5814, 121.00001)
+scale = Vector2(3, 1.5)
+
+[node name="SecondRoomCeilingA" parent="MapPieces/Ceilings/SecondRoomCeilingA" unique_id=1974918623 instance=ExtResource("16_ceiling")]
+position = Vector2(299.3333, 1.3333282)
+
+[node name="SecondRoomCeilingB" parent="MapPieces/Ceilings" unique_id=1976415173 instance=ExtResource("16_ceiling")]
+position = Vector2(4735, 1027)
+scale = Vector2(-0.67636496, -6.04585)
+
+[node name="CameraRooms" type="Node2D" parent="." unique_id=700730949]
+visible = false
+
+[node name="FirstRoomCameraZone" parent="CameraRooms" unique_id=1217773700 instance=ExtResource("19_camera_room")]
+position = Vector2(690, 320)
+scale = Vector2(4.25, 1.6)
+limit_left = -650
+limit_top = 80
+limit_right = 2050
+limit_bottom = 560
+
+[node name="SecondRoomCameraZone" parent="CameraRooms" unique_id=122578085 instance=ExtResource("19_camera_room")]
+position = Vector2(2725, 320)
+scale = Vector2(2.1, 1.6)
+limit_left = 2050
+limit_top = 80
+limit_right = 3440
+limit_bottom = 560
+
+[node name="RoomCutGates" type="Node2D" parent="." unique_id=599427804]
+
+[node name="MapRooms" type="Node2D" parent="." unique_id=1162087050]
+visible = false
+
+[node name="TutorialRoomMarker" parent="MapRooms" unique_id=608160983 instance=ExtResource("21_map_room")]
+position = Vector2(690, 320)
+scale = Vector2(4.25, 1.6)
+room_id = "tutorial_route"
+display_name = "教學路線"
+map_rect = Rect2(70, 230, 340, 70)
+
+[node name="RestRoomMarker" parent="MapRooms" unique_id=666304189 instance=ExtResource("21_map_room")]
+position = Vector2(2725, 320)
+scale = Vector2(2.1, 1.6)
+room_id = "rest_room"
+display_name = "休息房間"
+map_rect = Rect2(420, 230, 180, 70)
+
+[node name="TutorialTriggers" type="Node2D" parent="." unique_id=284685651]
+
+[node name="JumpTutorial" parent="TutorialTriggers" unique_id=1204013737 instance=ExtResource("14_tutorial")]
+position = Vector2(1683.9999, 407.00003)
+scale = Vector2(1.9230357, 1.1988077)
+tutorial_text = "按 Z 可進行跳躍"
+
+[node name="AttackTutorial" parent="TutorialTriggers" unique_id=913876435 instance=ExtResource("14_tutorial")]
+position = Vector2(218, 404)
+tutorial_text = "按 X 可進行攻擊"
+
+[node name="NpcTutorial" parent="TutorialTriggers" unique_id=1818894192 instance=ExtResource("14_tutorial")]
+position = Vector2(216, -245)
+tutorial_text = "靠近 NPC 後按 E 對話。"
+
+[node name="DashTutorial" parent="TutorialTriggers" unique_id=988932221 instance=ExtResource("14_tutorial")]
+position = Vector2(745, -452)
+tutorial_text = "按 C 可以短衝刺。衝刺可用來快速接近敵人或越過小空隙。"
+
+[node name="CombatTutorial" parent="TutorialTriggers" unique_id=1389654808 instance=ExtResource("14_tutorial")]
+position = Vector2(1187, -461)
+tutorial_text = "敵人會造成傷害。跳起來後按 S+X 可以下砍，命中敵人會把你往上彈。"
+
+[node name="ShopTutorial" parent="TutorialTriggers" unique_id=1363279207 instance=ExtResource("14_tutorial")]
+position = Vector2(1599, -321)
+tutorial_text = "商人可以購買物品。按 I 可以打開背包。"
+
+[node name="PassageTutorial" parent="TutorialTriggers" unique_id=288207255 instance=ExtResource("14_tutorial")]
+position = Vector2(2011, -326)
+tutorial_text = "穿過通道可以前往下一段區域。鏡頭會持續跟著角色。"
+
+[node name="WallJumpTutorial" parent="TutorialTriggers" unique_id=478452426 instance=ExtResource("14_tutorial")]
+position = Vector2(4334, 367)
+scale = Vector2(-1.2594721, 2.5704293)
+tutorial_text = "貼著牆壁按下 Z 可使用蹬牆跳"
+
+[node name="BenchTutorial" parent="TutorialTriggers" unique_id=603598183 instance=ExtResource("14_tutorial")]
+position = Vector2(3629.9998, 408)
+scale = Vector2(3.4357285, 1.6309545)
+tutorial_text = "靠近長椅按 E 坐下休息，生命會回滿。再按 E 起身。"
+
+[node name="JumpTutorial2" parent="TutorialTriggers" unique_id=1683550228 instance=ExtResource("14_tutorial")]
+position = Vector2(2225, 374)
+scale = Vector2(-2.5043871, 2.05453)
+tutorial_text = "按下兩下 Z 可進行二段跳"
+
+[node name="Transitions" type="Node2D" parent="." unique_id=352503280]
+
+[node name="LoadingDoor" parent="Transitions" unique_id=1874514314 instance=ExtResource("18_transition")]
+position = Vector2(6784, -11)
+target_scene = "res://scenes/test_area_b.tscn"
+target_position = Vector2(-520, 128)
+target_spawn_marker_name = "SpawnFromTutorial"

@@ -1,0 +1,150 @@
+[gd_scene format=3 uid="uid://8isu01woqswh"]
+
+[ext_resource type="Script" uid="uid://dwkm62ow0d40d" path="res://intro.gd" id="1_intro"]
+[ext_resource type="Texture2D" uid="uid://c43m5vgq8beye" path="res://assets/title_bg.png" id="2_title_bg"]
+
+[node name="Intro" type="Control" unique_id=1894945478]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_intro")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1401180178]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_title_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Vignette" type="ColorRect" parent="." unique_id=2050282870]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.28)
+
+[node name="TopTextLabel" type="Label" parent="." unique_id=1134835145]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -470.0
+offset_top = -150.0
+offset_right = 470.0
+offset_bottom = -92.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.88, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.38, 0.74, 1, 0.65)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_font_sizes/font_size = 34
+text = "深邃且寂靜的大海之中。"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DividerLeft" type="ColorRect" parent="." unique_id=1047554865]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -78.0
+offset_right = -28.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.74, 0.88, 1, 0.55)
+
+[node name="DividerCenter" type="Label" parent="." unique_id=616724926]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -94.0
+offset_right = 28.0
+offset_bottom = -58.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.78, 0.91, 1, 0.8)
+theme_override_font_sizes/font_size = 25
+text = "◇"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DividerRight" type="ColorRect" parent="." unique_id=1858502523]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 28.0
+offset_top = -78.0
+offset_right = 300.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.74, 0.88, 1, 0.55)
+
+[node name="TextLabel" type="Label" parent="." unique_id=623336247]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -760.0
+offset_top = -42.0
+offset_right = 760.0
+offset_bottom = 76.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.96, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.32, 0.69, 1, 0.75)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PromptLabel" type="Label" parent="." unique_id=912077449]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = 238.0
+offset_right = 260.0
+offset_bottom = 290.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.78, 0.9, 1, 0.95)
+theme_override_colors/font_shadow_color = Color(0.25, 0.6, 1, 0.6)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_font_sizes/font_size = 28
+text = "按 Enter 繼續"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Timer" type="Timer" parent="." unique_id=1040758116]

@@ -1,0 +1,330 @@
+[gd_scene format=3 uid="uid://dmvp85e4hbm62"]
+
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="1_player_scene"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="2_health_ui"]
+[ext_resource type="Script" uid="uid://hid4uidnrebp" path="res://scripts/respawn_point.gd" id="3_respawn_point"]
+[ext_resource type="PackedScene" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="5_floor"]
+[ext_resource type="PackedScene" path="res://scenes/bench.tscn" id="6_bench"]
+[ext_resource type="Script" uid="uid://cjg0ursmhf37w" path="res://scripts/room_manager.gd" id="7_room_manager"]
+[ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="8_area_title"]
+[ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="9_a1kji"]
+[ext_resource type="PackedScene" path="res://scenes/room_transition.tscn" id="9_transition"]
+[ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="10_platform"]
+[ext_resource type="PackedScene" path="res://scenes/spike_hazard.tscn" id="11_spike"]
+[ext_resource type="PackedScene" uid="uid://0jam8o6gwigo" path="res://scenes/enemy.tscn" id="12_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="13_bs8s6"]
+[ext_resource type="PackedScene" path="res://scenes/camera_room_zone.tscn" id="13_camera_room"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall_jump.tscn" id="14_a1kji"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="14_map_room"]
+[ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="15_passage"]
+[ext_resource type="Script" path="res://scripts/exit_menu.gd" id="16_exit_menu"]
+
+[node name="CrossroadsDownPrototype" type="Node2D" unique_id=1443428261]
+script = ExtResource("7_room_manager")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1322202201]
+script = ExtResource("2_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=144977073]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=1910852837]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=1617796164]
+process_mode = 3
+layer = 20
+script = ExtResource("16_exit_menu")
+
+[node name="ExitPanel" type="Panel" parent="ExitMenu" unique_id=1877439512]
+process_mode = 3
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ExitMenu/ExitPanel" unique_id=2065878398]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -97.0
+offset_top = 19.0
+offset_right = 81.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "確認退出?"
+horizontal_alignment = 1
+
+[node name="NoButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=1778705611]
+process_mode = 3
+layout_mode = 0
+offset_left = 293.0
+offset_top = 117.0
+offset_right = 352.0
+offset_bottom = 167.0
+theme_override_font_sizes/font_size = 30
+text = "NO"
+
+[node name="YesButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=712543377]
+process_mode = 3
+layout_mode = 0
+offset_left = 120.0
+offset_top = 112.0
+offset_right = 179.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 30
+text = "YES"
+
+[node name="GameUI" parent="." unique_id=882883767 instance=ExtResource("4_game_ui")]
+
+[node name="Background" type="Polygon2D" parent="." unique_id=1806013309]
+z_index = -10
+position = Vector2(2, -62)
+scale = Vector2(1.2400005, 1)
+color = Color(0.035, 0.06, 0.075, 1)
+polygon = PackedVector2Array(-980, -180, 1840, -180, 1840, 920, -980, 920, -980.00006, 544.42773)
+
+[node name="AreaTitleTrigger" parent="." unique_id=1066635720 instance=ExtResource("8_area_title")]
+position = Vector2(-747, 100)
+main_title = "地區名"
+sub_title = "位置名"
+
+[node name="Player" parent="." unique_id=478275912 instance=ExtResource("1_player_scene")]
+position = Vector2(-818, 136)
+
+[node name="RespawnPoint" type="Marker2D" parent="." unique_id=229524245]
+position = Vector2(-835, 147)
+script = ExtResource("3_respawn_point")
+
+[node name="SpawnFromTutorial" type="Marker2D" parent="." unique_id=1722474855 groups=["spawn_marker"]]
+position = Vector2(-800, 99)
+
+[node name="SpawnFromUpperRoute" type="Marker2D" parent="." unique_id=1006190775 groups=["spawn_marker"]]
+position = Vector2(2040, 6)
+
+[node name="SpawnFromRightRoute" type="Marker2D" parent="." unique_id=1173012664 groups=["spawn_marker"]]
+position = Vector2(1850, 1156)
+
+[node name="Bench" parent="." unique_id=1321906523 instance=ExtResource("6_bench")]
+position = Vector2(-163, 986)
+
+[node name="BottomEnemy" parent="." unique_id=1337285977 instance=ExtResource("12_enemy")]
+position = Vector2(1313, 27)
+patrol_speed = 70.0
+
+[node name="PassageTutorial" parent="BottomEnemy" unique_id=1062204247 instance=ExtResource("9_a1kji")]
+position = Vector2(-1415, 21)
+scale = Vector2(-3.2230575, 2.4594815)
+tutorial_text = "嘗試通過這危險的道路吧，若空中跳躍距離不夠，可在空中按下 C 進行短距離衝刺"
+
+[node name="MapPieces" type="Node2D" parent="." unique_id=1428223262]
+
+[node name="EntryFloorLeft" parent="MapPieces" unique_id=471812429 instance=ExtResource("5_floor")]
+position = Vector2(-595.00006, 219)
+scale = Vector2(3, 1)
+
+[node name="EntryFloorRight" parent="MapPieces" unique_id=646708900 instance=ExtResource("5_floor")]
+position = Vector2(-94, 219)
+scale = Vector2(0.9, 1)
+
+[node name="DropPlatformA" parent="MapPieces" unique_id=1634093576 instance=ExtResource("10_platform")]
+position = Vector2(297, 132)
+scale = Vector2(0.5, 1)
+
+[node name="DropPlatformB" parent="MapPieces" unique_id=1049855661 instance=ExtResource("10_platform")]
+position = Vector2(1319, 86)
+
+[node name="DropPlatformC" parent="MapPieces" unique_id=236245784 instance=ExtResource("10_platform")]
+position = Vector2(650, 172)
+scale = Vector2(0.5, 1)
+
+[node name="BottomFloorFarLeft" parent="MapPieces" unique_id=1637675569 instance=ExtResource("5_floor")]
+position = Vector2(-731, 937)
+scale = Vector2(1.2, 1)
+
+[node name="BottomFloorLeft" parent="MapPieces" unique_id=91273654 instance=ExtResource("5_floor")]
+position = Vector2(-1127, 919)
+scale = Vector2(1.45, 1)
+
+[node name="BottomFloorMidLeft" parent="MapPieces" unique_id=727825915 instance=ExtResource("5_floor")]
+position = Vector2(272.99997, 924)
+scale = Vector2(1.45, 1)
+
+[node name="BottomFloorCenter" parent="MapPieces" unique_id=567444776 instance=ExtResource("5_floor")]
+position = Vector2(209, 467)
+scale = Vector2(1.45, 1)
+
+[node name="BottomFloorMidRight" parent="MapPieces" unique_id=643933657 instance=ExtResource("5_floor")]
+position = Vector2(581, 467)
+scale = Vector2(1.45, 1)
+
+[node name="BottomFloorRight" parent="MapPieces" unique_id=70853009 instance=ExtResource("5_floor")]
+position = Vector2(988, 942)
+scale = Vector2(1.45, 1)
+
+[node name="BottomFloorExitRight" parent="MapPieces" unique_id=14405432 instance=ExtResource("5_floor")]
+position = Vector2(1785, 114)
+scale = Vector2(1.45, 1)
+
+[node name="BottomFloorFarRight" parent="MapPieces" unique_id=1696667410 instance=ExtResource("5_floor")]
+position = Vector2(2127, 114)
+scale = Vector2(1.2, 1)
+
+[node name="SafetyFloorLeft" parent="MapPieces" unique_id=714555443 instance=ExtResource("5_floor")]
+position = Vector2(320, 949)
+scale = Vector2(3.2, 1)
+
+[node name="SafetyFloorRight" parent="MapPieces" unique_id=322375099 instance=ExtResource("5_floor")]
+position = Vector2(1173, 467)
+scale = Vector2(3.2, 1)
+
+[node name="SpikePit" parent="MapPieces" unique_id=697326737 instance=ExtResource("11_spike")]
+position = Vector2(1352, 420)
+
+[node name="SpikePit" parent="MapPieces/SpikePit" unique_id=913384605 instance=ExtResource("11_spike")]
+position = Vector2(-164, 1)
+
+[node name="SpikePit2" parent="MapPieces/SpikePit" unique_id=52599050 instance=ExtResource("11_spike")]
+position = Vector2(-482, 2)
+
+[node name="SpikePit3" parent="MapPieces/SpikePit" unique_id=2116596046 instance=ExtResource("11_spike")]
+position = Vector2(-323, 2)
+
+[node name="SpikePit4" parent="MapPieces/SpikePit" unique_id=1202526824 instance=ExtResource("11_spike")]
+position = Vector2(-643, 2)
+
+[node name="SpikePit5" parent="MapPieces/SpikePit" unique_id=2053430776 instance=ExtResource("11_spike")]
+position = Vector2(-804, 2)
+
+[node name="SpikePit6" parent="MapPieces/SpikePit" unique_id=2116847285 instance=ExtResource("11_spike")]
+position = Vector2(-966, 1)
+
+[node name="TopReturnVisual" parent="MapPieces" unique_id=1264504849 instance=ExtResource("15_passage")]
+position = Vector2(-905, 117)
+
+[node name="LeftExitVisual" parent="MapPieces" unique_id=172690830 instance=ExtResource("15_passage")]
+position = Vector2(-465, 899)
+
+[node name="RightExitVisual" parent="MapPieces" unique_id=250669325 instance=ExtResource("15_passage")]
+position = Vector2(2173, 6)
+
+[node name="LeftBoundaryWall" parent="MapPieces" unique_id=1977356785 instance=ExtResource("13_bs8s6")]
+position = Vector2(2238, 902)
+scale = Vector2(1, 1.5)
+
+[node name="WallJumpPracticeWall" parent="MapPieces" unique_id=886475658 instance=ExtResource("14_a1kji")]
+position = Vector2(-1005, 1.999939)
+scale = Vector2(1, 2.191716)
+
+[node name="WallJumpPracticeWall2" parent="MapPieces" unique_id=794951999 instance=ExtResource("14_a1kji")]
+position = Vector2(46, 344)
+scale = Vector2(1, 1.3514547)
+
+[node name="WallJumpPracticeWall3" parent="MapPieces" unique_id=1747360234 instance=ExtResource("14_a1kji")]
+position = Vector2(1574, 291)
+scale = Vector2(1, 1.8264298)
+
+[node name="LeftBoundaryWall2" parent="MapPieces" unique_id=1005200961 instance=ExtResource("13_bs8s6")]
+position = Vector2(4134, 997.0321)
+scale = Vector2(1, 7.3057194)
+
+[node name="CameraRooms" type="Node2D" parent="." unique_id=1912812127]
+
+[node name="WholeMapCameraZone" parent="CameraRooms" unique_id=1134983639 instance=ExtResource("13_camera_room")]
+position = Vector2(404.00003, 1877.9999)
+scale = Vector2(4.25, 3.05)
+limit_left = -900
+limit_top = -120
+limit_right = 1740
+limit_bottom = 860
+
+[node name="MapRooms" type="Node2D" parent="." unique_id=826156517]
+
+[node name="EntryRoom" parent="MapRooms" unique_id=1951118850 instance=ExtResource("14_map_room")]
+position = Vector2(-306.00006, -685.00006)
+scale = Vector2(1.45, 0.85)
+room_id = "upper_entry"
+display_name = "上方入口"
+map_rect = Rect2(90, 65, 170, 60)
+
+[node name="DropRoom" parent="MapRooms" unique_id=1321223378 instance=ExtResource("14_map_room")]
+position = Vector2(28.999992, 1316)
+scale = Vector2(2.25, 1.75)
+room_id = "down_path"
+display_name = "下行道路"
+map_rect = Rect2(285, 140, 135, 175)
+
+[node name="BottomRoom" parent="MapRooms" unique_id=1901843120 instance=ExtResource("14_map_room")]
+position = Vector2(180, 1154.0001)
+scale = Vector2(4, 0.9)
+room_id = "bottom_hub"
+display_name = "底層通道"
+map_rect = Rect2(80, 330, 500, 70)
+
+[node name="Transitions" type="Node2D" parent="." unique_id=172547456]
+
+[node name="PathToUpperRoom" parent="Transitions" unique_id=1540611924 instance=ExtResource("9_transition")]
+position = Vector2(2175, -9)
+target_scene = "res://scenes/upper_route_room.tscn"
+target_spawn_marker_name = "SpawnFromAreaB"
+prompt_text = "前往上方房間（之後製作）"
+
+[node name="RouteLabel" type="Label" parent="Transitions/PathToUpperRoom" unique_id=1055771645]
+offset_left = -92.0
+offset_top = -124.0
+offset_right = 92.0
+offset_bottom = -88.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackToTutorial" parent="Transitions" unique_id=902699617 instance=ExtResource("9_transition")]
+position = Vector2(-904, 99)
+target_scene = "res://scenes/test_level.tscn"
+target_position = Vector2(6680, -11)
+message = "返回教學地圖"
+
+[node name="RouteLabel" type="Label" parent="Transitions/BackToTutorial" unique_id=726901528]
+offset_left = -72.0
+offset_top = -124.0
+offset_right = 72.0
+offset_bottom = -88.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PathToRightRoom" parent="Transitions" unique_id=821996811 instance=ExtResource("9_transition")]
+position = Vector2(2031, -649)
+target_scene = "res://scenes/right_route_room.tscn"
+target_spawn_marker_name = "SpawnFromAreaB"
+prompt_text = "前往右側房間（之後製作）"
+
+[node name="RouteLabel" type="Label" parent="Transitions/PathToRightRoom" unique_id=1288802114]
+offset_left = -92.0
+offset_top = -124.0
+offset_right = 92.0
+offset_bottom = -88.0
+theme_override_font_sizes/font_size = 18
+text = "前往右側房間"
+horizontal_alignment = 1
+vertical_alignment = 1

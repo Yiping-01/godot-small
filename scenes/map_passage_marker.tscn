@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_passage"]
+size = Vector2(128, 160)
+
+[node name="MapPassageMarker" type="Node2D"]
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.08, 0.10, 0.13, 0.85)
+polygon = PackedVector2Array(-64, -80, 64, -80, 64, 80, -64, 80)
+
+[node name="Outline" type="Line2D" parent="."]
+points = PackedVector2Array(-64, -80, 64, -80, 64, 80, -64, 80, -64, -80)
+width = 3.0
+default_color = Color(0.45, 0.58, 0.62, 1)

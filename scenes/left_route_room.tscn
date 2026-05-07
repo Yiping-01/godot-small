@@ -1,0 +1,147 @@
+[gd_scene format=3 uid="uid://b23rwc77qbmc0"]
+
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="2_health_ui"]
+[ext_resource type="Script" uid="uid://hid4uidnrebp" path="res://scripts/respawn_point.gd" id="3_respawn_point"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="Script" uid="uid://cjg0ursmhf37w" path="res://scripts/room_manager.gd" id="5_room_manager"]
+[ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="6_area_title"]
+[ext_resource type="PackedScene" path="res://scenes/room_transition.tscn" id="7_transition"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="8_floor"]
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="9_wall"]
+[ext_resource type="PackedScene" uid="uid://uj0vu7eph4ga" path="res://scenes/map_ceiling.tscn" id="10_ceiling"]
+[ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="11_passage"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="12_exit_menu"]
+[ext_resource type="PackedScene" uid="uid://4ehtummn0pwm" path="res://scenes/blue_bounce_split_enemy.tscn" id="13_blue_bounce_split"]
+
+[node name="LeftRouteRoom" type="Node2D" unique_id=784136986]
+script = ExtResource("5_room_manager")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1378294913]
+script = ExtResource("2_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=1516989654]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=424030749]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=487456299]
+process_mode = 3
+layer = 20
+script = ExtResource("12_exit_menu")
+
+[node name="ExitPanel" type="Panel" parent="ExitMenu" unique_id=1259750227]
+process_mode = 3
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ExitMenu/ExitPanel" unique_id=490534092]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -105.0
+offset_top = 18.0
+offset_right = 105.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "Exit game?"
+horizontal_alignment = 1
+
+[node name="NoButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=2011769767]
+process_mode = 3
+layout_mode = 0
+offset_left = 293.0
+offset_top = 117.0
+offset_right = 352.0
+offset_bottom = 167.0
+theme_override_font_sizes/font_size = 30
+text = "NO"
+
+[node name="YesButton" type="Button" parent="ExitMenu/ExitPanel" unique_id=551273466]
+process_mode = 3
+layout_mode = 0
+offset_left = 120.0
+offset_top = 112.0
+offset_right = 179.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 30
+text = "YES"
+
+[node name="GameUI" parent="." unique_id=151452579 instance=ExtResource("4_game_ui")]
+
+[node name="Background" type="Polygon2D" parent="." unique_id=923554477]
+z_index = -10
+color = Color(0.035, 0.045, 0.06, 1)
+polygon = PackedVector2Array(-900, -320, 1540, -320, 1540, 760, -900, 760)
+
+[node name="AreaTitleTrigger" parent="." unique_id=298727729 instance=ExtResource("6_area_title")]
+position = Vector2(-565, 330)
+main_title = "Left Route"
+sub_title = "Sealed room"
+
+[node name="Player" parent="." unique_id=1877980434 instance=ExtResource("1_player")]
+position = Vector2(-560, 330)
+
+[node name="RespawnPoint" type="Marker2D" parent="." unique_id=304556101]
+position = Vector2(-560, 330)
+script = ExtResource("3_respawn_point")
+
+[node name="SpawnFromRightRoute" type="Marker2D" parent="." unique_id=1171723124 groups=["spawn_marker"]]
+position = Vector2(-560, 330)
+
+[node name="MapPieces" type="Node2D" parent="." unique_id=2026624847]
+
+[node name="MainFloor" parent="MapPieces" unique_id=420290770 instance=ExtResource("8_floor")]
+position = Vector2(-193, 479)
+scale = Vector2(4.3, 1)
+
+[node name="LeftWall" parent="MapPieces" unique_id=796813680 instance=ExtResource("9_wall")]
+position = Vector2(-735, 231)
+scale = Vector2(0.769, 2.5)
+
+[node name="RightWall" parent="MapPieces" unique_id=900565878 instance=ExtResource("9_wall")]
+position = Vector2(375, 222)
+scale = Vector2(1, 3.25)
+
+[node name="Ceiling" parent="MapPieces" unique_id=869024697 instance=ExtResource("10_ceiling")]
+position = Vector2(115.00006, 16)
+scale = Vector2(7, 1)
+
+[node name="BackDoorVisual" parent="MapPieces" unique_id=36234888 instance=ExtResource("11_passage")]
+position = Vector2(-669, 349)
+
+[node name="BlueBounceSplitEnemy" parent="." unique_id=1365032531 instance=ExtResource("13_blue_bounce_split")]
+position = Vector2(-60, 402.99997)
+scale = Vector2(0.22, 0.22)
+bounce_min = Vector2(-640, 90)
+bounce_max = Vector2(295, 370)
+
+[node name="Transitions" type="Node2D" parent="." unique_id=1135259680]
+
+[node name="BackToRightRoute" parent="Transitions" unique_id=1868759713 instance=ExtResource("7_transition")]
+position = Vector2(-669, 349)
+target_scene = "res://scenes/right_route_room.tscn"
+target_spawn_marker_name = "SpawnFromLeftRoute"
+prompt_text = "Back to right route"

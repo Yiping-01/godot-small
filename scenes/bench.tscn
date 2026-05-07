@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/bench.gd" id="1_bench"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(150, 96)
+
+[node name="Bench" type="Node2D"]
+script = ExtResource("1_bench")
+
+[node name="Seat" type="Polygon2D" parent="."]
+z_index = 0
+color = Color(0.36, 0.25, 0.16, 1)
+polygon = PackedVector2Array(-70, -10, 70, -10, 82, 6, -82, 6)
+
+[node name="Back" type="Polygon2D" parent="."]
+z_index = -1
+color = Color(0.24, 0.18, 0.13, 1)
+polygon = PackedVector2Array(-62, -42, 62, -42, 70, -18, -70, -18)
+
+[node name="LegLeft" type="Polygon2D" parent="."]
+color = Color(0.18, 0.13, 0.09, 1)
+polygon = PackedVector2Array(-48, 6, -32, 6, -36, 36, -52, 36)
+
+[node name="LegRight" type="Polygon2D" parent="."]
+color = Color(0.18, 0.13, 0.09, 1)
+polygon = PackedVector2Array(32, 6, 48, 6, 52, 36, 36, 36)
+
+[node name="InteractArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_interact")
