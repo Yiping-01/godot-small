@@ -20,6 +20,8 @@ extends CanvasLayer
 ]
 @onready var shop_close_hint_label: Label = $ShopPanel/VBoxContainer/CloseHintLabel
 @onready var map_panel: Panel = $MapPanel
+@onready var map_corner_icon: TextureRect = $MapPanel/CornerIcon
+@onready var map_vbox: VBoxContainer = $MapPanel/VBoxContainer
 @onready var map_title_label: Label = $MapPanel/VBoxContainer/TitleLabel
 @onready var map_canvas: Control = $MapPanel/VBoxContainer/MapCanvas
 @onready var map_hint_label: Label = $MapPanel/VBoxContainer/HintLabel
@@ -35,6 +37,18 @@ var shop_items: Array[Dictionary] = []
 var toast_tween: Tween
 var area_title_tween: Tween
 var fade_tween: Tween
+var map_display_mode := 0
+
+const MAP_MODE_CLOSED := 0
+const MAP_MODE_MINI := 1
+const MAP_MODE_FULL := 2
+const MAP_PANEL_FULL_RECT := Rect2(282.0, 82.0, 716.0, 508.0)
+const MAP_VBOX_FULL_RECT := Rect2(22.0, 18.0, 672.0, 470.0)
+const MAP_CANVAS_FULL_SIZE := Vector2(672.0, 380.0)
+const MAP_PANEL_MINI_RECT := Rect2(930.0, 72.0, 200.0, 130.0)
+const MAP_VBOX_MINI_RECT := Rect2(10.0, 10.0, 226.0, 138.0)
+const MAP_CANVAS_MINI_SIZE := Vector2(226.0, 138.0)
+const MAP_MINI_SCALE := Vector2(0.33, 0.33)
 
 
 func _ready() -> void:
@@ -77,7 +91,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("map"):
 		if inventory_panel.visible or shop_panel.visible or dialogue_panel.visible:
 			close_all_windows()
-		elif not GameState.input_locked:
+		elif map_panel.visible or not GameState.input_locked:
 			toggle_map()
 		get_viewport().set_input_as_handled()
 
@@ -130,12 +144,26 @@ func toggle_inventory() -> void:
 
 
 func toggle_map() -> void:
-	if map_panel.visible:
+	if map_display_mode == MAP_MODE_CLOSED:
+		_show_mini_map()
+	elif map_display_mode == MAP_MODE_MINI:
+		_show_full_map()
+	else:
 		close_all_windows()
-		return
 
+
+func _show_mini_map() -> void:
+	hide_prompt()
+	GameState.set_input_locked(false)
+	_apply_map_layout(MAP_MODE_MINI)
+	_rebuild_map()
+	map_panel.show()
+
+
+func _show_full_map() -> void:
 	hide_prompt()
 	GameState.set_input_locked(true)
+	_apply_map_layout(MAP_MODE_FULL)
 	_rebuild_map()
 	map_panel.show()
 
@@ -145,6 +173,7 @@ func close_all_windows() -> void:
 	inventory_panel.hide()
 	shop_panel.hide()
 	map_panel.hide()
+	_apply_map_layout(MAP_MODE_CLOSED)
 
 	active_npc = null
 	GameState.set_input_locked(false)
@@ -341,11 +370,47 @@ func _rebuild_map() -> void:
 	_add_player_map_marker(rooms)
 
 
+func _apply_map_layout(mode: int) -> void:
+	map_display_mode = mode
+	map_canvas.scale = Vector2.ONE
+	map_canvas.clip_contents = false
+	map_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	map_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	if mode == MAP_MODE_MINI:
+		_set_control_rect(map_panel, MAP_PANEL_MINI_RECT)
+		_set_control_rect(map_vbox, MAP_VBOX_MINI_RECT)
+		map_corner_icon.hide()
+		map_title_label.hide()
+		map_hint_label.hide()
+		map_canvas.custom_minimum_size = MAP_CANVAS_MINI_SIZE
+		map_canvas.scale = MAP_MINI_SCALE
+		map_canvas.clip_contents = true
+		return
+
+	_set_control_rect(map_panel, MAP_PANEL_FULL_RECT)
+	_set_control_rect(map_vbox, MAP_VBOX_FULL_RECT)
+	map_corner_icon.show()
+	map_title_label.show()
+	map_hint_label.show()
+	map_canvas.custom_minimum_size = MAP_CANVAS_FULL_SIZE
+
+
+func _set_control_rect(control: Control, rect: Rect2) -> void:
+	control.offset_left = rect.position.x
+	control.offset_top = rect.position.y
+	control.offset_right = rect.position.x + rect.size.x
+	control.offset_bottom = rect.position.y + rect.size.y
+
+
 func _add_map_empty_label() -> void:
 	var label := Label.new()
 	label.text = "這個場景還沒有地圖房間標記。"
-	label.add_theme_font_size_override("font_size", 18)
-	label.position = Vector2(20, 20)
+	label.add_theme_font_size_override("font_size", 12 if map_display_mode == MAP_MODE_MINI else 18)
+	label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
+	label.clip_text = true
+	label.position = Vector2(8, 8) if map_display_mode == MAP_MODE_MINI else Vector2(20, 20)
+	label.size = Vector2(280, 70) if map_display_mode == MAP_MODE_MINI else Vector2(360, 40)
 
 	map_canvas.add_child(label)
 

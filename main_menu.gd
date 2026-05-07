@@ -11,6 +11,8 @@ extends Control
 @onready var back_button = $SettingsPanel/Button
 
 func _ready():
+	_play_title_music()
+
 	background_video.finished.connect(_on_background_video_finished)
 	background_video.play()
 
@@ -59,3 +61,9 @@ func _play_game_music() -> void:
 	var music_player := get_node_or_null("/root/MusicPlayer")
 	if music_player != null and music_player.has_method("play_game_music"):
 		music_player.play_game_music()
+
+
+func _play_title_music() -> void:
+	var music_player := get_node_or_null("/root/MusicPlayer")
+	if music_player != null and music_player.has_method("play_title_music"):
+		music_player.play_title_music()

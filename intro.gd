@@ -9,6 +9,8 @@ var current_index := 0
 var prompt_time := 0.0
 
 func _ready() -> void:
+	_play_title_music()
+
 	text_label.text = ""
 	prompt_label.modulate.a = 0.0
 	timer.wait_time = 0.055
@@ -29,3 +31,9 @@ func _on_timer_timeout() -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept"):
 		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+
+
+func _play_title_music() -> void:
+	var music_player := get_node_or_null("/root/MusicPlayer")
+	if music_player != null and music_player.has_method("play_title_music"):
+		music_player.play_title_music()

@@ -4,6 +4,7 @@ const MUSIC_BUS := "Music"
 const SFX_BUS := "SFX"
 
 var game_music := preload("res://scores/game_music.wav")
+var title_music := preload("res://scores/bgtitle_music.wav")
 var game_music_player: AudioStreamPlayer
 
 
@@ -38,12 +39,22 @@ func _ensure_game_music_player() -> void:
 
 
 func play_game_music() -> void:
+	_play_music_stream(game_music)
+
+
+func play_title_music() -> void:
+	_play_music_stream(title_music)
+
+
+func _play_music_stream(stream: AudioStream) -> void:
 	_ensure_game_music_player()
 
-	if game_music_player.playing:
-		return
+	if game_music_player.stream != stream:
+		game_music_player.stop()
+		game_music_player.stream = stream
 
-	game_music_player.play()
+	if not game_music_player.playing:
+		game_music_player.play()
 
 
 func stop_game_music() -> void:
@@ -52,4 +63,5 @@ func stop_game_music() -> void:
 
 
 func _on_game_music_finished() -> void:
-	play_game_music()
+	if game_music_player != null:
+		game_music_player.play()
