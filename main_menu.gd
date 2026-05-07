@@ -31,9 +31,11 @@ func _on_start_pressed():
 
 	GameState.reset_demo_state()
 	GameState.clear_continue_scene()
+	_play_game_music()
 	get_tree().change_scene_to_file(GameState.DEFAULT_START_SCENE)
 
 func _on_continue_pressed():
+	_play_game_music()
 	get_tree().change_scene_to_file(GameState.prepare_continue_scene())
 
 func _on_quit_pressed():
@@ -52,3 +54,8 @@ func _on_volume_changed(value):
 func _on_background_video_finished():
 	background_video.stream_position = 0.0
 	background_video.play()
+
+func _play_game_music() -> void:
+	var music_player := get_node_or_null("/root/MusicPlayer")
+	if music_player != null and music_player.has_method("play_game_music"):
+		music_player.play_game_music()

@@ -44,6 +44,11 @@ signal respawned
 @export var charge_attack_cooldown: float = 0.55
 @export var charge_recoil_velocity: float = 260.0
 @export var charge_move_speed_multiplier: float = 0.45
+@export var far_attack_damage: int = 1
+@export var far_attack_speed: float = 640.0
+@export var far_attack_duration: float = 0.55
+@export var far_attack_hit_radius: float = 22.0
+@export var far_attack_effect_scale := Vector2(0.35, 0.35)
 
 @export_category("Camera")
 @export var camera_follow_position := Vector2(80.0, -40.0)
@@ -51,6 +56,14 @@ signal respawned
 @export var camera_follow_smoothing_speed: float = 8.0
 
 const CAMERA_UNBOUNDED_LIMIT := 10000000
+const FAR_ATTACK_TEXTURES: Array[Texture2D] = [
+	preload("res://assets/player/attack_far/far_1.png"),
+	preload("res://assets/player/attack_far/far_2.png"),
+	preload("res://assets/player/attack_far/far_3.png"),
+	preload("res://assets/player/attack_far/far_4.png"),
+	preload("res://assets/player/attack_far/far_5.png"),
+]
+const FAR_ATTACK_PROJECTILE := preload("res://scripts/far_attack_projectile.gd")
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_area: Area2D = $AttackArea
@@ -112,9 +125,11 @@ var is_resting := false
 var normal_z_index := 0
 var attack_effect_base_scale := Vector2.ONE
 var charge_effect_base_scale := Vector2.ONE
+var far_attack_frames: SpriteFrames
 
 
 func _ready() -> void:
+	_play_game_music()
 	GameState.refill_health_potions()
 	current_health = float(max_health)
 	respawn_position = _get_spawn_position()
@@ -132,6 +147,7 @@ func _ready() -> void:
 	last_attack_cooldown = attack_cooldown
 	attack_effect_base_scale = attack_effect.scale
 	charge_effect_base_scale = charge_effect.scale
+	far_attack_frames = _build_far_attack_frames()
 	active_attack_area = attack_area
 	active_attack_shape = attack_shape
 	_set_all_attack_areas_enabled(false)
@@ -191,6 +207,7 @@ func _physics_process(delta: float) -> void:
 	_update_wall_slide()
 	_handle_movement(delta)
 	_handle_jump()
+	_handle_far_attack_input()
 	_handle_attack_input(delta)
 	_update_attack(delta)
 
@@ -285,6 +302,16 @@ func _handle_attack_input(delta: float) -> void:
 		_cancel_attack_charge()
 
 
+func _handle_far_attack_input() -> void:
+	if hurt_lock_left > 0.0 or is_attacking or is_dashing or is_charging_attack:
+		return
+
+	if not Input.is_action_just_pressed("far_attack"):
+		return
+
+	_try_far_attack()
+
+
 func _try_attack() -> void:
 	if is_attacking or is_dashing:
 		return
@@ -309,6 +336,23 @@ func _try_attack() -> void:
 	_play_attack_effect(active_attack_type)
 	_play_audio(attack_audio)
 	_play_player_attack_animation(active_attack_type)
+
+
+func _try_far_attack() -> void:
+	if is_attacking or is_dashing:
+		return
+
+	var input_direction := _get_horizontal_input()
+	if not is_zero_approx(input_direction):
+		facing_direction = int(signf(input_direction))
+		animated_sprite.flip_h = facing_direction > 0
+		_update_attack_area_side()
+
+	is_attacking = true
+	active_attack_type = &"far"
+	_spawn_far_attack_projectile()
+	_play_audio(attack_audio)
+	_play_player_attack_animation(&"side")
 
 
 func _try_charge_attack() -> void:
@@ -392,6 +436,34 @@ func _find_damage_receiver(target: Node) -> Node:
 			return current
 		current = current.get_parent()
 	return null
+
+
+func _build_far_attack_frames() -> SpriteFrames:
+	var frames := SpriteFrames.new()
+	frames.add_animation(&"fly")
+	frames.set_animation_loop(&"fly", true)
+	frames.set_animation_speed(&"fly", 18.0)
+	for texture in FAR_ATTACK_TEXTURES:
+		frames.add_frame(&"fly", texture)
+	return frames
+
+
+func _spawn_far_attack_projectile() -> void:
+	if far_attack_frames == null:
+		far_attack_frames = _build_far_attack_frames()
+
+	var projectile := FAR_ATTACK_PROJECTILE.new()
+	get_parent().add_child(projectile)
+	projectile.global_position = global_position + Vector2(46.0 * facing_direction, -6.0)
+	projectile.setup(
+		far_attack_frames,
+		facing_direction,
+		far_attack_speed,
+		far_attack_damage,
+		far_attack_duration,
+		far_attack_hit_radius,
+		far_attack_effect_scale
+	)
 
 
 func _set_all_attack_areas_enabled(enabled: bool) -> void:
@@ -703,6 +775,14 @@ func _show_game_toast(text: String) -> void:
 	var ui := get_tree().get_first_node_in_group("game_ui")
 	if ui != null and ui.has_method("show_toast"):
 		ui.call("show_toast", text, 1.2)
+
+
+func _play_game_music() -> void:
+	var music_player := get_node_or_null("/root/MusicPlayer")
+	if music_player != null and music_player.has_method("play_game_music"):
+		music_player.play_game_music()
+
+
 func _respawn_room_enemies() -> void:
 	var manager := get_tree().get_first_node_in_group("room_manager")
 	if manager != null and manager.has_method("respawn_enemies"):
