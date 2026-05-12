@@ -11,6 +11,7 @@ signal respawned
 @export var knockback_force: float = 420.0
 @export var knockback_up_velocity: float = -260.0
 @export var hurt_control_lock_time: float = 0.18
+@export var hurt_animation_time: float = 0.25
 @export var respawn_delay: float = 1.35
 @export var health_potion_heal_amount: float = 0.5
 
@@ -54,6 +55,7 @@ signal respawned
 @export var camera_follow_position := Vector2(80.0, -40.0)
 @export var camera_follow_zoom := Vector2(1.2, 1.2)
 @export var camera_follow_smoothing_speed: float = 8.0
+@export var use_map_wall_camera_limits := true
 
 const CAMERA_UNBOUNDED_LIMIT := 10000000
 const FAR_ATTACK_TEXTURES: Array[Texture2D] = [
@@ -90,6 +92,8 @@ var current_health: float = 0.0
 var invincible := false
 var is_dead := false
 var hurt_lock_left := 0.0
+var hurt_animation_left := 0.0
+var is_hurt_animating := false
 var knockback_velocity := Vector2.ZERO
 var respawn_position := Vector2.ZERO
 var camera_base_offset := Vector2.ZERO
@@ -97,6 +101,11 @@ var default_camera_position := Vector2.ZERO
 var default_camera_offset := Vector2.ZERO
 var default_camera_zoom := Vector2.ONE
 var default_camera_smoothing_speed := 8.0
+var manual_camera_limits_enabled := false
+var manual_camera_limit_left := -CAMERA_UNBOUNDED_LIMIT
+var manual_camera_limit_top := -CAMERA_UNBOUNDED_LIMIT
+var manual_camera_limit_right := CAMERA_UNBOUNDED_LIMIT
+var manual_camera_limit_bottom := CAMERA_UNBOUNDED_LIMIT
 var shake_time_left := 0.0
 var shake_strength := 0.0
 
@@ -171,6 +180,8 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		_update_camera_shake(delta)
 		return
+
+	_update_hurt_animation_state(delta)
 
 	if is_resting:
 		_cancel_attack_charge()
@@ -257,7 +268,7 @@ func _handle_movement(delta: float) -> void:
 
 
 func _handle_jump() -> void:
-	if hurt_lock_left > 0.0:
+	if hurt_lock_left > 0.0 or is_hurt_animating:
 		return
 
 	if Input.is_action_just_pressed("jump") and _can_wall_jump():
@@ -277,7 +288,7 @@ func _handle_jump() -> void:
 
 
 func _handle_attack_input(delta: float) -> void:
-	if hurt_lock_left > 0.0:
+	if hurt_lock_left > 0.0 or is_hurt_animating:
 		_cancel_attack_charge()
 		return
 
@@ -304,7 +315,7 @@ func _handle_attack_input(delta: float) -> void:
 
 
 func _handle_far_attack_input() -> void:
-	if hurt_lock_left > 0.0 or is_attacking or is_dashing or is_charging_attack:
+	if hurt_lock_left > 0.0 or is_hurt_animating or is_attacking or is_dashing or is_charging_attack:
 		return
 
 	if not Input.is_action_just_pressed("far_attack"):
@@ -567,7 +578,7 @@ func _update_dash_cooldown(delta: float) -> void:
 
 
 func _handle_dash_input() -> void:
-	if hurt_lock_left > 0.0 or is_attacking or is_charging_attack or dash_cooldown_left > 0.0:
+	if hurt_lock_left > 0.0 or is_hurt_animating or is_attacking or is_charging_attack or dash_cooldown_left > 0.0:
 		return
 	if not Input.is_action_just_pressed("dash"):
 		return
@@ -627,11 +638,34 @@ func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO) -> void:
 
 	current_health = maxf(current_health - float(amount), 0.0)
 	health_changed.emit(current_health, max_health)
+	_cancel_attack_state()
+	_end_dash(false)
+	_cancel_attack_charge()
 	_apply_hurt_knockback(from_position)
 	_play_audio(hurt_audio)
 	_play_hurt_animation()
 	_play_hit_effect(global_position)
 	_start_camera_shake(0.24, 8.0)
+
+	if current_health <= 0.0:
+		die()
+		return
+
+	_start_invincibility()
+
+
+func take_quake_damage(amount: int) -> void:
+	if is_dead or invincible:
+		return
+
+	current_health = maxf(current_health - float(amount), 0.0)
+	health_changed.emit(current_health, max_health)
+	_cancel_attack_state()
+	_end_dash(false)
+	_cancel_attack_charge()
+	_play_audio(hurt_audio)
+	_play_hurt_animation()
+	_play_hit_effect(global_position)
 
 	if current_health <= 0.0:
 		die()
@@ -694,7 +728,10 @@ func die() -> void:
 
 	is_dead = true
 	invincible = true
+	is_hurt_animating = false
+	hurt_animation_left = 0.0
 	velocity = Vector2.ZERO
+	_cancel_attack_state()
 	_end_dash(false)
 	_cancel_attack_charge()
 	_set_all_attack_areas_enabled(false)
@@ -739,6 +776,9 @@ func _respawn() -> void:
 	current_health = float(max_health)
 	jump_count = 0
 	hurt_lock_left = 0.0
+	is_hurt_animating = false
+	hurt_animation_left = 0.0
+	_cancel_attack_state()
 	_end_dash(false)
 	_cancel_attack_charge()
 	is_dead = false
@@ -828,7 +868,12 @@ func reset_camera_profile() -> void:
 	_configure_follow_camera()
 
 
-func set_camera_limits(_left: int, _top: int, _right: int, _bottom: int) -> void:
+func set_camera_limits(left: int, top: int, right: int, bottom: int) -> void:
+	manual_camera_limits_enabled = true
+	manual_camera_limit_left = left
+	manual_camera_limit_top = top
+	manual_camera_limit_right = right
+	manual_camera_limit_bottom = bottom
 	_configure_follow_camera()
 
 
@@ -840,6 +885,7 @@ func _configure_follow_camera() -> void:
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = camera_follow_smoothing_speed
 	_clear_camera_limits()
+	_apply_scene_camera_limits()
 
 
 func _clear_camera_limits() -> void:
@@ -847,6 +893,43 @@ func _clear_camera_limits() -> void:
 	camera.limit_top = -CAMERA_UNBOUNDED_LIMIT
 	camera.limit_right = CAMERA_UNBOUNDED_LIMIT
 	camera.limit_bottom = CAMERA_UNBOUNDED_LIMIT
+
+
+func _apply_scene_camera_limits() -> void:
+	if manual_camera_limits_enabled:
+		camera.limit_left = manual_camera_limit_left
+		camera.limit_top = manual_camera_limit_top
+		camera.limit_right = manual_camera_limit_right
+		camera.limit_bottom = manual_camera_limit_bottom
+
+	if not use_map_wall_camera_limits:
+		return
+
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+
+	var map_left := scene.find_child("map_left", true, false)
+	if map_left is Node2D:
+		camera.limit_left = maxi(camera.limit_left, floori(_get_node_world_rect(map_left).position.x))
+
+	var map_right := scene.find_child("map_right", true, false)
+	if map_right is Node2D:
+		camera.limit_right = mini(camera.limit_right, ceili(_get_node_world_rect(map_right).end.x))
+
+	var map_floor := scene.find_child("map_floor", true, false)
+	if map_floor is Node2D:
+		camera.limit_bottom = mini(camera.limit_bottom, ceili(_get_node_world_rect(map_floor).end.y))
+
+
+func _get_node_world_rect(node: Node2D) -> Rect2:
+	var shape_node := node.find_child("CollisionShape2D", true, false)
+	if shape_node is CollisionShape2D and shape_node.shape is RectangleShape2D:
+		var rect_shape: RectangleShape2D = shape_node.shape
+		var shape_size: Vector2 = rect_shape.size * shape_node.global_scale.abs()
+		return Rect2(shape_node.global_position - shape_size * 0.5, shape_size)
+
+	return Rect2(node.global_position, Vector2.ZERO)
 
 
 func _play_hit_effect(effect_position: Vector2) -> void:
@@ -892,7 +975,31 @@ func _play_player_attack_animation(attack_type: StringName) -> void:
 
 func _play_hurt_animation() -> void:
 	if animated_sprite.sprite_frames.has_animation(&"damage"):
+		is_hurt_animating = true
+		hurt_animation_left = hurt_animation_time
 		animated_sprite.play(&"damage")
+
+
+func _update_hurt_animation_state(delta: float) -> void:
+	if not is_hurt_animating:
+		return
+
+	hurt_animation_left -= delta
+	if hurt_animation_left > 0.0 and animated_sprite.animation == &"damage":
+		return
+
+	is_hurt_animating = false
+	hurt_animation_left = 0.0
+	_update_animation()
+
+
+func _cancel_attack_state() -> void:
+	is_attacking = false
+	attack_time_left = 0.0
+	hit_targets.clear()
+	_set_all_attack_areas_enabled(false)
+	attack_effect.visible = false
+	charge_effect.visible = false
 
 
 func _begin_attack_charge() -> void:
@@ -958,10 +1065,10 @@ func _update_camera_shake(delta: float) -> void:
 
 
 func _update_animation() -> void:
-	if animated_sprite.animation == &"damage" and animated_sprite.is_playing():
+	if is_hurt_animating:
 		return
 
-	if is_attacking:
+	if is_attacking and animated_sprite.animation != &"damage":
 		return
 
 	if is_dashing:
@@ -982,6 +1089,8 @@ func _update_animation() -> void:
 
 func _on_animated_sprite_animation_finished() -> void:
 	if animated_sprite.animation == &"damage":
+		is_hurt_animating = false
+		hurt_animation_left = 0.0
 		_update_animation()
 		return
 

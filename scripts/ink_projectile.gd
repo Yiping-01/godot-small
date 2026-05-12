@@ -5,9 +5,11 @@ class_name InkProjectile
 @export var damage: int = 1
 @export var lifetime: float = 2.2
 @export var spin_speed: float = 7.0
+@export var arc_gravity: float = 900.0
 
 var velocity := Vector2.ZERO
 var source: Node
+var uses_arc := false
 
 
 func _ready() -> void:
@@ -20,10 +22,23 @@ func launch(direction: int, damage_amount: int = 1, projectile_speed: float = 42
 	damage = damage_amount
 	speed = projectile_speed
 	source = source_node
+	uses_arc = false
 	velocity = Vector2(float(launch_direction) * speed, -24.0)
 
 
+func launch_arc(direction: int, damage_amount: int = 1, projectile_speed: float = 420.0, vertical_speed: float = -360.0, gravity_amount: float = 900.0, source_node: Node = null) -> void:
+	var launch_direction := -1 if direction < 0 else 1
+	damage = damage_amount
+	speed = projectile_speed
+	arc_gravity = gravity_amount
+	source = source_node
+	uses_arc = true
+	velocity = Vector2(float(launch_direction) * speed, vertical_speed)
+
+
 func _physics_process(delta: float) -> void:
+	if uses_arc:
+		velocity.y += arc_gravity * delta
 	global_position += velocity * delta
 	rotation += spin_speed * delta * signf(velocity.x)
 	lifetime -= delta

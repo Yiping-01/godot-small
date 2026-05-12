@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://bukwsd4tgpet0"]
+
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="1_ivf3x"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="2_apo74"]
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://uj0vu7eph4ga" path="res://scenes/map_ceiling.tscn" id="4_eliua"]
+[ext_resource type="Texture2D" uid="uid://cko54hf6fqwua" path="res://assets/enemy/boss.png" id="5_hyg8q"]
+[ext_resource type="Script" path="res://scripts/boss.gd" id="6_boss"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
+size = Vector2(120, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_damage"]
+size = Vector2(92, 94)
+
+[node name="Bosslevel" type="Node2D" unique_id=1054835420]
+
+[node name="map_left" parent="." unique_id=2078946100 instance=ExtResource("1_ivf3x")]
+position = Vector2(37, 311)
+scale = Vector2(1.3490925, 3.0206344)
+
+[node name="map_floor" parent="." unique_id=432150940 instance=ExtResource("2_apo74")]
+position = Vector2(819, 619)
+scale = Vector2(6.36, 1)
+
+[node name="Player" parent="." unique_id=1348616487 instance=ExtResource("3_player")]
+position = Vector2(220, 540)
+
+[node name="MapCeiling" parent="." unique_id=2088948770 instance=ExtResource("4_eliua")]
+position = Vector2(990.00006, 123)
+scale = Vector2(7.6800017, 1)
+
+[node name="map_right" parent="." unique_id=776427194 instance=ExtResource("1_ivf3x")]
+position = Vector2(948.00006, 264)
+scale = Vector2(1.3, 3)
+
+[node name="Boss" type="CharacterBody2D" parent="." unique_id=1649915940]
+position = Vector2(803, 520)
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("6_boss")
+
+[node name="Sprite2D" type="Sprite2D" parent="Boss"]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("5_hyg8q")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boss"]
+shape = SubResource("RectangleShape2D_boss")
+
+[node name="DamageArea" type="Area2D" parent="Boss"]
+position = Vector2(-64, 0)
+collision_layer = 32
+collision_mask = 16
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boss/DamageArea"]
+shape = SubResource("RectangleShape2D_boss_damage")
+disabled = true
