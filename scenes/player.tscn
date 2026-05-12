@@ -34,6 +34,8 @@
 [ext_resource type="Texture2D" uid="uid://c5jp7xhm3bs3q" path="res://assets/player/AttackUp/sea0_attackup_4.png" id="29_attack_up_4"]
 [ext_resource type="Texture2D" uid="uid://b1ftaqtamaeto" path="res://assets/player/AttackUp/sea0_attackup_5.png" id="30_attack_up_5"]
 [ext_resource type="Texture2D" uid="uid://c3sxqu1m06mmr" path="res://assets/player/AttackUp/sea0_attackup_6.png" id="31_attack_up_6"]
+[ext_resource type="Texture2D" path="res://assets/player/sea0_damage/sea0_damage_1.png" id="32_damage_1"]
+[ext_resource type="Texture2D" path="res://assets/player/sea0_damage/sea0_damage_2.png" id="33_damage_2"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
@@ -82,6 +84,17 @@ animations = [{
 "loop": false,
 "name": &"attack_up",
 "speed": 18.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("32_damage_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_damage_2")
+}],
+"loop": false,
+"name": &"damage",
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,

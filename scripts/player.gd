@@ -629,6 +629,7 @@ func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO) -> void:
 	health_changed.emit(current_health, max_health)
 	_apply_hurt_knockback(from_position)
 	_play_audio(hurt_audio)
+	_play_hurt_animation()
 	_play_hit_effect(global_position)
 	_start_camera_shake(0.24, 8.0)
 
@@ -889,6 +890,11 @@ func _play_player_attack_animation(attack_type: StringName) -> void:
 		animated_sprite.play(&"attack")
 
 
+func _play_hurt_animation() -> void:
+	if animated_sprite.sprite_frames.has_animation(&"damage"):
+		animated_sprite.play(&"damage")
+
+
 func _begin_attack_charge() -> void:
 	if is_attacking or is_dashing:
 		return
@@ -952,6 +958,9 @@ func _update_camera_shake(delta: float) -> void:
 
 
 func _update_animation() -> void:
+	if animated_sprite.animation == &"damage" and animated_sprite.is_playing():
+		return
+
 	if is_attacking:
 		return
 
@@ -972,6 +981,10 @@ func _update_animation() -> void:
 
 
 func _on_animated_sprite_animation_finished() -> void:
+	if animated_sprite.animation == &"damage":
+		_update_animation()
+		return
+
 	if animated_sprite.animation != "attack" and animated_sprite.animation != "attack_up":
 		return
 
