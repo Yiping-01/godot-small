@@ -15,12 +15,11 @@
 [ext_resource type="PackedScene" path="res://scenes/map_wall_jump.tscn" id="13_wall_jump"]
 [ext_resource type="PackedScene" uid="uid://uj0vu7eph4ga" path="res://scenes/map_ceiling.tscn" id="14_ceiling"]
 [ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="15_passage"]
-[ext_resource type="PackedScene" path="res://scenes/enemy2.tscn" id="16_enemy2"]
+[ext_resource type="PackedScene" uid="uid://q051cpudn7vw" path="res://scenes/enemy2.tscn" id="16_enemy2"]
 [ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="17_exit_menu"]
 [ext_resource type="PackedScene" path="res://scenes/legacy_split_enemy.tscn" id="18_split_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/squid_monster.tscn" id="19_squid_monster"]
 [ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="20_tutorial"]
-
 
 [node name="RightRouteRoom" type="Node2D" unique_id=1829796952]
 script = ExtResource("5_room_manager")
@@ -116,7 +115,8 @@ position = Vector2(210, -104)
 [node name="RespawnPoint" type="Marker2D" parent="." unique_id=348304717]
 position = Vector2(-650, 360)
 script = ExtResource("3_respawn_point")
-[node name="MonsterGatheringTutorial" parent="." instance=ExtResource("20_tutorial")]
+
+[node name="MonsterGatheringTutorial" parent="." unique_id=1889315163 instance=ExtResource("20_tutorial")]
 position = Vector2(160, 385)
 scale = Vector2(3.2, 1.35)
 tutorial_text = "怪物聚集地,請試著打敗他們"
@@ -218,5 +218,4 @@ vertical_alignment = 1
 position = Vector2(-838, 400)
 target_scene = "res://scenes/left_route_room.tscn"
 target_spawn_marker_name = "SpawnFromRightRoute"
-enabled = true
 prompt_text = "按 E 進入新場景"

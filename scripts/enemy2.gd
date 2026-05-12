@@ -24,7 +24,7 @@ class_name Enemy2
 @export var coin_drop_amount: int = 4
 @export var coin_scene: PackedScene = preload("res://scenes/coin_pickup.tscn")
 
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var hurtbox: Area2D = $Hurtbox
 @onready var damage_area: Area2D = $DamageArea
@@ -56,6 +56,7 @@ func _ready() -> void:
 	hit_effect.visible = false
 	_set_damage_area_enabled(false)
 	_sync_facing()
+	sprite.play("walk")
 
 
 func _physics_process(delta: float) -> void:
@@ -83,6 +84,7 @@ func _physics_process(delta: float) -> void:
 				_update_idle(delta)
 
 	move_and_slide()
+	_update_walk_animation()
 
 	if state == &"idle" and (is_on_wall() or (is_on_floor() and not _has_floor_ahead())):
 		_flip()
@@ -164,6 +166,7 @@ func _start_dash() -> void:
 	state_timer = dash_time
 	dash_direction = direction
 	_set_damage_area_enabled(true)
+	sprite.play("attack")
 	velocity.x = float(dash_direction) * dash_speed
 
 
@@ -245,6 +248,22 @@ func _has_floor_ahead() -> bool:
 func _sync_facing() -> void:
 	sprite.flip_h = direction > 0
 	damage_area.position.x = damage_area_offset_x * direction
+
+
+func _update_walk_animation() -> void:
+	if is_dead:
+		return
+	if state == &"dash":
+		if sprite.animation != &"attack":
+			sprite.play("attack")
+		return
+
+	if absf(velocity.x) > 5.0:
+		if sprite.animation != &"walk" or not sprite.is_playing():
+			sprite.play("walk")
+	else:
+		sprite.stop()
+		sprite.frame = 0
 
 
 func _set_damage_area_enabled(enabled: bool) -> void:

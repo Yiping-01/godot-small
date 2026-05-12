@@ -1,9 +1,61 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene format=3 uid="uid://q051cpudn7vw"]
 
-[ext_resource type="Script" path="res://scripts/enemy2.gd" id="1_enemy2_script"]
-[ext_resource type="Texture2D" path="res://assets/enemy/enemy1.png" id="2_enemy2_texture"]
-[ext_resource type="Texture2D" path="res://assets/Temporary_Art/Effect and FX Pixel All Free/Free/Part 2/62.png" id="3_hit_fx"]
-[ext_resource type="AudioStream" path="res://assets/audio/enemy_damage.wav" id="4_enemy_damage"]
+[ext_resource type="Script" uid="uid://xo1uqxynubcw" path="res://scripts/enemy2.gd" id="1_enemy2_script"]
+[ext_resource type="Texture2D" uid="uid://bgs2q0t3mc78g" path="res://assets/enemy/enemy03_walk/enemy03_walk_1.png" id="2_enemy03_walk_1"]
+[ext_resource type="Texture2D" uid="uid://b1j544fx7axuk" path="res://assets/Temporary_Art/Effect and FX Pixel All Free/Free/Part 2/62.png" id="3_hit_fx"]
+[ext_resource type="AudioStream" uid="uid://8kqewh3whodf" path="res://assets/audio/enemy_damage.wav" id="4_enemy_damage"]
+[ext_resource type="Texture2D" uid="uid://nvwcdpckik27" path="res://assets/enemy/enemy03_walk/enemy03_walk_2.png" id="5_enemy03_walk_2"]
+[ext_resource type="Texture2D" uid="uid://di5m2bmwvejmu" path="res://assets/enemy/enemy03_walk/enemy03_walk_3.png" id="6_enemy03_walk_3"]
+[ext_resource type="Texture2D" uid="uid://phekl4obnrw" path="res://assets/enemy/enemy03_walk/enemy03_walk_4.png" id="7_enemy03_walk_4"]
+[ext_resource type="Texture2D" path="res://assets/enemy/enemy03_attack/enemy03_attack/enemy03_attack_1.png" id="8_enemy03_attack_1"]
+[ext_resource type="Texture2D" path="res://assets/enemy/enemy03_attack/enemy03_attack/enemy03_attack_2.png" id="9_enemy03_attack_2"]
+[ext_resource type="Texture2D" path="res://assets/enemy/enemy03_attack/enemy03_attack/enemy03_attack_3.png" id="10_enemy03_attack_3"]
+[ext_resource type="Texture2D" path="res://assets/enemy/enemy03_attack/enemy03_attack/enemy03_attack_4.png" id="11_enemy03_attack_4"]
+[ext_resource type="Texture2D" path="res://assets/enemy/enemy03_attack/enemy03_attack/enemy03_attack_5.png" id="12_enemy03_attack_5"]
+[ext_resource type="Texture2D" path="res://assets/enemy/enemy03_attack/enemy03_attack/enemy03_attack_6.png" id="13_enemy03_attack_6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_enemy2_walk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_enemy03_attack_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_enemy03_attack_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_enemy03_attack_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_enemy03_attack_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_enemy03_attack_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_enemy03_attack_6")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 18.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_enemy03_walk_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_enemy03_walk_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_enemy03_walk_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_enemy03_walk_4")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy2"]
 size = Vector2(58, 70)
@@ -78,59 +130,54 @@ animations = [{
 "speed": 22.0
 }]
 
-[node name="Enemy2" type="CharacterBody2D" groups=["enemy"]]
+[node name="Enemy2" type="CharacterBody2D" unique_id=1197384610 groups=["enemy"]]
 collision_layer = 4
-collision_mask = 1
 script = ExtResource("1_enemy2_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=667412004]
 scale = Vector2(0.12, 0.12)
-texture = ExtResource("2_enemy2_texture")
+sprite_frames = SubResource("SpriteFrames_enemy2_walk")
+animation = &"walk"
+frame_progress = 0.56720203
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=329621338]
 position = Vector2(0, 16)
 shape = SubResource("RectangleShape2D_enemy2")
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=1199551649]
 collision_layer = 4
 collision_mask = 8
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1829933096]
 position = Vector2(0, 12)
 shape = SubResource("RectangleShape2D_hurtbox")
 
-[node name="DamageArea" type="Area2D" parent="."]
+[node name="DamageArea" type="Area2D" parent="." unique_id=966644860]
 position = Vector2(-58, 8)
 collision_layer = 32
 collision_mask = 16
 monitoring = false
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea" unique_id=952847158]
 shape = SubResource("RectangleShape2D_damage")
 disabled = true
 
-[node name="HitEffect" type="AnimatedSprite2D" parent="."]
+[node name="HitEffect" type="AnimatedSprite2D" parent="." unique_id=812507821]
 visible = false
 scale = Vector2(0.18, 0.18)
 sprite_frames = SubResource("SpriteFrames_hit_effect")
 animation = &"hit"
 
-[node name="LeftFloorRay" type="RayCast2D" parent="."]
-enabled = true
+[node name="LeftFloorRay" type="RayCast2D" parent="." unique_id=1743756925]
 position = Vector2(-40, 48)
 target_position = Vector2(0, 54)
-collision_mask = 1
 
-[node name="RightFloorRay" type="RayCast2D" parent="."]
-enabled = true
+[node name="RightFloorRay" type="RayCast2D" parent="." unique_id=968648571]
 position = Vector2(40, 48)
 target_position = Vector2(0, 54)
-collision_mask = 1
 
-[node name="DamageAudio" type="AudioStreamPlayer2D" parent="."]
+[node name="DamageAudio" type="AudioStreamPlayer2D" parent="." unique_id=1751154361]
 stream = ExtResource("4_enemy_damage")
-bus = &"SFX"
 
-[node name="DeathAudio" type="AudioStreamPlayer2D" parent="."]
-bus = &"SFX"
+[node name="DeathAudio" type="AudioStreamPlayer2D" parent="." unique_id=1146964917]
