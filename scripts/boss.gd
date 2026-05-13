@@ -34,6 +34,7 @@ const THROW_FRAME_PATHS: Array[String] = [
 @export var close_attack_range: float = 360.0
 @export var vertical_tolerance: float = 180.0
 @export var contact_damage: int = 1
+@export var body_contact_damage_enabled: bool = true
 @export var hurt_knockback: float = 240.0
 @export var hit_stun_time: float = 0.18
 @export var quake_jump_velocity: float = -620.0
@@ -69,6 +70,24 @@ const THROW_FRAME_PATHS: Array[String] = [
 @export var ink_projectile_min_wave_frequency: float = 3.8
 @export var ink_projectile_max_wave_frequency: float = 5.4
 @export var ink_projectile_scene: PackedScene = preload("res://scenes/ink_projectile.tscn")
+@export var intro_effect_enabled: bool = true
+@export var intro_effect_duration: float = 2.8
+@export var intro_ring_start_interval: float = 0.32
+@export var intro_ring_end_interval: float = 0.07
+@export var intro_ring_radius: float = 72.0
+@export var intro_ring_max_scale: float = 14.0
+@export var intro_ring_width: float = 10.0
+@export var intro_spike_count: int = 18
+@export var intro_spike_inner_radius: float = 42.0
+@export var intro_spike_outer_radius: float = 118.0
+@export var intro_spike_angle_width: float = 0.08
+@export var intro_center_glow_radius: float = 96.0
+@export var intro_min_shake_strength: float = 2.0
+@export var intro_max_shake_strength: float = 13.0
+@export var intro_sfx: AudioStream = preload("res://scores/boss1.wav")
+@export var intro_sfx_volume_db: float = 6.0
+@export var ink_sfx: AudioStream = preload("res://scores/boss_attack1.wav")
+@export var ink_sfx_volume_db: float = 0.0
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -101,6 +120,12 @@ var jump_frame_time_left := 0.0
 var throw_frame_index := 0
 var throw_frame_time_left := 0.0
 var throw_animation_active := false
+var intro_time_left := 0.0
+var intro_elapsed := 0.0
+var intro_next_ring_time := 0.0
+var intro_audio: AudioStreamPlayer
+var body_contact_area: Area2D
+var body_contact_shape: CollisionShape2D
 var target: Node2D
 
 
@@ -115,8 +140,11 @@ func _ready() -> void:
 	quake_attacks_before_forced_other = _roll_quake_attacks_before_forced_other()
 	add_to_group("enemy")
 	damage_area.area_entered.connect(_on_damage_area_entered)
+	_setup_body_contact_area()
 	_set_damage_area_enabled(false)
 	_sync_facing()
+	if intro_effect_enabled:
+		_start_intro_effect()
 
 
 func _physics_process(delta: float) -> void:
@@ -125,7 +153,10 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += _get_current_gravity() * delta
 
-	if hit_stun_left > 0.0:
+	if intro_time_left > 0.0:
+		_update_intro_effect(delta)
+		velocity.x = move_toward(velocity.x, 0.0, dash_speed * delta)
+	elif hit_stun_left > 0.0:
 		hit_stun_left -= delta
 		velocity.x = move_toward(velocity.x, 0.0, hurt_knockback * delta * 3.0)
 	else:
@@ -151,6 +182,7 @@ func _physics_process(delta: float) -> void:
 
 	_update_boss_animation(delta)
 	move_and_slide()
+	_damage_body_contact_overlaps()
 
 
 func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO) -> void:
@@ -333,6 +365,161 @@ func _get_jump_animation_frame_time() -> float:
 	return jump_fall_animation_frame_time
 
 
+func _start_intro_effect() -> void:
+	intro_time_left = intro_effect_duration
+	intro_elapsed = 0.0
+	intro_next_ring_time = 0.0
+	state = &"intro"
+	_make_player_face_boss()
+	GameState.set_input_locked(true)
+	_set_damage_area_enabled(false)
+	_play_intro_sfx()
+
+
+func _update_intro_effect(delta: float) -> void:
+	intro_time_left -= delta
+	intro_elapsed += delta
+	intro_next_ring_time -= delta
+
+	if intro_next_ring_time <= 0.0:
+		_spawn_intro_ring()
+
+	var progress := clampf(intro_elapsed / maxf(intro_effect_duration, 0.001), 0.0, 1.0)
+	if intro_next_ring_time <= 0.0:
+		intro_next_ring_time = lerpf(intro_ring_start_interval, intro_ring_end_interval, progress)
+	var shake_strength := lerpf(intro_min_shake_strength, intro_max_shake_strength, progress)
+	var player := target
+	if player == null:
+		player = _find_player()
+	if player != null and player.has_method("_start_camera_shake"):
+		player.call("_start_camera_shake", 0.18, shake_strength)
+
+	if intro_time_left <= 0.0:
+		GameState.set_input_locked(false)
+		_stop_intro_sfx()
+		state = &"idle"
+
+
+func _make_player_face_boss() -> void:
+	var player := _find_player()
+	if player != null and player.has_method("face_position"):
+		player.call("face_position", global_position)
+
+
+func _spawn_intro_ring() -> void:
+	var burst := Node2D.new()
+	burst.name = "IntroBurst"
+	burst.z_index = 200
+	add_child(burst)
+
+	var glow := Polygon2D.new()
+	glow.name = "CenterGlow"
+	glow.color = Color(1.0, 0.96, 0.82, 0.06)
+	glow.polygon = _build_circle_polygon(intro_center_glow_radius, 48)
+	glow.z_index = 198
+	burst.add_child(glow)
+
+	_add_intro_spikes(burst)
+
+	var ring := Line2D.new()
+	ring.name = "IntroRing"
+	ring.closed = true
+	ring.width = intro_ring_width
+	ring.default_color = Color(1.0, 1.0, 1.0, 0.24)
+	ring.gradient = _build_intro_ring_gradient()
+	ring.z_index = 200
+	ring.points = _build_ring_points(intro_ring_radius, 128)
+	burst.add_child(ring)
+
+	var tween := create_tween()
+	burst.scale = Vector2(0.12, 0.12)
+	tween.set_parallel(true)
+	tween.tween_property(burst, "scale", Vector2.ONE * intro_ring_max_scale, 0.72)
+	tween.tween_property(burst, "modulate:a", 0.0, 0.72)
+	tween.set_parallel(false)
+	tween.tween_callback(burst.queue_free)
+
+
+func _build_ring_points(radius: float, point_count: int) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for index in range(point_count):
+		var angle := TAU * float(index) / float(point_count)
+		points.append(Vector2(cos(angle), sin(angle)) * radius)
+	return points
+
+
+func _add_intro_spikes(parent: Node2D) -> void:
+	var count := maxi(3, intro_spike_count)
+	for index in range(count):
+		var angle := TAU * float(index) / float(count)
+		var half_width := intro_spike_angle_width * randf_range(0.75, 1.2)
+		var inner_radius := intro_spike_inner_radius * randf_range(0.85, 1.15)
+		var outer_radius := intro_spike_outer_radius * randf_range(0.85, 1.2)
+		var spike := Polygon2D.new()
+		spike.name = "IntroSpike"
+		spike.color = Color(1.0, 1.0, 1.0, 0.08)
+		spike.z_index = 199
+		spike.polygon = PackedVector2Array([
+			Vector2(cos(angle - half_width), sin(angle - half_width)) * inner_radius,
+			Vector2(cos(angle), sin(angle)) * outer_radius,
+			Vector2(cos(angle + half_width), sin(angle + half_width)) * inner_radius,
+		])
+		parent.add_child(spike)
+
+
+func _build_circle_polygon(radius: float, point_count: int) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for index in range(point_count):
+		var angle := TAU * float(index) / float(point_count)
+		points.append(Vector2(cos(angle), sin(angle)) * radius)
+	return points
+
+
+func _play_intro_sfx() -> void:
+	if intro_sfx == null:
+		return
+	if intro_audio == null:
+		intro_audio = AudioStreamPlayer.new()
+		intro_audio.name = "IntroAudio"
+		add_child(intro_audio)
+	intro_audio.stream = intro_sfx
+	intro_audio.bus = "SFX"
+	intro_audio.volume_db = intro_sfx_volume_db
+	intro_audio.play()
+
+
+func _stop_intro_sfx() -> void:
+	if intro_audio != null and intro_audio.playing:
+		intro_audio.stop()
+
+
+func _play_ink_sfx() -> void:
+	if ink_sfx == null:
+		return
+
+	var audio := AudioStreamPlayer.new()
+	audio.name = "InkAudio"
+	audio.stream = ink_sfx
+	audio.bus = "SFX"
+	audio.volume_db = ink_sfx_volume_db
+	audio.finished.connect(audio.queue_free)
+	add_child(audio)
+	audio.play()
+
+
+func _build_intro_ring_gradient() -> Gradient:
+	var gradient := Gradient.new()
+	gradient.offsets = PackedFloat32Array([0.0, 0.18, 0.42, 0.7, 1.0])
+	gradient.colors = PackedColorArray([
+		Color(1.0, 1.0, 1.0, 0.0),
+		Color(1.0, 1.0, 1.0, 0.22),
+		Color(0.86, 0.96, 1.0, 0.08),
+		Color(1.0, 1.0, 1.0, 0.18),
+		Color(1.0, 1.0, 1.0, 0.0),
+	])
+	return gradient
+
+
 func _begin_random_special_after_dash() -> void:
 	if _must_use_non_quake_attack():
 		_begin_ink_attack()
@@ -417,6 +604,7 @@ func _shoot_one_ink() -> void:
 		var wave_frequency := randf_range(ink_projectile_min_wave_frequency, ink_projectile_max_wave_frequency)
 		var wave_phase := randf_range(0.0, TAU)
 		projectile.call("launch_wave", direction, contact_damage, projectile_speed, wave_amplitude, wave_frequency, wave_phase, self)
+	_play_ink_sfx()
 
 
 func _can_dash_attack() -> bool:
@@ -602,15 +790,55 @@ func _set_damage_area_enabled(enabled: bool) -> void:
 	damage_shape.set_deferred("disabled", not enabled)
 
 
-func _on_damage_area_entered(area: Area2D) -> void:
-	if state != &"dash":
+func _setup_body_contact_area() -> void:
+	if not body_contact_damage_enabled or collision_shape == null or collision_shape.shape == null:
 		return
 
-	var receiver := _find_damage_receiver(area)
+	body_contact_area = Area2D.new()
+	body_contact_area.name = "BodyContactArea"
+	body_contact_area.collision_layer = 32
+	body_contact_area.collision_mask = 16
+	body_contact_area.monitoring = true
+	body_contact_area.monitorable = false
+	body_contact_area.area_entered.connect(_on_body_contact_area_entered)
+	add_child(body_contact_area)
+
+	body_contact_shape = CollisionShape2D.new()
+	body_contact_shape.shape = collision_shape.shape
+	body_contact_shape.position = collision_shape.position
+	body_contact_shape.rotation = collision_shape.rotation
+	body_contact_shape.scale = collision_shape.scale
+	body_contact_area.add_child(body_contact_shape)
+
+
+func _damage_body_contact_overlaps() -> void:
+	if intro_time_left > 0.0 or body_contact_area == null:
+		return
+
+	for area in body_contact_area.get_overlapping_areas():
+		_damage_contact_target(area)
+
+
+func _on_body_contact_area_entered(area: Area2D) -> void:
+	if intro_time_left > 0.0:
+		return
+	_damage_contact_target(area)
+
+
+func _damage_contact_target(target_area: Area2D) -> void:
+	var receiver := _find_damage_receiver(target_area)
 	if receiver == null or receiver == self:
 		return
 
 	receiver.call("take_damage", contact_damage, global_position)
+
+
+func _on_damage_area_entered(area: Area2D) -> void:
+	if state != &"dash":
+		return
+
+	_damage_contact_target(area)
+
 
 
 func _find_damage_receiver(target_node: Node) -> Node:

@@ -695,6 +695,16 @@ func set_respawn_position(new_position: Vector2) -> void:
 	GameState.set_respawn_position(new_position)
 
 
+func face_position(target_position: Vector2) -> void:
+	var new_direction := signf(target_position.x - global_position.x)
+	if is_zero_approx(new_direction):
+		return
+
+	facing_direction = int(new_direction)
+	animated_sprite.flip_h = facing_direction > 0
+	_update_attack_area_side()
+
+
 func sit_on_bench(seat_position: Vector2, facing: int = 1) -> void:
 	is_resting = true
 	_cancel_attack_charge()
