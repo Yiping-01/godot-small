@@ -3,10 +3,12 @@
 [ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="1_ivf3x"]
 [ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="2_apo74"]
 [ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="4_game_ui"]
 [ext_resource type="Texture2D" uid="uid://cko54hf6fqwua" path="res://assets/enemy/boss.png" id="5_hyg8q"]
 [ext_resource type="Script" uid="uid://bb3fwl1h3i07o" path="res://scripts/boss.gd" id="6_boss"]
 [ext_resource type="Texture2D" uid="uid://b173ha6kc107h" path="res://assets/bosslevel_bgtitle/bosslevelbg1.png" id="7_boss_bg"]
 [ext_resource type="Texture2D" uid="uid://ditms5q8lp52i" path="res://assets/bosslevel_bgtitle/bosslevel_title.png" id="8_boss_title"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="9_health_ui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
 size = Vector2(177, 120)
@@ -15,6 +17,26 @@ size = Vector2(177, 120)
 size = Vector2(92, 94)
 
 [node name="Bosslevel" type="Node2D" unique_id=1054835420]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("9_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD"]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD"]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="GameUI" parent="." instance=ExtResource("4_game_ui")]
 
 [node name="BossBackground" type="Sprite2D" parent="." unique_id=301488957]
 z_index = -100

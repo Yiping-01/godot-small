@@ -22,7 +22,7 @@ const THROW_FRAME_PATHS: Array[String] = [
 	"res://assets/enemy/boss_throw/boss_throw4.png",
 ]
 
-@export var max_health: int = 20
+@export var max_health: int = 10
 @export var gravity: float = 1600.0
 @export var dash_speed: float = 760.0
 @export var dash_time: float = 0.42
@@ -30,6 +30,7 @@ const THROW_FRAME_PATHS: Array[String] = [
 @export var dash_animation_flipped: bool = true
 @export var windup_time: float = 0.55
 @export var recover_time: float = 0.8
+@export var attack_switch_pause_time: float = 0.5
 @export var attack_range: float = 720.0
 @export var close_attack_range: float = 360.0
 @export var vertical_tolerance: float = 180.0
@@ -62,8 +63,8 @@ const THROW_FRAME_PATHS: Array[String] = [
 @export var throw_animation_frame_time: float = 0.09
 @export var throw_animation_scale_multiplier: float = 0.81
 @export var ink_projectile_speed: float = 330.0
-@export var ink_projectile_min_count: int = 5
-@export var ink_projectile_max_count: int = 7
+@export var ink_projectile_min_count: int = 4
+@export var ink_projectile_max_count: int = 4
 @export var ink_projectile_min_batch: int = 1
 @export var ink_projectile_max_batch: int = 1
 @export var ink_projectile_min_height: float = -58.0
@@ -104,6 +105,7 @@ const THROW_FRAME_PATHS: Array[String] = [
 var health := 0
 var state := &"idle"
 var state_timer := 0.0
+var next_attack_after_pause := &"any"
 var direction := -1
 var hit_stun_left := 0.0
 var ink_projectiles_left := 0
@@ -174,6 +176,8 @@ func _physics_process(delta: float) -> void:
 				_update_dash(delta)
 			&"recover":
 				_update_recover(delta)
+			&"attack_pause":
+				_update_attack_pause(delta)
 			&"ink_windup":
 				_update_ink_windup(delta)
 			&"ink_fire":
@@ -245,9 +249,22 @@ func _update_recover(delta: float) -> void:
 	state_timer -= delta
 	if state_timer <= 0.0:
 		if target != null:
-			_begin_random_special_after_dash()
+			_begin_attack_pause(&"special_after_dash")
 			return
 		state = &"idle"
+
+
+func _update_attack_pause(delta: float) -> void:
+	velocity.x = move_toward(velocity.x, 0.0, dash_speed * delta * 2.0)
+	_face_target()
+	state_timer -= delta
+	if state_timer > 0.0:
+		return
+
+	if next_attack_after_pause == &"special_after_dash":
+		_begin_random_special_after_dash()
+	else:
+		_begin_random_attack()
 
 
 func _update_ink_windup(delta: float) -> void:
@@ -287,7 +304,7 @@ func _update_ink_recover(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0.0, dash_speed * delta)
 	state_timer -= delta
 	if state_timer <= 0.0:
-		_begin_random_attack()
+		_begin_attack_pause()
 
 
 func _update_quake_jump(delta: float) -> void:
@@ -304,7 +321,15 @@ func _update_quake_recover(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0.0, dash_speed * delta)
 	state_timer -= delta
 	if state_timer <= 0.0:
-		_begin_random_attack()
+		_begin_attack_pause()
+
+
+func _begin_attack_pause(next_attack: StringName = &"any") -> void:
+	next_attack_after_pause = next_attack
+	state = &"attack_pause"
+	state_timer = attack_switch_pause_time
+	velocity.x = 0.0
+	_set_damage_area_enabled(false)
 
 
 func _begin_dash_attack() -> void:

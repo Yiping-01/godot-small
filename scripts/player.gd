@@ -50,6 +50,7 @@ signal respawned
 @export var far_attack_duration: float = 0.3
 @export var far_attack_hit_radius: float = 22.0
 @export var far_attack_effect_scale := Vector2(0.2, 0.2)
+@export var far_attack_cooldown: float = 3.0
 
 @export_category("Camera")
 @export var camera_follow_position := Vector2(80.0, -40.0)
@@ -130,6 +131,7 @@ var charge_ready := false
 var is_dashing := false
 var dash_time_left := 0.0
 var dash_cooldown_left := 0.0
+var far_attack_cooldown_left := 0.0
 var dash_direction := 1
 var is_resting := false
 var normal_z_index := 0
@@ -181,6 +183,8 @@ func _physics_process(delta: float) -> void:
 		_update_camera_shake(delta)
 		return
 
+	if far_attack_cooldown_left > 0.0:
+		far_attack_cooldown_left = maxf(far_attack_cooldown_left - delta, 0.0)
 	_update_hurt_animation_state(delta)
 
 	if is_resting:
@@ -315,7 +319,7 @@ func _handle_attack_input(delta: float) -> void:
 
 
 func _handle_far_attack_input() -> void:
-	if hurt_lock_left > 0.0 or is_hurt_animating or is_attacking or is_dashing or is_charging_attack:
+	if hurt_lock_left > 0.0 or is_hurt_animating or is_attacking or is_dashing or is_charging_attack or far_attack_cooldown_left > 0.0:
 		return
 
 	if not Input.is_action_just_pressed("far_attack"):
@@ -351,7 +355,7 @@ func _try_attack() -> void:
 
 
 func _try_far_attack() -> void:
-	if is_attacking or is_dashing:
+	if is_attacking or is_dashing or far_attack_cooldown_left > 0.0:
 		return
 
 	var input_direction := _get_horizontal_input()
@@ -361,6 +365,7 @@ func _try_far_attack() -> void:
 		_update_attack_area_side()
 
 	is_attacking = true
+	far_attack_cooldown_left = far_attack_cooldown
 	active_attack_type = &"far"
 	_spawn_far_attack_projectile()
 	_play_audio(far_attack_audio)
