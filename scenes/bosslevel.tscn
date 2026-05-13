@@ -66,7 +66,186 @@ monitorable = false
 shape = SubResource("RectangleShape2D_boss_damage")
 disabled = true
 
+[node name="BossLevelTitle46" type="Sprite2D" parent="." unique_id=1758222445]
+z_index = -90
+position = Vector2(334, 713)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(629.68164, 614.6824, 33.954712, 66.02301)
+
+[node name="BossLevelTitle45" type="Sprite2D" parent="." unique_id=734508279]
+z_index = -90
+position = Vector2(502, 723)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(629.68164, 614.6824, 33.954712, 66.02301)
+
+[node name="BossLevelTitle44" type="Sprite2D" parent="." unique_id=1536739115]
+z_index = -90
+position = Vector2(581, 679)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(1357.8213, 580.72766, 71.68213, 111.29596)
+
+[node name="BossLevelTitle43" type="Sprite2D" parent="." unique_id=2069450184]
+z_index = -90
+position = Vector2(81, 679)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(741.0069, 704.5675, 48.186768, 79.366455)
+
+[node name="BossLevelTitle42" type="Sprite2D" parent="." unique_id=1424963093]
+z_index = -90
+position = Vector2(1009, 688)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(934.3402, 554.228, 77.94916, 124.71863)
+
+[node name="BossLevelTitle41" type="Sprite2D" parent="." unique_id=21078568]
+z_index = -90
+position = Vector2(643, 701)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(548.719, 581.96216, 74.5365, 101.15662)
+
+[node name="BossLevelTitle40" type="Sprite2D" parent="." unique_id=1457720833]
+z_index = -90
+position = Vector2(156, 651)
+scale = Vector2(2.25, 2.25)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(548.719, 581.96216, 74.5365, 101.15662)
+
+[node name="BossLevelTitle39" type="Sprite2D" parent="." unique_id=690487128]
+z_index = -90
+position = Vector2(1013.9999, 255.99998)
+rotation = 3.2073152
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(1118.9468, 451.39697, 108.22693, 121.11096)
+
+[node name="BossLevelTitle38" type="Sprite2D" parent="." unique_id=802696820]
+z_index = -90
+position = Vector2(327, 263)
+rotation = -3.1008525
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(1118.9468, 451.39697, 108.22693, 121.11096)
+
+[node name="BossLevelTitle37" type="Sprite2D" parent="." unique_id=1970044407]
+z_index = -90
+position = Vector2(760, 247)
+rotation = 3.0677314
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(430.1137, 195.95113, 146.37695, 96.66405)
+
+[node name="BossLevelTitle36" type="Sprite2D" parent="." unique_id=745131538]
+z_index = -90
+position = Vector2(1026, 249)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(917.48083, 429.6574, 46.301758, 118.3266)
+
+[node name="BossLevelTitle35" type="Sprite2D" parent="." unique_id=1394482253]
+z_index = -90
+position = Vector2(821, 235)
+rotation = -2.9427514
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(23.369858, 887.6123, 112.2466, 56.12329)
+
+[node name="BossLevelTitle34" type="Sprite2D" parent="." unique_id=870618234]
+z_index = -90
+position = Vector2(422.00003, 227.00003)
+rotation = -3.181973
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(23.369858, 887.6123, 112.2466, 56.12329)
+
+[node name="BossLevelTitle33" type="Sprite2D" parent="." unique_id=659879847]
+z_index = -90
+position = Vector2(230, 228)
+rotation = 2.7998824
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(23.369858, 887.6123, 112.2466, 56.12329)
+
+[node name="BossLevelTitle32" type="Sprite2D" parent="." unique_id=817392105]
+z_index = -90
+position = Vector2(587, 262)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(13.384701, 441.04678, 238.52393, 113.80551)
+
+[node name="BossLevelTitle31" type="Sprite2D" parent="." unique_id=1731725061]
+z_index = -90
+position = Vector2(1054, 271)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(965.3258, 436.77524, 56.025024, 126.5751)
+
+[node name="BossLevelTitle30" type="Sprite2D" parent="." unique_id=50171515]
+z_index = -90
+position = Vector2(60, 291)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(965.3258, 436.77524, 56.025024, 126.5751)
+
+[node name="BossLevelTitle29" type="Sprite2D" parent="." unique_id=2063018248]
+z_index = -90
+position = Vector2(80, 270)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(965.3258, 436.77524, 56.025024, 126.5751)
+
+[node name="BossLevelTitle28" type="Sprite2D" parent="." unique_id=1860582010]
+z_index = -90
+position = Vector2(909, 272)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(265.06946, 451.427, 139.48926, 121.38757)
+
+[node name="BossLevelTitle27" type="Sprite2D" parent="." unique_id=1268855142]
+z_index = -90
+position = Vector2(157, 268)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(265.06946, 451.427, 139.48926, 121.38757)
+
+[node name="BossLevelTitle26" type="Sprite2D" parent="." unique_id=1725088426]
+z_index = -90
+position = Vector2(467, 267)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(841.938, 438.4524, 63.888184, 134.16528)
+
+[node name="BossLevelTitle25" type="Sprite2D" parent="." unique_id=1493433024]
+z_index = -90
+position = Vector2(853, 273)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(841.938, 438.4524, 63.888184, 134.16528)
+
+[node name="BossLevelTitle24" type="Sprite2D" parent="." unique_id=1068014262]
+z_index = -90
+position = Vector2(96, 279)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(841.938, 438.4524, 63.888184, 134.16528)
+
 [node name="boundary" type="Node2D" parent="." unique_id=232177234]
+
+[node name="BossLevelTitle27" type="Sprite2D" parent="boundary" unique_id=264483304]
+z_index = -90
+position = Vector2(13.924768, 421.48233)
+rotation = -0.027347565
+scale = Vector2(0.6844692, 1)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(153.79622, 194.60585, 120.72783, 169.77348)
 
 [node name="BossLevelTitle24" type="Sprite2D" parent="boundary" unique_id=2096619964]
 z_index = -90
@@ -160,17 +339,9 @@ texture = ExtResource("8_boss_title")
 region_enabled = true
 region_rect = Rect2(288.66992, 204.3675, 143.79742, 123.254974)
 
-[node name="BossLevelTitle14" type="Sprite2D" parent="boundary" unique_id=157515231]
-z_index = -90
-position = Vector2(2, 620)
-rotation = 3.1415925
-texture = ExtResource("8_boss_title")
-region_enabled = true
-region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
-
 [node name="BossLevelTitle13" type="Sprite2D" parent="boundary" unique_id=964099743]
 z_index = -90
-position = Vector2(2, 449)
+position = Vector2(-11, 469)
 rotation = 3.1415925
 texture = ExtResource("8_boss_title")
 region_enabled = true
@@ -183,6 +354,16 @@ rotation = 3.1415925
 texture = ExtResource("8_boss_title")
 region_enabled = true
 region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle28" type="Sprite2D" parent="boundary" unique_id=1804883959]
+z_index = -90
+position = Vector2(20.829298, 537.7696)
+rotation = 3.1286683
+scale = Vector2(0.7028202, 1)
+texture = ExtResource("8_boss_title")
+flip_h = true
+region_enabled = true
+region_rect = Rect2(153.79622, 194.60585, 120.72783, 169.77348)
 
 [node name="BossLevelTitle11" type="Sprite2D" parent="boundary" unique_id=1792553008]
 z_index = -90
@@ -212,6 +393,15 @@ region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
 z_index = -90
 position = Vector2(783, 783)
 rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle14" type="Sprite2D" parent="boundary" unique_id=157515231]
+z_index = -90
+position = Vector2(15.000002, 673.87)
+rotation = 3.1415925
+scale = Vector2(1, 0.861613)
 texture = ExtResource("8_boss_title")
 region_enabled = true
 region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
