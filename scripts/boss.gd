@@ -1,9 +1,26 @@
 extends CharacterBody2D
 
+const DASH_FRAME_PATHS: Array[String] = [
+	"res://assets/enemy/boss_go/bossgo_1.png",
+	"res://assets/enemy/boss_go/bossgo_2.png",
+	"res://assets/enemy/boss_go/bossgo_3.png",
+	"res://assets/enemy/boss_go/bossgo_4.png",
+]
+
+const JUMP_FRAME_PATHS: Array[String] = [
+	"res://assets/enemy/boss_jump/boss_jump1.png",
+	"res://assets/enemy/boss_jump/boss_jump2.png",
+	"res://assets/enemy/boss_jump/boss_jump3.png",
+	"res://assets/enemy/boss_jump/boss_jump4.png",
+	"res://assets/enemy/boss_jump/boss_jump5.png",
+]
+
 @export var max_health: int = 20
 @export var gravity: float = 1600.0
 @export var dash_speed: float = 760.0
 @export var dash_time: float = 0.42
+@export var dash_animation_frame_time: float = 0.08
+@export var dash_animation_flipped: bool = true
 @export var windup_time: float = 0.55
 @export var recover_time: float = 0.8
 @export var attack_range: float = 720.0
@@ -12,29 +29,36 @@ extends CharacterBody2D
 @export var contact_damage: int = 1
 @export var hurt_knockback: float = 240.0
 @export var hit_stun_time: float = 0.18
-@export var quake_jump_velocity: float = -820.0
-@export var quake_gravity: float = 1050.0
+@export var quake_jump_velocity: float = -620.0
+@export var quake_rise_gravity: float = 650.0
+@export var quake_fall_gravity: float = 1900.0
+@export var jump_rise_animation_frame_time: float = 0.3
+@export var jump_fall_animation_frame_time: float = 0.08
 @export var quake_damage: int = 1
 @export var quake_recover_time: float = 0.7
 @export var quake_camera_shake_duration: float = 0.7
 @export var quake_camera_shake_strength: float = 7.0
+@export var min_quake_attacks_before_forced_other: int = 1
+@export var max_quake_attacks_before_forced_other: int = 2
+@export var min_ranged_attacks_before_forced_close: int = 1
+@export var max_ranged_attacks_before_forced_close: int = 2
 @export var ink_attack_windup_time: float = 0.45
 @export var ink_attack_recover_time: float = 0.75
-@export var ink_projectile_speed: float = 430.0
-@export var ink_projectile_min_count: int = 8
-@export var ink_projectile_max_count: int = 10
+@export var ink_projectile_speed: float = 330.0
+@export var ink_projectile_min_count: int = 5
+@export var ink_projectile_max_count: int = 7
 @export var ink_projectile_min_batch: int = 1
-@export var ink_projectile_max_batch: int = 3
+@export var ink_projectile_max_batch: int = 1
 @export var ink_projectile_min_height: float = -58.0
 @export var ink_projectile_max_height: float = 52.0
-@export var ink_projectile_min_interval: float = 0.3
-@export var ink_projectile_max_interval: float = 0.5
+@export var ink_projectile_min_interval: float = 0.6
+@export var ink_projectile_max_interval: float = 0.8
 @export var ink_projectile_min_speed_multiplier: float = 0.75
 @export var ink_projectile_max_speed_multiplier: float = 1.35
-@export var ink_projectile_straight_chance: float = 0.45
-@export var ink_projectile_min_arc_vertical_speed: float = -760.0
-@export var ink_projectile_max_arc_vertical_speed: float = -540.0
-@export var ink_projectile_arc_gravity: float = 900.0
+@export var ink_projectile_min_wave_amplitude: float = 18.0
+@export var ink_projectile_max_wave_amplitude: float = 34.0
+@export var ink_projectile_min_wave_frequency: float = 3.8
+@export var ink_projectile_max_wave_frequency: float = 5.4
 @export var ink_projectile_scene: PackedScene = preload("res://scenes/ink_projectile.tscn")
 
 @onready var sprite: Sprite2D = $Sprite2D
@@ -50,12 +74,29 @@ var hit_stun_left := 0.0
 var ink_projectiles_left := 0
 var ink_projectile_index := 0
 var ink_next_shot_time := 0.0
+var ranged_attack_count := 0
+var ranged_attacks_before_forced_close := 0
+var quake_attack_count := 0
+var quake_attacks_before_forced_other := 0
 var quake_has_left_floor := false
+var default_texture: Texture2D
+var dash_frames: Array[Texture2D] = []
+var jump_frames: Array[Texture2D] = []
+var dash_frame_index := 0
+var dash_frame_time_left := 0.0
+var jump_rise_frame_index := 0
+var jump_fall_frame_index := 0
+var jump_frame_time_left := 0.0
 var target: Node2D
 
 
 func _ready() -> void:
 	health = max_health
+	default_texture = sprite.texture
+	_load_dash_frames()
+	_load_jump_frames()
+	ranged_attacks_before_forced_close = _roll_ranged_attacks_before_forced_close()
+	quake_attacks_before_forced_other = _roll_quake_attacks_before_forced_other()
 	add_to_group("enemy")
 	damage_area.area_entered.connect(_on_damage_area_entered)
 	_set_damage_area_enabled(false)
@@ -92,6 +133,7 @@ func _physics_process(delta: float) -> void:
 			_:
 				_update_idle(delta)
 
+	_update_boss_animation(delta)
 	move_and_slide()
 
 
@@ -114,7 +156,7 @@ func _update_idle(_delta: float) -> void:
 	if not _can_dash_attack():
 		return
 
-	_begin_dash_attack()
+	_begin_random_attack()
 
 
 func _update_windup(delta: float) -> void:
@@ -128,6 +170,7 @@ func _update_windup(delta: float) -> void:
 	state_timer = dash_time
 	velocity.x = direction * dash_speed
 	_set_damage_area_enabled(true)
+	_start_dash_animation()
 
 
 func _update_dash(delta: float) -> void:
@@ -137,6 +180,7 @@ func _update_dash(delta: float) -> void:
 		return
 
 	_set_damage_area_enabled(false)
+	_stop_dash_animation()
 	state = &"recover"
 	state_timer = recover_time
 
@@ -208,12 +252,16 @@ func _update_quake_recover(delta: float) -> void:
 
 
 func _begin_dash_attack() -> void:
+	_reset_ranged_attack_count()
+	_reset_quake_attack_count()
 	_face_target()
 	state = &"windup"
 	state_timer = windup_time
 
 
 func _begin_ink_attack() -> void:
+	_reset_quake_attack_count()
+	ranged_attack_count += 1
 	_face_target()
 	state = &"ink_windup"
 	state_timer = ink_attack_windup_time
@@ -227,11 +275,14 @@ func _begin_ink_fire() -> void:
 
 
 func _begin_quake_jump() -> void:
+	_reset_ranged_attack_count()
+	quake_attack_count += 1
 	_set_damage_area_enabled(false)
 	state = &"quake_jump"
 	quake_has_left_floor = false
 	velocity.x = 0.0
 	velocity.y = quake_jump_velocity
+	_start_jump_animation()
 
 
 func _trigger_quake() -> void:
@@ -253,12 +304,24 @@ func _is_target_on_floor() -> bool:
 
 func _get_current_gravity() -> float:
 	if state == &"quake_jump":
-		return quake_gravity
+		if velocity.y < 0.0:
+			return quake_rise_gravity
+		return quake_fall_gravity
 	return gravity
 
 
+func _get_jump_animation_frame_time() -> float:
+	if velocity.y < 0.0:
+		return jump_rise_animation_frame_time
+	return jump_fall_animation_frame_time
+
+
 func _begin_random_special_after_dash() -> void:
-	if _is_target_close():
+	if _must_use_non_quake_attack():
+		_begin_ink_attack()
+		return
+
+	if _must_use_close_attack() or _is_target_close():
 		_begin_quake_jump()
 	else:
 		_begin_ink_attack()
@@ -269,13 +332,46 @@ func _begin_random_attack() -> void:
 		state = &"idle"
 		return
 
-	if _is_target_close():
+	if _must_use_non_quake_attack():
+		if _is_target_close():
+			_begin_dash_attack()
+		else:
+			_begin_ink_attack()
+		return
+
+	if _must_use_close_attack() or _is_target_close():
 		if randf() < 0.5:
 			_begin_dash_attack()
 		else:
 			_begin_quake_jump()
 	else:
 		_begin_ink_attack()
+
+
+func _must_use_close_attack() -> bool:
+	return ranged_attack_count >= ranged_attacks_before_forced_close
+
+
+func _must_use_non_quake_attack() -> bool:
+	return quake_attack_count >= quake_attacks_before_forced_other
+
+
+func _reset_ranged_attack_count() -> void:
+	ranged_attack_count = 0
+	ranged_attacks_before_forced_close = _roll_ranged_attacks_before_forced_close()
+
+
+func _reset_quake_attack_count() -> void:
+	quake_attack_count = 0
+	quake_attacks_before_forced_other = _roll_quake_attacks_before_forced_other()
+
+
+func _roll_ranged_attacks_before_forced_close() -> int:
+	return randi_range(min_ranged_attacks_before_forced_close, max_ranged_attacks_before_forced_close)
+
+
+func _roll_quake_attacks_before_forced_other() -> int:
+	return randi_range(min_quake_attacks_before_forced_other, max_quake_attacks_before_forced_other)
 
 
 func _is_target_close() -> bool:
@@ -299,11 +395,11 @@ func _shoot_one_ink() -> void:
 		projectile.global_position = global_position + Vector2(74.0 * direction, random_height)
 	var speed_multiplier := randf_range(ink_projectile_min_speed_multiplier, ink_projectile_max_speed_multiplier)
 	var projectile_speed := ink_projectile_speed * speed_multiplier
-	if randf() < ink_projectile_straight_chance and projectile.has_method("launch"):
-		projectile.call("launch", direction, contact_damage, projectile_speed, self)
-	elif projectile.has_method("launch_arc"):
-		var vertical_speed := randf_range(ink_projectile_min_arc_vertical_speed, ink_projectile_max_arc_vertical_speed)
-		projectile.call("launch_arc", direction, contact_damage, projectile_speed, vertical_speed, ink_projectile_arc_gravity, self)
+	if projectile.has_method("launch_wave"):
+		var wave_amplitude := randf_range(ink_projectile_min_wave_amplitude, ink_projectile_max_wave_amplitude)
+		var wave_frequency := randf_range(ink_projectile_min_wave_frequency, ink_projectile_max_wave_frequency)
+		var wave_phase := randf_range(0.0, TAU)
+		projectile.call("launch_wave", direction, contact_damage, projectile_speed, wave_amplitude, wave_frequency, wave_phase, self)
 
 
 func _can_dash_attack() -> bool:
@@ -342,8 +438,104 @@ func _face_target() -> void:
 
 
 func _sync_facing() -> void:
-	sprite.flip_h = direction > 0
+	_apply_sprite_facing()
 	damage_area.position.x = 64.0 * direction
+
+
+func _apply_sprite_facing() -> void:
+	sprite.flip_h = direction > 0
+	if state == &"dash" and dash_animation_flipped:
+		sprite.flip_h = not sprite.flip_h
+
+
+func _start_dash_animation() -> void:
+	dash_frame_index = 0
+	dash_frame_time_left = dash_animation_frame_time
+	_apply_sprite_facing()
+	if not dash_frames.is_empty():
+		sprite.texture = dash_frames[dash_frame_index]
+
+
+func _stop_dash_animation() -> void:
+	if default_texture != null:
+		sprite.texture = default_texture
+	_apply_sprite_facing()
+
+
+func _update_boss_animation(delta: float) -> void:
+	if state == &"dash":
+		_update_dash_animation(delta)
+		return
+	if state == &"quake_jump" or state == &"quake_recover":
+		_update_jump_animation(delta)
+		return
+
+	if sprite.texture != default_texture:
+		_stop_special_animation()
+
+
+func _update_dash_animation(delta: float) -> void:
+	if dash_frames.is_empty():
+		return
+
+	dash_frame_time_left -= delta
+	if dash_frame_time_left > 0.0:
+		return
+
+	dash_frame_time_left = dash_animation_frame_time
+	dash_frame_index = (dash_frame_index + 1) % dash_frames.size()
+	sprite.texture = dash_frames[dash_frame_index]
+
+
+func _start_jump_animation() -> void:
+	jump_rise_frame_index = 0
+	jump_fall_frame_index = 3
+	jump_frame_time_left = _get_jump_animation_frame_time()
+	_apply_sprite_facing()
+	if not jump_frames.is_empty():
+		sprite.texture = jump_frames[jump_rise_frame_index]
+
+
+func _update_jump_animation(delta: float) -> void:
+	if jump_frames.is_empty():
+		return
+
+	jump_frame_time_left -= delta
+	if jump_frame_time_left > 0.0:
+		return
+
+	jump_frame_time_left = _get_jump_animation_frame_time()
+	if velocity.y < 0.0:
+		jump_rise_frame_index = mini(jump_rise_frame_index + 1, mini(2, jump_frames.size() - 1))
+		sprite.texture = jump_frames[jump_rise_frame_index]
+	else:
+		if jump_frames.size() < 5:
+			sprite.texture = jump_frames[jump_frames.size() - 1]
+			return
+		jump_fall_frame_index = mini(jump_fall_frame_index + 1, 4)
+		sprite.texture = jump_frames[jump_fall_frame_index]
+
+
+func _stop_special_animation() -> void:
+	if default_texture != null:
+		sprite.texture = default_texture
+	_apply_sprite_facing()
+
+
+func _load_dash_frames() -> void:
+	dash_frames.clear()
+	for path in DASH_FRAME_PATHS:
+		var texture := load(path)
+		if texture is Texture2D:
+			dash_frames.append(texture)
+
+
+func _load_jump_frames() -> void:
+	jump_frames.clear()
+	for path in JUMP_FRAME_PATHS:
+		var texture := load(path)
+		if texture is Texture2D:
+			jump_frames.append(texture)
 
 
 func _set_damage_area_enabled(enabled: bool) -> void:
