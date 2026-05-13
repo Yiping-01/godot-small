@@ -46,6 +46,13 @@ const THROW_FRAME_PATHS: Array[String] = [
 @export var quake_recover_time: float = 0.7
 @export var quake_camera_shake_duration: float = 0.7
 @export var quake_camera_shake_strength: float = 7.0
+@export var quake_wave_duration: float = 0.45
+@export var quake_wave_width: float = 520.0
+@export var quake_wave_height: float = 34.0
+@export var quake_wave_line_width: float = 8.0
+@export var quake_wave_y_offset: float = 70.0
+@export var quake_floor_wave_width: float = 1800.0
+@export var quake_floor_wave_height: float = 24.0
 @export var min_quake_attacks_before_forced_other: int = 1
 @export var max_quake_attacks_before_forced_other: int = 2
 @export var min_ranged_attacks_before_forced_close: int = 1
@@ -335,6 +342,7 @@ func _begin_quake_jump() -> void:
 
 
 func _trigger_quake() -> void:
+	_spawn_quake_wave()
 	if target != null and target.has_method("_start_camera_shake"):
 		target.call("_start_camera_shake", quake_camera_shake_duration, quake_camera_shake_strength)
 	if not _is_target_on_floor() or target == null:
@@ -349,6 +357,77 @@ func _is_target_on_floor() -> bool:
 	if target is CharacterBody2D:
 		return target.is_on_floor()
 	return false
+
+
+func _spawn_quake_wave() -> void:
+	var parent := get_parent()
+	if parent == null:
+		return
+
+	var wave := Node2D.new()
+	wave.name = "QuakeWave"
+	wave.z_index = 180
+	parent.add_child(wave)
+	wave.global_position = global_position + Vector2(0.0, quake_wave_y_offset)
+
+	var fill := Polygon2D.new()
+	fill.name = "QuakeWaveFill"
+	fill.color = Color(1.0, 1.0, 1.0, 0.08)
+	fill.polygon = _build_ellipse_points(quake_wave_width * 0.5, quake_wave_height * 0.5, 72)
+	wave.add_child(fill)
+
+	var floor_flash := Polygon2D.new()
+	floor_flash.name = "QuakeFloorFlash"
+	floor_flash.color = Color(1.0, 1.0, 1.0, 0.22)
+	floor_flash.polygon = _build_floor_wave_polygon(quake_floor_wave_width, quake_floor_wave_height)
+	wave.add_child(floor_flash)
+
+	var ring := Line2D.new()
+	ring.name = "QuakeWaveRing"
+	ring.closed = true
+	ring.width = quake_wave_line_width
+	ring.default_color = Color(1.0, 1.0, 1.0, 0.55)
+	ring.points = _build_ellipse_points(quake_wave_width * 0.5, quake_wave_height * 0.5, 96)
+	wave.add_child(ring)
+
+	for index in range(3):
+		var floor_line := Line2D.new()
+		floor_line.name = "QuakeFloorLine"
+		floor_line.width = maxf(2.0, quake_wave_line_width - float(index) * 2.0)
+		floor_line.default_color = Color(1.0, 1.0, 1.0, 0.5 - float(index) * 0.12)
+		var line_y := float(index - 1) * quake_floor_wave_height * 0.35
+		floor_line.points = PackedVector2Array([
+			Vector2(-quake_floor_wave_width * 0.5, line_y),
+			Vector2(quake_floor_wave_width * 0.5, line_y),
+		])
+		wave.add_child(floor_line)
+
+	wave.scale = Vector2(0.05, 0.18)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(wave, "scale", Vector2(1.0, 1.0), quake_wave_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(wave, "modulate:a", 0.0, quake_wave_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(false)
+	tween.tween_callback(wave.queue_free)
+
+
+func _build_ellipse_points(radius_x: float, radius_y: float, point_count: int) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for index in range(point_count):
+		var angle := TAU * float(index) / float(point_count)
+		points.append(Vector2(cos(angle) * radius_x, sin(angle) * radius_y))
+	return points
+
+
+func _build_floor_wave_polygon(width: float, height: float) -> PackedVector2Array:
+	var half_width := width * 0.5
+	var half_height := height * 0.5
+	return PackedVector2Array([
+		Vector2(-half_width, -half_height),
+		Vector2(half_width, -half_height),
+		Vector2(half_width, half_height),
+		Vector2(-half_width, half_height),
+	])
 
 
 func _get_current_gravity() -> float:
