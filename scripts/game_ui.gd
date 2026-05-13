@@ -441,15 +441,6 @@ func _add_map_room(room_id: String, display_name: String, room_rect: Rect2, visi
 
 	map_canvas.add_child(label)
 
-	if is_current:
-		var marker := ColorRect.new()
-		marker.color = Color(0.2, 0.95, 1.0, 1.0)
-		marker.size = Vector2(10, 10)
-		marker.position = room_rect.position + room_rect.size * 0.5 - marker.size * 0.5
-
-		map_canvas.add_child(marker)
-
-
 func _add_player_map_marker(rooms: Dictionary) -> void:
 	if GameState.current_map_room == "":
 		return

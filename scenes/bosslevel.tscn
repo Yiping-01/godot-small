@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://ditms5q8lp52i" path="res://assets/bosslevel_bgtitle/bosslevel_title.png" id="8_boss_title"]
 [ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="9_health_ui"]
 [ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="10_exit_menu"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="11_ct8uc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
 size = Vector2(177, 120)
@@ -19,17 +20,17 @@ size = Vector2(92, 94)
 
 [node name="Bosslevel" type="Node2D" unique_id=1054835420]
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1238368204]
 script = ExtResource("9_health_ui")
 
-[node name="HealthPips" type="HBoxContainer" parent="HUD"]
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=163147142]
 offset_left = 18.0
 offset_top = 12.0
 offset_right = 260.0
 offset_bottom = 58.0
 theme_override_constants/separation = 2
 
-[node name="HealthLabel" type="Label" parent="HUD"]
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=136503295]
 offset_left = 22.0
 offset_top = 58.0
 offset_right = 240.0
@@ -37,12 +38,12 @@ offset_bottom = 90.0
 theme_override_font_sizes/font_size = 18
 text = "HP: 5 / 5"
 
-[node name="ExitMenu" type="CanvasLayer" parent="."]
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=987469001]
 process_mode = 3
 layer = 20
 script = ExtResource("10_exit_menu")
 
-[node name="GameUI" parent="." instance=ExtResource("4_game_ui")]
+[node name="GameUI" parent="." unique_id=1098441461 instance=ExtResource("4_game_ui")]
 
 [node name="BossBackground" type="Sprite2D" parent="." unique_id=301488957]
 z_index = -100
@@ -467,3 +468,14 @@ rotation = 1.5707964
 texture = ExtResource("8_boss_title")
 region_enabled = true
 region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="MapRooms" type="Node2D" parent="." unique_id=236934027]
+visible = false
+position = Vector2(583, 454)
+
+[node name="BossRoomMarker" parent="MapRooms" unique_id=1366671650 instance=ExtResource("11_ct8uc")]
+position = Vector2(8, 4)
+scale = Vector2(1.8, 1.5)
+room_id = "boss_room"
+display_name = "Boss房"
+map_rect = Rect2(240, 140, 220, 90)
