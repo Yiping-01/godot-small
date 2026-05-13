@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://b173ha6kc107h" path="res://assets/bosslevel_bgtitle/bosslevelbg1.png" id="7_boss_bg"]
 [ext_resource type="Texture2D" uid="uid://ditms5q8lp52i" path="res://assets/bosslevel_bgtitle/bosslevel_title.png" id="8_boss_title"]
 [ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="9_health_ui"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="10_exit_menu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
 size = Vector2(177, 120)
@@ -35,6 +36,11 @@ offset_right = 240.0
 offset_bottom = 90.0
 theme_override_font_sizes/font_size = 18
 text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 20
+script = ExtResource("10_exit_menu")
 
 [node name="GameUI" parent="." instance=ExtResource("4_game_ui")]
 
