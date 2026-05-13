@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://g66ue5g74047" path="res://assets/boss_bg.png" id="7_boss_bg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
-size = Vector2(120, 120)
+size = Vector2(177, 120)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_damage"]
 size = Vector2(92, 94)
@@ -22,24 +22,24 @@ texture = ExtResource("7_boss_bg")
 
 [node name="map_left" parent="." unique_id=2078946100 instance=ExtResource("1_ivf3x")]
 modulate = Color(1, 1, 1, 0.14117648)
-position = Vector2(76, 390.00003)
+position = Vector2(67, 436)
 scale = Vector2(1.3490925, 3.0206344)
 
 [node name="map_floor" parent="." unique_id=432150940 instance=ExtResource("2_apo74")]
 modulate = Color(1, 1, 1, 0.5137255)
-position = Vector2(831.00006, 680)
+position = Vector2(846.00006, 774)
 scale = Vector2(6.36, 1)
 
 [node name="Player" parent="." unique_id=1348616487 instance=ExtResource("3_player")]
-position = Vector2(265, 617)
+position = Vector2(278, 706)
 
 [node name="map_right" parent="." unique_id=776427194 instance=ExtResource("1_ivf3x")]
 modulate = Color(1, 1, 1, 0.17254902)
-position = Vector2(1091, 368)
+position = Vector2(1091, 475)
 scale = Vector2(1.3, 3)
 
 [node name="Boss" type="CharacterBody2D" parent="." unique_id=1649915940]
-position = Vector2(844, 577)
+position = Vector2(879, 672)
 collision_layer = 4
 script = ExtResource("6_boss")
 
@@ -48,10 +48,13 @@ scale = Vector2(0.2, 0.2)
 texture = ExtResource("5_hyg8q")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Boss" unique_id=896799472]
+position = Vector2(-0.5, 0)
+scale = Vector2(1, 1.2)
 shape = SubResource("RectangleShape2D_boss")
 
 [node name="DamageArea" type="Area2D" parent="Boss" unique_id=2027004710]
-position = Vector2(-64, 0)
+position = Vector2(-1, 0)
+scale = Vector2(1.8, 1.6)
 collision_layer = 32
 collision_mask = 16
 monitoring = false

@@ -15,6 +15,13 @@ const JUMP_FRAME_PATHS: Array[String] = [
 	"res://assets/enemy/boss_jump/boss_jump5.png",
 ]
 
+const THROW_FRAME_PATHS: Array[String] = [
+	"res://assets/enemy/boss_throw/boss_throw1.png",
+	"res://assets/enemy/boss_throw/boss_throw2.png",
+	"res://assets/enemy/boss_throw/boss_throw3.png",
+	"res://assets/enemy/boss_throw/boss_throw4.png",
+]
+
 @export var max_health: int = 20
 @export var gravity: float = 1600.0
 @export var dash_speed: float = 760.0
@@ -44,6 +51,8 @@ const JUMP_FRAME_PATHS: Array[String] = [
 @export var max_ranged_attacks_before_forced_close: int = 2
 @export var ink_attack_windup_time: float = 0.45
 @export var ink_attack_recover_time: float = 0.75
+@export var throw_animation_frame_time: float = 0.09
+@export var throw_animation_scale_multiplier: float = 0.81
 @export var ink_projectile_speed: float = 330.0
 @export var ink_projectile_min_count: int = 5
 @export var ink_projectile_max_count: int = 7
@@ -51,8 +60,8 @@ const JUMP_FRAME_PATHS: Array[String] = [
 @export var ink_projectile_max_batch: int = 1
 @export var ink_projectile_min_height: float = -58.0
 @export var ink_projectile_max_height: float = 52.0
-@export var ink_projectile_min_interval: float = 0.6
-@export var ink_projectile_max_interval: float = 0.8
+@export var ink_projectile_min_interval: float = 1.0
+@export var ink_projectile_max_interval: float = 1.25
 @export var ink_projectile_min_speed_multiplier: float = 0.75
 @export var ink_projectile_max_speed_multiplier: float = 1.35
 @export var ink_projectile_min_wave_amplitude: float = 18.0
@@ -80,21 +89,28 @@ var quake_attack_count := 0
 var quake_attacks_before_forced_other := 0
 var quake_has_left_floor := false
 var default_texture: Texture2D
+var default_sprite_scale := Vector2.ONE
 var dash_frames: Array[Texture2D] = []
 var jump_frames: Array[Texture2D] = []
+var throw_frames: Array[Texture2D] = []
 var dash_frame_index := 0
 var dash_frame_time_left := 0.0
 var jump_rise_frame_index := 0
 var jump_fall_frame_index := 0
 var jump_frame_time_left := 0.0
+var throw_frame_index := 0
+var throw_frame_time_left := 0.0
+var throw_animation_active := false
 var target: Node2D
 
 
 func _ready() -> void:
 	health = max_health
 	default_texture = sprite.texture
+	default_sprite_scale = sprite.scale
 	_load_dash_frames()
 	_load_jump_frames()
+	_load_throw_frames()
 	ranged_attacks_before_forced_close = _roll_ranged_attacks_before_forced_close()
 	quake_attacks_before_forced_other = _roll_quake_attacks_before_forced_other()
 	add_to_group("enemy")
@@ -215,6 +231,7 @@ func _update_ink_fire(delta: float) -> void:
 	var batch_count := randi_range(ink_projectile_min_batch, ink_projectile_max_batch)
 	batch_count = mini(batch_count, ink_projectiles_left)
 	for _shot in range(batch_count):
+		_start_throw_animation()
 		_shoot_one_ink()
 		ink_projectile_index += 1
 		ink_projectiles_left -= 1
@@ -449,6 +466,7 @@ func _apply_sprite_facing() -> void:
 
 
 func _start_dash_animation() -> void:
+	sprite.scale = default_sprite_scale
 	dash_frame_index = 0
 	dash_frame_time_left = dash_animation_frame_time
 	_apply_sprite_facing()
@@ -469,6 +487,9 @@ func _update_boss_animation(delta: float) -> void:
 	if state == &"quake_jump" or state == &"quake_recover":
 		_update_jump_animation(delta)
 		return
+	if state == &"ink_fire" and throw_animation_active:
+		_update_throw_animation(delta)
+		return
 
 	if sprite.texture != default_texture:
 		_stop_special_animation()
@@ -488,6 +509,7 @@ func _update_dash_animation(delta: float) -> void:
 
 
 func _start_jump_animation() -> void:
+	sprite.scale = default_sprite_scale
 	jump_rise_frame_index = 0
 	jump_fall_frame_index = 3
 	jump_frame_time_left = _get_jump_animation_frame_time()
@@ -517,8 +539,10 @@ func _update_jump_animation(delta: float) -> void:
 
 
 func _stop_special_animation() -> void:
+	sprite.scale = default_sprite_scale
 	if default_texture != null:
 		sprite.texture = default_texture
+	throw_animation_active = false
 	_apply_sprite_facing()
 
 
@@ -536,6 +560,41 @@ func _load_jump_frames() -> void:
 		var texture := load(path)
 		if texture is Texture2D:
 			jump_frames.append(texture)
+
+
+func _start_throw_animation() -> void:
+	throw_animation_active = true
+	sprite.scale = default_sprite_scale * throw_animation_scale_multiplier
+	throw_frame_index = 0
+	throw_frame_time_left = throw_animation_frame_time
+	_apply_sprite_facing()
+	if not throw_frames.is_empty():
+		sprite.texture = throw_frames[throw_frame_index]
+
+
+func _update_throw_animation(delta: float) -> void:
+	if throw_frames.is_empty():
+		throw_animation_active = false
+		return
+
+	throw_frame_time_left -= delta
+	if throw_frame_time_left > 0.0:
+		return
+
+	throw_frame_time_left = throw_animation_frame_time
+	throw_frame_index += 1
+	if throw_frame_index >= throw_frames.size():
+		throw_animation_active = false
+		return
+	sprite.texture = throw_frames[throw_frame_index]
+
+
+func _load_throw_frames() -> void:
+	throw_frames.clear()
+	for path in THROW_FRAME_PATHS:
+		var texture := load(path)
+		if texture is Texture2D:
+			throw_frames.append(texture)
 
 
 func _set_damage_area_enabled(enabled: bool) -> void:
