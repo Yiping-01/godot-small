@@ -1,0 +1,177 @@
+[gd_scene format=3 uid="uid://dj6laa27hby6k"]
+
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="1_ivf3x"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="2_apo74"]
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="4_platform"]
+[ext_resource type="Texture2D" uid="uid://oghgnwu5i5fa" path="res://assets/background/deepsea_prop_plant.png" id="13_plant"]
+[ext_resource type="Texture2D" uid="uid://df8fm05wvrlx0" path="res://assets/background/radial_warm_light.png" id="14_light"]
+[ext_resource type="Script" path="res://scripts/water_zone.gd" id="15_water_zone"]
+[ext_resource type="PackedScene" path="res://scenes/blue_bounce_small_enemy.tscn" id="17_blue_bounce"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_light_add"]
+blend_mode = 1
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_top_water_passage"]
+size = Vector2(1692, 1130)
+
+[node name="Swimming" type="Node2D" unique_id=1199756155]
+
+[node name="Player" parent="." unique_id=2047384657 instance=ExtResource("3_player")]
+position = Vector2(587, -191)
+
+[node name="LevelCollision" type="Node2D" parent="." unique_id=1050726406]
+
+[node name="map_left" parent="LevelCollision" unique_id=1845123786 instance=ExtResource("1_ivf3x")]
+modulate = Color(0, 0, 0, 0.35)
+position = Vector2(-136.40002, -256)
+scale = Vector2(1, 3.02)
+
+[node name="map_floor" parent="LevelCollision" unique_id=1919828819 instance=ExtResource("2_apo74")]
+modulate = Color(0, 0, 0, 0.35)
+position = Vector2(989.6, 978)
+scale = Vector2(9, 1)
+
+[node name="map_right" parent="LevelCollision" unique_id=1929673684 instance=ExtResource("1_ivf3x")]
+modulate = Color(0, 0, 0, 0.35)
+position = Vector2(2279, 1132)
+scale = Vector2(1, 3.02)
+
+[node name="UnderwaterExpansion" type="Node2D" parent="." unique_id=302984423]
+
+[node name="Markers" type="Node2D" parent="UnderwaterExpansion" unique_id=1525047990]
+
+[node name="UnderwaterEntry" type="Marker2D" parent="UnderwaterExpansion/Markers" unique_id=1026173407]
+position = Vector2(-2.4000244, 3.6362305)
+
+[node name="TopReturn" type="Marker2D" parent="UnderwaterExpansion/Markers" unique_id=457203414]
+position = Vector2(650, 1282)
+
+[node name="TopPondVisuals" type="Node2D" parent="UnderwaterExpansion" unique_id=1724783850]
+z_index = 25
+
+[node name="PondTint" type="Polygon2D" parent="UnderwaterExpansion/TopPondVisuals" unique_id=1096767770]
+position = Vector2(574, 1036)
+color = Color(0.04, 0.42, 0.62, 0.48)
+polygon = PackedVector2Array(360, 1256, 978, 1256, 1036, 1416, 248, 1416, 286, 1310)
+
+[node name="PondSurface" type="Line2D" parent="UnderwaterExpansion/TopPondVisuals" unique_id=7545293]
+position = Vector2(395.00012, 1232)
+scale = Vector2(0.85231465, 0.5127419)
+points = PackedVector2Array(345, 1262, 505, 1252, 680, 1263, 850, 1255, 920.59973, 1259.5386, 990, 1264)
+width = 7.0
+default_color = Color(0.55, 0.9, 1, 0.82)
+
+[node name="PondGlow" type="Sprite2D" parent="UnderwaterExpansion/TopPondVisuals" unique_id=1503626024]
+modulate = Color(0.2, 0.74, 1, 0.28)
+z_index = -1
+material = SubResource("CanvasItemMaterial_light_add")
+position = Vector2(1450, 2205)
+scale = Vector2(1.8, 0.72)
+texture = ExtResource("14_light")
+
+[node name="UnderwaterBackVisuals" type="Node2D" parent="UnderwaterExpansion" unique_id=745950585]
+z_index = -45
+
+[node name="WaterTint" type="Polygon2D" parent="UnderwaterExpansion/UnderwaterBackVisuals" unique_id=1812016877]
+position = Vector2(-362.40002, -1926.3638)
+color = Color(0.02, 0.22, 0.38, 0.64)
+polygon = PackedVector2Array(208, 1780, 1900, 1780, 1900, 2910, 208, 2910)
+
+[node name="DeepGlow" type="Sprite2D" parent="UnderwaterExpansion/UnderwaterBackVisuals" unique_id=1276503906]
+modulate = Color(0.1, 0.64, 0.9, 0.34)
+material = SubResource("CanvasItemMaterial_light_add")
+position = Vector2(669.6, 449)
+scale = Vector2(3.6, 2.4)
+texture = ExtResource("14_light")
+
+[node name="BackPlantA" type="Sprite2D" parent="UnderwaterExpansion/UnderwaterBackVisuals" unique_id=1398137281]
+modulate = Color(0.42, 0.85, 1, 0.48)
+position = Vector2(97.599976, 865.6362)
+scale = Vector2(0.11, 0.11)
+texture = ExtResource("13_plant")
+
+[node name="BackPlantB" type="Sprite2D" parent="UnderwaterExpansion/UnderwaterBackVisuals" unique_id=345656570]
+modulate = Color(0.42, 0.85, 1, 0.42)
+position = Vector2(1321.6001, 853.63635)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("13_plant")
+
+[node name="UnderwaterCollision" type="Node2D" parent="UnderwaterExpansion" unique_id=383707392]
+modulate = Color(0.08, 0.22, 0.25, 0.9)
+
+[node name="UnderwaterLeftWall" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=1581418435 instance=ExtResource("1_ivf3x")]
+position = Vector2(-142.40002, 423.63623)
+scale = Vector2(1, 5.1)
+
+[node name="UnderwaterRightWall" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=2135327782 instance=ExtResource("1_ivf3x")]
+position = Vector2(1517.6, 423.63623)
+scale = Vector2(1, 5.1)
+
+[node name="UnderwaterCeiling" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=31401865 instance=ExtResource("2_apo74")]
+position = Vector2(1354.6, 1112)
+scale = Vector2(6.55, 1)
+
+[node name="UnderwaterFloor" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=1866672398 instance=ExtResource("2_apo74")]
+position = Vector2(687.6, 965.6362)
+scale = Vector2(6.55, 1)
+
+[node name="KickWallPillar" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=1980212858 instance=ExtResource("1_ivf3x")]
+position = Vector2(397.6001, 528.63635)
+scale = Vector2(0.8, 1.45)
+
+[node name="MidSwimPlatform" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=2094114293 instance=ExtResource("4_platform")]
+position = Vector2(957.6, 543.6362)
+scale = Vector2(1.25, 1)
+
+[node name="UpperSwimPlatform" parent="UnderwaterExpansion/UnderwaterCollision" unique_id=1842049003 instance=ExtResource("4_platform")]
+position = Vector2(667.6, 173.63623)
+scale = Vector2(1.05, 1)
+
+[node name="WaterZone" type="Area2D" parent="UnderwaterExpansion" unique_id=190124492]
+position = Vector2(691.6, 418.63623)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("15_water_zone")
+apply_camera_limits = false
+bounds_source_path = NodePath("../UnderwaterBackVisuals/WaterTint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UnderwaterExpansion/WaterZone" unique_id=1340801343]
+shape = SubResource("RectangleShape2D_top_water_passage")
+
+[node name="UnderwaterFrontVisuals" type="Node2D" parent="UnderwaterExpansion" unique_id=760767691]
+z_index = 42
+
+[node name="FrontPlantA" type="Sprite2D" parent="UnderwaterExpansion/UnderwaterFrontVisuals" unique_id=903595020]
+position = Vector2(-2.4000244, 867.6362)
+scale = Vector2(0.14, 0.14)
+texture = ExtResource("13_plant")
+
+[node name="FrontPlantB" type="Sprite2D" parent="UnderwaterExpansion/UnderwaterFrontVisuals" unique_id=1739092732]
+position = Vector2(1147.6001, 863.63635)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("13_plant")
+
+[node name="WaterSurfaceLine" type="Line2D" parent="UnderwaterExpansion/UnderwaterFrontVisuals" unique_id=1131017541]
+position = Vector2(-362.40002, -1926.3638)
+points = PackedVector2Array(234, 1818, 540, 1804, 870, 1816, 1190, 1806, 1510, 1817, 1874, 1807)
+width = 5.0
+default_color = Color(0.46, 0.88, 1, 0.72)
+
+[node name="Enemies" type="Node2D" parent="UnderwaterExpansion" unique_id=1803449933]
+
+[node name="BlueBounceSmallEnemyA" parent="UnderwaterExpansion/Enemies" unique_id=2137775602 instance=ExtResource("17_blue_bounce")]
+position = Vector2(477.59998, 333.63623)
+respawn_scene_path = "res://scenes/blue_bounce_small_enemy.tscn"
+bounce_velocity = Vector2(235, -170)
+bounce_min = Vector2(420, 1940)
+bounce_max = Vector2(1660, 2760)
+blue_modulate = Color(0.45, 0.78, 1, 1)
+
+[node name="BlueBounceSmallEnemyB" parent="UnderwaterExpansion/Enemies" unique_id=1500792021 instance=ExtResource("17_blue_bounce")]
+position = Vector2(1087.6, 673.6362)
+respawn_scene_path = "res://scenes/blue_bounce_small_enemy.tscn"
+bounce_velocity = Vector2(-210, 185)
+bounce_min = Vector2(420, 1940)
+bounce_max = Vector2(1660, 2760)
+blue_modulate = Color(0.45, 0.78, 1, 1)

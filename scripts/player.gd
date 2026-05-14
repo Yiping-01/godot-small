@@ -31,6 +31,14 @@ signal respawned
 @export var dash_speed: float = 860.0
 @export var dash_duration: float = 0.18
 @export var dash_cooldown: float = 0.45
+@export var underwater_swim_speed: float = 285.0
+@export var underwater_swim_acceleration: float = 1350.0
+@export var underwater_drag: float = 1050.0
+@export var underwater_dash_speed: float = 720.0
+@export var underwater_dash_duration: float = 0.14
+@export var underwater_wall_dash_speed: float = 900.0
+@export var underwater_wall_dash_duration: float = 0.22
+@export var underwater_dash_cooldown: float = 0.34
 
 @export_category("Combat")
 @export var attack_damage: int = 1
@@ -141,6 +149,9 @@ var dash_time_left := 0.0
 var dash_cooldown_left := 0.0
 var far_attack_cooldown_left := 0.0
 var dash_direction := 1
+var is_underwater := false
+var underwater_dash_direction := Vector2.ZERO
+var underwater_dash_current_speed := 0.0
 var is_resting := false
 var normal_z_index := 0
 var attack_effect_base_scale := Vector2.ONE
@@ -206,13 +217,20 @@ func _physics_process(delta: float) -> void:
 	if GameState.input_locked:
 		_cancel_attack_charge()
 		_end_dash(false)
-		if is_on_floor() and velocity.y >= 0.0:
-			jump_count = 0
-		_apply_gravity(delta)
-		velocity.x = move_toward(velocity.x, 0.0, speed * delta * 6.0)
+		if is_underwater:
+			velocity = velocity.move_toward(Vector2.ZERO, underwater_drag * delta)
+		else:
+			if is_on_floor() and velocity.y >= 0.0:
+				jump_count = 0
+			_apply_gravity(delta)
+			velocity.x = move_toward(velocity.x, 0.0, speed * delta * 6.0)
 		move_and_slide()
 		_update_animation()
 		_update_camera_shake(delta)
+		return
+
+	if is_underwater:
+		_update_underwater_movement(delta)
 		return
 
 	if is_on_floor() and velocity.y >= 0.0:
@@ -280,6 +298,89 @@ func _handle_movement(delta: float) -> void:
 		_update_attack_area_side()
 
 
+func _update_underwater_movement(delta: float) -> void:
+	jump_count = 0
+	wall_jump_lock_left = 0.0
+	_update_dash_cooldown(delta)
+	_handle_underwater_dash_input()
+	if is_dashing:
+		_update_underwater_dash(delta)
+		_update_attack(delta)
+		move_and_slide()
+		_update_animation()
+		_update_camera_shake(delta)
+		return
+
+	_handle_underwater_swim(delta)
+	_handle_far_attack_input()
+	_handle_underwater_attack_input()
+	_update_attack(delta)
+
+	move_and_slide()
+	_update_animation()
+	_update_camera_shake(delta)
+
+
+func _handle_underwater_swim(delta: float) -> void:
+	if hurt_lock_left > 0.0:
+		hurt_lock_left -= delta
+		velocity = velocity.move_toward(Vector2.ZERO, underwater_drag * delta * 0.55)
+		return
+
+	var input_vector := _get_underwater_input()
+	var move_speed := underwater_swim_speed
+	if is_charging_attack:
+		move_speed *= charge_move_speed_multiplier
+
+	if input_vector == Vector2.ZERO:
+		velocity = velocity.move_toward(Vector2.ZERO, underwater_drag * delta)
+	else:
+		velocity = velocity.move_toward(input_vector * move_speed, underwater_swim_acceleration * delta)
+		if not is_zero_approx(input_vector.x):
+			facing_direction = int(signf(input_vector.x))
+			animated_sprite.flip_h = facing_direction > 0
+			_update_attack_area_side()
+
+
+func _handle_underwater_dash_input() -> void:
+	if hurt_lock_left > 0.0 or is_hurt_animating or is_attacking or is_charging_attack or dash_cooldown_left > 0.0:
+		return
+	if not Input.is_action_just_pressed("dash"):
+		return
+
+	var input_vector := _get_underwater_input()
+	var wall_normal := _get_wall_jump_surface_normal()
+	var input_direction := _get_horizontal_input()
+	var is_wall_dash := not is_zero_approx(wall_normal.x) and is_equal_approx(input_direction, -signf(wall_normal.x))
+
+	if is_wall_dash:
+		underwater_dash_direction = Vector2(signf(wall_normal.x), 0.0)
+		underwater_dash_current_speed = underwater_wall_dash_speed
+		dash_time_left = underwater_wall_dash_duration
+	else:
+		if input_vector == Vector2.ZERO:
+			input_vector = Vector2(float(facing_direction), 0.0)
+		underwater_dash_direction = input_vector.normalized()
+		underwater_dash_current_speed = underwater_dash_speed
+		dash_time_left = underwater_dash_duration
+
+	if not is_zero_approx(underwater_dash_direction.x):
+		facing_direction = int(signf(underwater_dash_direction.x))
+		animated_sprite.flip_h = facing_direction > 0
+		_update_attack_area_side()
+
+	is_dashing = true
+	dash_cooldown_left = underwater_dash_cooldown
+	velocity = underwater_dash_direction * underwater_dash_current_speed
+
+
+func _update_underwater_dash(delta: float) -> void:
+	dash_time_left -= delta
+	velocity = underwater_dash_direction * underwater_dash_current_speed
+	if dash_time_left <= 0.0:
+		_end_dash(true)
+
+
 func _handle_jump() -> void:
 	if hurt_lock_left > 0.0 or is_hurt_animating:
 		return
@@ -325,6 +426,16 @@ func _handle_attack_input(delta: float) -> void:
 		else:
 			_try_attack()
 		_cancel_attack_charge()
+
+
+func _handle_underwater_attack_input() -> void:
+	if hurt_lock_left > 0.0 or is_hurt_animating:
+		_cancel_attack_charge()
+		return
+
+	if Input.is_action_just_pressed("attack"):
+		_cancel_attack_charge()
+		_try_attack()
 
 
 func _handle_far_attack_input() -> void:
@@ -530,6 +641,22 @@ func _get_horizontal_input() -> float:
 	if Input.is_action_pressed("move_right"):
 		input_direction += 1.0
 	return input_direction
+
+
+func _get_vertical_input() -> float:
+	var input_direction: float = 0.0
+	if Input.is_action_pressed("move_up"):
+		input_direction -= 1.0
+	if Input.is_action_pressed("move_down"):
+		input_direction += 1.0
+	return input_direction
+
+
+func _get_underwater_input() -> Vector2:
+	var input_vector := Vector2(_get_horizontal_input(), _get_vertical_input())
+	if input_vector.length_squared() > 1.0:
+		return input_vector.normalized()
+	return input_vector
 
 
 func _update_wall_slide() -> void:
@@ -744,6 +871,19 @@ func stand_from_bench(stand_position: Vector2) -> void:
 	jump_count = 0
 	is_resting = false
 	animated_sprite.play("wait")
+
+
+func set_underwater(enabled: bool) -> void:
+	if is_underwater == enabled:
+		return
+
+	is_underwater = enabled
+	jump_count = 0
+	wall_jump_lock_left = 0.0
+	_end_dash(false)
+	velocity *= 0.35
+	if not enabled:
+		dash_cooldown_left = 0.0
 
 
 func die() -> void:
@@ -1155,6 +1295,11 @@ func _update_animation() -> void:
 		return
 
 	if is_dashing:
+		if animated_sprite.animation != "walk":
+			animated_sprite.play("walk")
+		return
+
+	if is_underwater:
 		if animated_sprite.animation != "walk":
 			animated_sprite.play("walk")
 		return
