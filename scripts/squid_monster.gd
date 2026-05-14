@@ -180,7 +180,35 @@ func take_damage(amount: int, _attacker_position := Vector2.ZERO) -> void:
 	_flash_hurt()
 
 	if hp <= 0:
-		queue_free()
+		_die()
+
+
+func _die() -> void:
+	set_physics_process(false)
+	collision_layer = 0
+	collision_mask = 1
+	if attack_area != null:
+		attack_area.set_deferred("monitoring", false)
+		attack_area.set_deferred("monitorable", false)
+	if hurt_box != null:
+		hurt_box.set_deferred("monitoring", false)
+		hurt_box.set_deferred("monitorable", false)
+
+	await _fade_out_death(sprite, 0.45)
+	queue_free()
+
+
+func _fade_out_death(target: CanvasItem, duration: float) -> void:
+	if target == null:
+		return
+
+	target.material = null
+	target.modulate = Color(1.0, 0.35, 0.28, 0.9)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(target, "modulate:a", 0.0, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(target, "scale", target.scale * 0.82, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tween.finished
 
 
 func _flash_hurt() -> void:

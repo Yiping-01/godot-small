@@ -58,6 +58,13 @@ signal respawned
 @export var camera_follow_smoothing_speed: float = 8.0
 @export var use_map_wall_camera_limits := true
 
+@export_category("Lighting")
+@export var enable_player_light := true
+@export var scene_darkness := Color(0.24, 0.28, 0.34, 1.0)
+@export var player_light_radius: float = 250.0
+@export var player_light_energy: float = 0.32
+@export var player_light_color := Color(0.74, 0.92, 1.0, 1.0)
+
 const CAMERA_UNBOUNDED_LIMIT := 10000000
 const FAR_ATTACK_TEXTURES: Array[Texture2D] = [
 	preload("res://assets/player/attack_far/far_1.png"),
@@ -67,6 +74,7 @@ const FAR_ATTACK_TEXTURES: Array[Texture2D] = [
 	preload("res://assets/player/attack_far/far_5.png"),
 ]
 const FAR_ATTACK_PROJECTILE := preload("res://scripts/far_attack_projectile.gd")
+const CUSTOM_2D_LIGHT_SHADER := preload("res://shaders/shaderlib/custom_2d_light.gdshader")
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_area: Area2D = $AttackArea
@@ -152,6 +160,7 @@ func _ready() -> void:
 	default_camera_zoom = camera_follow_zoom
 	default_camera_smoothing_speed = camera_follow_smoothing_speed
 	_configure_follow_camera()
+	_setup_player_light()
 	normal_z_index = z_index
 	attack_offset_x = absf(attack_area.position.x)
 	charge_attack_offset_x = absf(charge_attack_area.position.x)
@@ -1061,6 +1070,58 @@ func _hide_charge_effect() -> void:
 func _play_audio(audio: AudioStreamPlayer2D) -> void:
 	if audio != null and audio.stream != null:
 		audio.play()
+
+
+func _setup_player_light() -> void:
+	if not enable_player_light:
+		return
+
+	var scene: Node = get_tree().current_scene
+	if scene != null and scene.get_node_or_null("SceneDarkness") == null:
+		var darkness: CanvasModulate = CanvasModulate.new()
+		darkness.name = "SceneDarkness"
+		darkness.color = scene_darkness
+		scene.add_child.call_deferred(darkness)
+
+	if get_node_or_null("PlayerLight") != null:
+		return
+
+	var light_texture: ImageTexture = _build_radial_light_texture(256)
+	var light: Sprite2D = Sprite2D.new()
+	var light_material: ShaderMaterial = ShaderMaterial.new()
+
+	light_material.shader = CUSTOM_2D_LIGHT_SHADER
+	light_material.set_shader_parameter("light_texture", light_texture)
+	light_material.set_shader_parameter(
+		"light_color",
+		Vector3(player_light_color.r * 255.0, player_light_color.g * 255.0, player_light_color.b * 255.0)
+	)
+	light_material.set_shader_parameter("brightness", clampf(player_light_energy, 0.0, 1.0))
+	light_material.set_shader_parameter("attenuation_strength", 0.35)
+	light_material.set_shader_parameter("intensity", 1.0)
+	light_material.set_shader_parameter("max_brightness", 1.0)
+
+	light.name = "PlayerLight"
+	light.texture = light_texture
+	light.material = light_material
+	light.scale = Vector2.ONE * (player_light_radius / 128.0)
+	light.show_behind_parent = true
+	light.z_index = -10
+	add_child(light)
+
+
+func _build_radial_light_texture(size: int) -> ImageTexture:
+	var image: Image = Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var center: Vector2 = Vector2(size, size) * 0.5
+	var radius: float = float(size) * 0.5
+
+	for y in range(size):
+		for x in range(size):
+			var distance: float = Vector2(x, y).distance_to(center) / radius
+			var alpha: float = pow(clampf(1.0 - distance, 0.0, 1.0), 2.2)
+			image.set_pixel(x, y, Color(1.0, 1.0, 1.0, alpha))
+
+	return ImageTexture.create_from_image(image)
 
 
 func _start_camera_shake(duration: float, strength: float) -> void:

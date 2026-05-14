@@ -16,6 +16,7 @@ extends Control
 var menu_buttons: Array[Button] = []
 var selected_menu_index := 0
 var key_buttons: Dictionary = {}
+var key_rows: Dictionary = {}
 var waiting_for_action := ""
 var waiting_label: Label
 var reset_controls_button: Button
@@ -111,6 +112,9 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if keyboard_panel.visible:
+		if _try_start_rebind_from_mouse(event):
+			_mark_input_handled()
+			return
 		if event.is_action_pressed("ui_cancel"):
 			_on_keyboard_back_pressed()
 			_mark_input_handled()
@@ -197,21 +201,29 @@ func _capture_rebind_input(event: InputEvent) -> void:
 
 
 func _build_keyboard_rebind_panel() -> void:
+	keyboard_panel.z_index = 80
+	keyboard_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	keyboard_panel.offset_left = -390.0
+	keyboard_panel.offset_top = -255.0
+	keyboard_panel.offset_right = 390.0
+	keyboard_panel.offset_bottom = 255.0
 	for child in keyboard_panel.get_children():
 		child.visible = false
 
 	var content := VBoxContainer.new()
 	content.name = "RebindContent"
+	content.mouse_filter = Control.MOUSE_FILTER_PASS
 	content.set_anchors_preset(Control.PRESET_FULL_RECT)
-	content.offset_left = 34.0
-	content.offset_top = 14.0
-	content.offset_right = -34.0
-	content.offset_bottom = -18.0
+	content.offset_left = 46.0
+	content.offset_top = 24.0
+	content.offset_right = -46.0
+	content.offset_bottom = -24.0
 	content.add_theme_constant_override("separation", 10)
 	keyboard_panel.add_child(content)
 
 	var title := Label.new()
 	title.text = "按鍵設定"
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 28)
 	title.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
@@ -219,22 +231,26 @@ func _build_keyboard_rebind_panel() -> void:
 
 	waiting_label = Label.new()
 	waiting_label.text = "點選右側按鍵後，按下新的鍵。Esc 取消。"
+	waiting_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	waiting_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	waiting_label.add_theme_font_size_override("font_size", 15)
 	waiting_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.72))
 	content.add_child(waiting_label)
 
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 40)
+	columns.mouse_filter = Control.MOUSE_FILTER_PASS
+	columns.add_theme_constant_override("separation", 54)
 	content.add_child(columns)
 
 	var left_column := VBoxContainer.new()
-	left_column.custom_minimum_size = Vector2(280.0, 0.0)
+	left_column.mouse_filter = Control.MOUSE_FILTER_PASS
+	left_column.custom_minimum_size = Vector2(310.0, 0.0)
 	left_column.add_theme_constant_override("separation", 6)
 	columns.add_child(left_column)
 
 	var right_column := VBoxContainer.new()
-	right_column.custom_minimum_size = Vector2(280.0, 0.0)
+	right_column.mouse_filter = Control.MOUSE_FILTER_PASS
+	right_column.custom_minimum_size = Vector2(310.0, 0.0)
 	right_column.add_theme_constant_override("separation", 6)
 	columns.add_child(right_column)
 
@@ -261,33 +277,86 @@ func _build_keyboard_rebind_panel() -> void:
 
 
 func _add_key_row(parent: VBoxContainer, action_text: String, action_name: String) -> void:
-	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(270.0, 29.0)
-	row.add_theme_constant_override("separation", 12)
+	var row := Button.new()
+	row.flat = true
+	row.z_index = 30
+	row.custom_minimum_size = Vector2(306.0, 34.0)
+	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	row.focus_mode = Control.FOCUS_NONE
+	row.add_theme_stylebox_override("normal", _clear_style())
+	row.add_theme_stylebox_override("hover", _row_hover_style())
+	row.add_theme_stylebox_override("pressed", _row_pressed_style())
+	row.pressed.connect(_start_rebind.bind(action_name))
+	row.gui_input.connect(_on_key_row_gui_input.bind(action_name))
 	parent.add_child(row)
+	key_rows[action_name] = row
+
+	var row_content := HBoxContainer.new()
+	row_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row_content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	row_content.offset_left = 4.0
+	row_content.offset_right = -4.0
+	row_content.add_theme_constant_override("separation", 12)
+	row.add_child(row_content)
 
 	var action_label := Label.new()
 	action_label.text = action_text
-	action_label.custom_minimum_size = Vector2(132.0, 29.0)
+	action_label.custom_minimum_size = Vector2(144.0, 34.0)
+	action_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	action_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	action_label.add_theme_font_size_override("font_size", 16)
 	action_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.82))
-	row.add_child(action_label)
+	row_content.add_child(action_label)
 
-	var key_button := _create_key_button()
-	key_button.pressed.connect(_start_rebind.bind(action_name))
-	row.add_child(key_button)
-	key_buttons[action_name] = key_button
+	var key_panel := Panel.new()
+	key_panel.custom_minimum_size = Vector2(124.0, 34.0)
+	key_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	key_panel.add_theme_stylebox_override("panel", _keycap_style())
+	row_content.add_child(key_panel)
+
+	var key_label := _create_key_label()
+	key_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	key_panel.add_child(key_label)
+	key_buttons[action_name] = key_label
 
 
-func _create_key_button() -> Button:
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(96.0, 29.0)
-	button.focus_mode = Control.FOCUS_ALL
-	button.add_theme_font_size_override("font_size", 15)
-	button.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
-	button.add_theme_color_override("font_hover_color", Color(1.0, 0.96, 0.78, 1.0))
-	return button
+func _create_key_label() -> Label:
+	var label := Label.new()
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 15)
+	label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
+	return label
+
+
+func _keycap_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.12, 0.13, 0.14, 0.42)
+	style.border_color = Color(1.0, 1.0, 1.0, 0.5)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	return style
+
+
+func _clear_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	return style
+
+
+func _row_hover_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1.0, 1.0, 1.0, 0.08)
+	style.set_corner_radius_all(4)
+	return style
+
+
+func _row_pressed_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1.0, 1.0, 1.0, 0.14)
+	style.set_corner_radius_all(4)
+	return style
 
 
 func _create_panel_button(text: String) -> Button:
@@ -304,6 +373,27 @@ func _start_rebind(action_name: String) -> void:
 	_show_waiting_message("請按新的「%s」按鍵，Esc 取消。" % _get_action_display_name(action_name))
 
 
+func _on_key_row_gui_input(event: InputEvent, action_name: String) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_start_rebind(action_name)
+		_mark_input_handled()
+
+
+func _try_start_rebind_from_mouse(event: InputEvent) -> bool:
+	if not (event is InputEventMouseButton):
+		return false
+	if event.button_index != MOUSE_BUTTON_LEFT or not event.pressed:
+		return false
+
+	for action_name in key_rows.keys():
+		var row := key_rows[action_name] as Control
+		if row != null and row.get_global_rect().has_point(event.position):
+			_start_rebind(String(action_name))
+			return true
+
+	return false
+
+
 func _get_action_display_name(action_name: String) -> String:
 	var input_settings: Node = _get_input_settings()
 	if input_settings == null:
@@ -316,7 +406,7 @@ func _get_action_display_name(action_name: String) -> String:
 
 func _refresh_key_labels() -> void:
 	for action_name in key_buttons.keys():
-		var button := key_buttons[action_name] as Button
+		var button := key_buttons[action_name] as Label
 		var input_settings: Node = _get_input_settings()
 		if input_settings != null:
 			button.text = String(input_settings.call("get_label_for_action", String(action_name)))

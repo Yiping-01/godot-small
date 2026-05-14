@@ -108,7 +108,7 @@ func show_prompt(text: String) -> void:
 	if dialogue_panel.visible or shop_panel.visible or inventory_panel.visible or map_panel.visible:
 		return
 
-	prompt_label.text = text
+	prompt_label.text = _format_action_text(text)
 	prompt_label.show()
 
 
@@ -204,7 +204,7 @@ func show_area_title(main_title: String, sub_title: String) -> void:
 
 
 func show_toast(text: String, duration: float = 2.0) -> void:
-	toast_label.text = text
+	toast_label.text = _format_action_text(text)
 	toast_label.show()
 
 	if toast_tween != null:
@@ -252,14 +252,14 @@ func _fade_to(alpha: float, duration: float) -> void:
 
 
 func _show_dialogue_line() -> void:
-	dialogue_text_label.text = "..." if dialogue_lines.is_empty() else dialogue_lines[dialogue_index]
+	dialogue_text_label.text = "..." if dialogue_lines.is_empty() else _format_action_text(dialogue_lines[dialogue_index])
 
 	var can_open_shop: bool = active_npc != null and active_npc.opens_shop and dialogue_index >= dialogue_lines.size() - 1
 
 	if can_open_shop:
-		dialogue_hint_label.text = "E：打開商店 / Esc：關閉"
+		dialogue_hint_label.text = _format_action_text("{interact}：打開商店 / Esc：關閉")
 	else:
-		dialogue_hint_label.text = "E：下一句 / Esc：關閉"
+		dialogue_hint_label.text = _format_action_text("{interact}：下一句 / Esc：關閉")
 
 
 func _advance_dialogue() -> void:
@@ -290,7 +290,7 @@ func _open_shop(npc: Node) -> void:
 	shop_panel.show()
 
 	GameState.has_shown_inventory_tutorial = true
-	show_toast("購買的物品會放進背包，按 I 可以查看。", 3.0)
+	show_toast("購買的物品會放進背包，按 {inventory} 可以查看。", 3.0)
 
 	_update_shop()
 
@@ -331,7 +331,7 @@ func _update_shop() -> void:
 			description,
 		]
 
-	shop_close_hint_label.text = "點選購買 / I 或 Esc：關閉"
+	shop_close_hint_label.text = _format_action_text("點選購買 / {inventory} 或 Esc：關閉")
 
 
 func _rebuild_map() -> void:
@@ -347,7 +347,7 @@ func _rebuild_map() -> void:
 	var rooms := GameState.get_map_rooms(scene_path)
 
 	map_title_label.text = "區域地圖"
-	map_hint_label.text = "M 或 Esc：關閉"
+	map_hint_label.text = _format_action_text("{map} 或 Esc：關閉")
 
 	if rooms.is_empty():
 		_add_map_empty_label()
@@ -541,7 +541,14 @@ func _on_first_item_obtained(_item_name: String) -> void:
 		return
 
 	GameState.has_shown_inventory_tutorial = true
-	show_toast("獲得物品後可按 I 打開背包。", 3.2)
+	show_toast("獲得物品後可按 {inventory} 打開背包。", 3.2)
+
+
+func _format_action_text(text: String) -> String:
+	var input_settings: Node = get_node_or_null("/root/InputSettings")
+	if input_settings == null:
+		return text
+	return String(input_settings.call("format_action_text", text))
 
 
 func _on_map_room_changed(_scene_path: String, _room_id: String) -> void:

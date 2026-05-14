@@ -7,6 +7,7 @@ extends CharacterBody2D
 @export var knockback_force := 350.0
 @export var knockback_friction := 1600.0
 @export var hurt_flash_time := 0.15
+@export var death_fade_time := 0.45
 @export var can_split := false
 @export var small_enemy_scene: PackedScene
 @export var small_enemy_scene_path := "res://scenes/enemy.tscn"
@@ -20,6 +21,7 @@ var start_position := Vector2.ZERO
 var knockback_velocity := Vector2.ZERO
 var hurt_tween: Tween
 var can_take_damage := true
+var is_dead := false
 
 
 func _ready() -> void:
@@ -32,6 +34,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if is_dead:
+		return
+
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
@@ -65,6 +70,9 @@ func _on_hurtbox_body_entered(body: Node2D) -> void:
 
 
 func take_damage(amount: int, attacker_position: Vector2) -> void:
+	if is_dead or not can_take_damage:
+		return
+
 	hp -= amount
 
 	if global_position.x > attacker_position.x:
@@ -75,9 +83,38 @@ func take_damage(amount: int, attacker_position: Vector2) -> void:
 	_flash_hurt()
 
 	if hp <= 0:
-		if can_split:
-			call_deferred("split")
-		call_deferred("queue_free")
+		_die()
+
+
+func _die() -> void:
+	is_dead = true
+	can_take_damage = false
+	velocity = Vector2.ZERO
+	knockback_velocity = Vector2.ZERO
+	collision_layer = 0
+	collision_mask = 1
+	if has_node("HurtBox"):
+		$HurtBox.set_deferred("monitoring", false)
+		$HurtBox.set_deferred("monitorable", false)
+
+	if can_split:
+		call_deferred("split")
+
+	await _fade_out_death(anim, death_fade_time)
+	queue_free()
+
+
+func _fade_out_death(target: CanvasItem, duration: float) -> void:
+	if target == null:
+		return
+
+	target.material = null
+	target.modulate = Color(1.0, 0.35, 0.28, 0.9)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(target, "modulate:a", 0.0, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(target, "scale", target.scale * 0.82, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tween.finished
 
 
 func split() -> void:

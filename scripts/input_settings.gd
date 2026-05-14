@@ -36,6 +36,38 @@ func get_label_for_action(action: String) -> String:
 	return InputHelper.get_label_for_input(input)
 
 
+func format_action_text(text: String) -> String:
+	var formatted := text
+	for item in ACTIONS:
+		var action := String(item["action"])
+		formatted = formatted.replace("{%s}" % action, get_label_for_action(action))
+
+	formatted = formatted.replace("按 E", "按 %s" % get_label_for_action("interact"))
+	formatted = formatted.replace("按下E", "按下%s" % get_label_for_action("interact"))
+	formatted = formatted.replace("E：", "%s：" % get_label_for_action("interact"))
+
+	formatted = formatted.replace("按 I", "按 %s" % get_label_for_action("inventory"))
+	formatted = formatted.replace("I 或", "%s 或" % get_label_for_action("inventory"))
+
+	formatted = formatted.replace("按 M", "按 %s" % get_label_for_action("map"))
+	formatted = formatted.replace("M 或", "%s 或" % get_label_for_action("map"))
+
+	formatted = formatted.replace("按 Z", "按 %s" % get_label_for_action("jump"))
+	formatted = formatted.replace("按下 Z", "按下 %s" % get_label_for_action("jump"))
+	formatted = formatted.replace("按下兩下 Z", "按下兩下 %s" % get_label_for_action("jump"))
+	formatted = formatted.replace("Z是跳躍", "%s是跳躍" % get_label_for_action("jump"))
+
+	formatted = formatted.replace("按 X", "按 %s" % get_label_for_action("attack"))
+	formatted = formatted.replace("X是攻擊", "%s是攻擊" % get_label_for_action("attack"))
+
+	formatted = formatted.replace("按 C", "按 %s" % get_label_for_action("dash"))
+	formatted = formatted.replace("按下C", "按下%s" % get_label_for_action("dash"))
+	formatted = formatted.replace("C可進行衝刺", "%s可進行衝刺" % get_label_for_action("dash"))
+
+	formatted = formatted.replace("按 F", "按 %s" % get_label_for_action("far_attack"))
+	return formatted
+
+
 func rebind_keyboard_action(action: String, event: InputEventKey) -> Error:
 	if not InputMap.has_action(action):
 		return ERR_DOES_NOT_EXIST

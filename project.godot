@@ -8,6 +8,7 @@
 
 config_version=5
 
+"ï»¿config_version"=5
 
 [application]
 
@@ -26,7 +27,7 @@ InputSettings="*res://scripts/input_settings.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/input_helper/plugin.cfg")
+enabled=PackedStringArray("res://addons/input_helper/plugin.cfg", "res://addons/shader_library/plugin.cfg")
 
 [input]
 
@@ -117,3 +118,7 @@ audio_settings={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+
+[shader_library]
+
+internal/previous_shaders_folder="res://shaders/shaderlib/"

@@ -8,7 +8,7 @@ class_name Enemy2
 @export var max_fall_speed: float = 620.0
 @export var hurt_knockback: float = 260.0
 @export var hit_stun_time: float = 0.24
-@export var death_delay: float = 0.12
+@export var death_delay: float = 0.35
 @export var contact_damage: int = 1
 @export var detection_range: float = 620.0
 @export var melee_range: float = 310.0
@@ -288,10 +288,14 @@ func _die() -> void:
 	damage_area.set_deferred("monitoring", false)
 	damage_area.set_deferred("monitorable", false)
 	_play_audio(death_audio)
-	sprite.modulate = Color(1.0, 0.25, 0.25, 0.75)
+	sprite.modulate = Color(1.0, 0.35, 0.28, 0.9)
 	call_deferred("_drop_coins")
 
-	await get_tree().create_timer(death_delay).timeout
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(sprite, "modulate:a", 0.0, death_delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(sprite, "scale", sprite.scale * 0.82, death_delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tween.finished
 	queue_free()
 
 
