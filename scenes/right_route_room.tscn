@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" path="res://scenes/legacy_split_enemy.tscn" id="18_split_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/squid_monster.tscn" id="19_squid_monster"]
 [ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="20_tutorial"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="21_nrr78"]
 
 [node name="RightRouteRoom" type="Node2D" unique_id=1829796952]
 script = ExtResource("5_room_manager")
@@ -219,3 +220,21 @@ position = Vector2(-838, 400)
 target_scene = "res://scenes/left_route_room.tscn"
 target_spawn_marker_name = "SpawnFromRightRoute"
 prompt_text = "按 E 進入新場景"
+
+[node name="MapRooms" type="Node2D" parent="." unique_id=484924982]
+position = Vector2(176, 206)
+scale = Vector2(3.48, 1.6799986)
+
+[node name="monster1_room" parent="MapRooms" unique_id=2139566318 instance=ExtResource("21_nrr78")]
+position = Vector2(96.839096, 11.90477)
+scale = Vector2(0.5517245, 1)
+room_id = "monster1"
+display_name = "小怪一"
+map_rect = Rect2(330, 160, 220, 110)
+
+[node name="monster2_room" parent="MapRooms" unique_id=116030442 instance=ExtResource("21_nrr78")]
+position = Vector2(-195.4023, 8.928579)
+scale = Vector2(0.35, 1)
+room_id = "monster2"
+display_name = "小怪二"
+map_rect = Rect2(100, 160, 220, 110)

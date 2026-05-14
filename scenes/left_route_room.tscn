@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/map_passage_marker.tscn" id="11_passage"]
 [ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="12_exit_menu"]
 [ext_resource type="PackedScene" path="res://scenes/blue_bounce_split_enemy.tscn" id="13_blue_bounce_split"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="14_vdmoy"]
 
 [node name="LeftRouteRoom" type="Node2D" unique_id=784136986]
 script = ExtResource("5_room_manager")
@@ -145,3 +146,12 @@ position = Vector2(-669, 349)
 target_scene = "res://scenes/right_route_room.tscn"
 target_spawn_marker_name = "SpawnFromLeftRoute"
 prompt_text = "Back to right route"
+
+[node name="MapRoom" type="Node2D" parent="." unique_id=695965679]
+position = Vector2(316, 190)
+scale = Vector2(3.824709, 3.176797)
+
+[node name="MapRoomMarker" parent="MapRoom" unique_id=460178193 instance=ExtResource("14_vdmoy")]
+room_id = "dvd_room"
+display_name = "dvd變異怪"
+map_rect = Rect2(180, 180, 200, 110)

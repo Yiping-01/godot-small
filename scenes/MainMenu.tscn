@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://6df8hhstawla" path="res://main_menu.gd" id="1_2wh52"]
 [ext_resource type="Texture2D" uid="uid://ejy2h5onxyvy" path="res://assets/gamebg.png" id="2_ow34m"]
-[ext_resource type="Texture2D" uid="uid://cjk4441d25nx1" path="res://assets/useicon.png" id="3_l72w3"]
+[ext_resource type="Texture2D" uid="uid://2en60ni8080a" path="res://assets/settings_icon_circle.png" id="3_l72w3"]
 [ext_resource type="FontFile" uid="uid://b6ccjvy4kce2u" path="res://fonts/DelaGothicOne-Regular.ttf" id="3_ow34m"]
 [ext_resource type="VideoStream" uid="uid://ctsia0f7yvjpq" path="res://assets/videos/newbg1_menu.ogv" id="4_newbg"]
 [ext_resource type="Texture2D" uid="uid://dw42skti743su" path="res://assets/bgtitle_cropped.png" id="5_title"]
@@ -22,6 +22,41 @@ bg_color = Color(0.06666667, 0.007843138, 0.02745098, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_826wr"]
 bg_color = Color(0.019607844, 0.039215688, 0.039215688, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_menu"]
+bg_color = Color(0.06, 0.065, 0.07, 0.62)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.12)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keyboard_panel"]
+bg_color = Color(0, 0, 0, 0.8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_key_button"]
+bg_color = Color(0.12, 0.13, 0.14, 0.36)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.62)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_button"]
+bg_color = Color(0.25, 0.25, 0.25, 0.78)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="MainMenu" type="Control" unique_id=1100919666]
 layout_mode = 3
@@ -72,6 +107,282 @@ theme_override_styles/hover = SubResource("StyleBoxEmpty_menu_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_menu_button")
 text = "開始新篇章"
 flat = true
+
+[node name="KeyboardPanel" type="Panel" parent="."]
+visible = false
+z_index = 20
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -335.0
+offset_top = -205.0
+offset_right = 335.0
+offset_bottom = 205.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_keyboard_panel")
+
+[node name="Title" type="Label" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 12.0
+offset_right = 670.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(1, 1, 1, 0.95)
+theme_override_fonts/font = ExtResource("3_ow34m")
+theme_override_font_sizes/font_size = 26
+text = "鍵盤"
+horizontal_alignment = 1
+
+[node name="Line" type="ColorRect" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 66.0
+offset_right = 634.0
+offset_bottom = 67.0
+color = Color(1, 1, 1, 0.42)
+
+[node name="LeftLabels" type="VBoxContainer" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 88.0
+offset_right = 122.0
+offset_bottom = 318.0
+theme_override_constants/separation = 12
+
+[node name="UpLabel" type="Label" parent="KeyboardPanel/LeftLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "上"
+
+[node name="DownLabel" type="Label" parent="KeyboardPanel/LeftLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "下"
+
+[node name="LeftLabel" type="Label" parent="KeyboardPanel/LeftLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "左"
+
+[node name="RightLabel" type="Label" parent="KeyboardPanel/LeftLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "右"
+
+[node name="JumpLabel" type="Label" parent="KeyboardPanel/LeftLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "跳躍"
+
+[node name="AttackLabel" type="Label" parent="KeyboardPanel/LeftLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "攻擊"
+
+[node name="LeftKeys" type="VBoxContainer" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 178.0
+offset_top = 82.0
+offset_right = 254.0
+offset_bottom = 318.0
+theme_override_constants/separation = 9
+
+[node name="UpKey" type="Label" parent="KeyboardPanel/LeftKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "W / ↑"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DownKey" type="Label" parent="KeyboardPanel/LeftKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "S / ↓"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LeftKey" type="Label" parent="KeyboardPanel/LeftKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "A / ←"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightKey" type="Label" parent="KeyboardPanel/LeftKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "D / →"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="JumpKey" type="Label" parent="KeyboardPanel/LeftKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "Z"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackKey" type="Label" parent="KeyboardPanel/LeftKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightLabels" type="VBoxContainer" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 368.0
+offset_top = 88.0
+offset_right = 488.0
+offset_bottom = 318.0
+theme_override_constants/separation = 12
+
+[node name="DashLabel" type="Label" parent="KeyboardPanel/RightLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "衝刺"
+
+[node name="FarAttackLabel" type="Label" parent="KeyboardPanel/RightLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "水槍"
+
+[node name="InteractLabel" type="Label" parent="KeyboardPanel/RightLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "互動 / 使用藥水"
+
+[node name="MapLabel" type="Label" parent="KeyboardPanel/RightLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "地圖"
+
+[node name="InventoryLabel" type="Label" parent="KeyboardPanel/RightLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "物品欄"
+
+[node name="SoundLabel" type="Label" parent="KeyboardPanel/RightLabels"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.88)
+theme_override_font_sizes/font_size = 18
+text = "聲音"
+
+[node name="RightKeys" type="VBoxContainer" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 504.0
+offset_top = 82.0
+offset_right = 580.0
+offset_bottom = 318.0
+theme_override_constants/separation = 9
+
+[node name="DashKey" type="Label" parent="KeyboardPanel/RightKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "C"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FarAttackKey" type="Label" parent="KeyboardPanel/RightKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "F"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InteractKey" type="Label" parent="KeyboardPanel/RightKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "E"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MapKey" type="Label" parent="KeyboardPanel/RightKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "M"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InventoryKey" type="Label" parent="KeyboardPanel/RightKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "I"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SoundKey" type="Label" parent="KeyboardPanel/RightKeys"]
+custom_minimum_size = Vector2(76, 31)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.92)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_key_button")
+text = "P"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackButton" type="Button" parent="KeyboardPanel"]
+layout_mode = 0
+offset_left = 292.0
+offset_top = 332.0
+offset_right = 378.0
+offset_bottom = 362.0
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_back_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back_button")
+text = "返回"
 
 [node name="ContinueButton" type="Button" parent="." unique_id=1826477223]
 layout_mode = 0
@@ -126,71 +437,65 @@ texture = ExtResource("5_title")
 
 [node name="SettingsButton" type="Button" parent="." unique_id=1411559680]
 layout_mode = 0
-offset_left = 922.0
-offset_top = -5.0
-offset_right = 994.0
-offset_bottom = 46.0
-scale = Vector2(4, 4)
+offset_left = 993.0
+offset_top = 6.0
+offset_right = 1129.0
+offset_bottom = 142.0
+scale = Vector2(0.85575426, 0.83221614)
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_menu_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_menu_button")
 icon = ExtResource("3_l72w3")
 flat = true
 
 [node name="SettingsPanel" type="Panel" parent="." unique_id=1712750936]
 visible = false
-modulate = Color(0.9764706, 0.99215686, 0.98039216, 1)
-self_modulate = Color(0.972549, 0.96862745, 0.96862745, 1)
+z_index = 30
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -250.0
-offset_right = 400.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_2wh52")
+anchors_preset = 0
+offset_left = 930.0
+offset_top = 120.0
+offset_right = 1120.0
+offset_bottom = 304.0
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_settings_menu")
 
-[node name="TextureRect" type="TextureRect" parent="SettingsPanel" unique_id=1582431168]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_ow34m")
-
-[node name="Label" type="Label" parent="SettingsPanel" unique_id=157332602]
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel"]
 layout_mode = 0
-offset_left = 92.0
-offset_top = 179.0
-offset_right = 182.0
-offset_bottom = 242.0
-theme_override_colors/font_color = Color(0.019607844, 0.043137256, 0.043137256, 1)
-theme_override_font_sizes/font_size = 45
-text = "音量"
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 172.0
+offset_bottom = 166.0
+theme_override_constants/separation = 12
 
-[node name="HSlider" type="HSlider" parent="SettingsPanel" unique_id=551488419]
-modulate = Color(0.98039216, 0.96862745, 0.9607843, 1)
-self_modulate = Color(0.019607844, 0, 0.007843138, 1)
-layout_mode = 0
-offset_left = 209.0
-offset_top = 204.0
-offset_right = 668.0
-offset_bottom = 220.0
-theme_override_styles/slider = SubResource("StyleBoxFlat_ow34m")
-theme_override_styles/grabber_area = SubResource("StyleBoxFlat_l72w3")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_826wr")
-max_value = 1.0
-step = 0.01
-value = 1.0
+[node name="SettingsOptionButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 0.9)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "設置"
+flat = true
 
-[node name="Button" type="Button" parent="SettingsPanel" unique_id=1941935754]
-layout_mode = 0
-offset_left = 285.0
-offset_top = 381.0
-offset_right = 482.0
-offset_bottom = 463.0
-theme_override_font_sizes/font_size = 32
-text = "返回"
+[node name="SoundOptionButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 0.9)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "聲音"
+flat = true
+
+[node name="QuitOptionButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 0.9)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "離開"
+flat = true

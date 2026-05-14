@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" path="res://scenes/tutorial_trigger.tscn" id="16_v10j6"]
 [ext_resource type="PackedScene" path="res://scenes/bench.tscn" id="17_oqwvp"]
 [ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="18_exit_menu"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="19_vknqt"]
 
 [node name="UpperRouteRoom" type="Node2D" unique_id=1241468937]
 script = ExtResource("5_room_manager")
@@ -217,3 +218,21 @@ vertical_alignment = 1
 
 [node name="Bench" parent="." unique_id=278616665 instance=ExtResource("17_oqwvp")]
 position = Vector2(1444, 411)
+
+[node name="MapRooms" type="Node2D" parent="." unique_id=1989618845]
+position = Vector2(397, 254)
+scale = Vector2(4, 2.8596654)
+
+[node name="shop_room" parent="MapRooms" unique_id=1258912247 instance=ExtResource("19_vknqt")]
+position = Vector2(-140, 0)
+scale = Vector2(0.53999996, 1)
+room_id = "shop_room"
+display_name = "商人房"
+map_rect = Rect2(110, 180, 220, 110)
+
+[node name="break_room" parent="MapRooms" unique_id=1183428229 instance=ExtResource("19_vknqt")]
+position = Vector2(180.75, -6.993826)
+scale = Vector2(0.44000033, 1)
+room_id = "break_room"
+display_name = "休息房"
+map_rect = Rect2(330, 180, 220, 110)

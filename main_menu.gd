@@ -7,8 +7,11 @@ extends Control
 
 @onready var settings_button = $SettingsButton
 @onready var settings_panel = $SettingsPanel
-@onready var volume_slider = $SettingsPanel/HSlider
-@onready var back_button = $SettingsPanel/Button
+@onready var panel_settings_button = $SettingsPanel/VBoxContainer/SettingsOptionButton
+@onready var panel_sound_button = $SettingsPanel/VBoxContainer/SoundOptionButton
+@onready var panel_quit_button = $SettingsPanel/VBoxContainer/QuitOptionButton
+@onready var keyboard_panel = $KeyboardPanel
+@onready var keyboard_back_button = $KeyboardPanel/BackButton
 
 var menu_buttons: Array[Button] = []
 var selected_menu_index := 0
@@ -25,10 +28,14 @@ func _ready():
 	quit_button.pressed.connect(_on_quit_pressed)
 
 	settings_button.pressed.connect(_on_settings_pressed)
-	back_button.pressed.connect(_on_back_pressed)
-	volume_slider.value_changed.connect(_on_volume_changed)
+	panel_settings_button.pressed.connect(_on_panel_settings_pressed)
+	panel_sound_button.pressed.connect(_on_panel_sound_pressed)
+	panel_quit_button.pressed.connect(_on_close_settings_panel)
+	keyboard_back_button.pressed.connect(_on_keyboard_back_pressed)
 
 	settings_panel.visible = false
+	keyboard_panel.visible = false
+	_update_menu_button_mouse_filter()
 	continue_button.disabled = not GameState.has_continue_scene()
 	menu_buttons = [start_button, continue_button, quit_button]
 	_setup_menu_keyboard()
@@ -51,17 +58,45 @@ func _on_quit_pressed():
 	get_tree().quit()
 
 func _on_settings_pressed():
-	settings_panel.visible = true
+	var next_visible: bool = not settings_panel.visible
+	settings_panel.visible = next_visible
+	keyboard_panel.visible = false
+	_update_menu_button_mouse_filter()
 
-func _on_back_pressed():
+
+func _on_panel_settings_pressed() -> void:
 	settings_panel.visible = false
+	keyboard_panel.visible = true
+	_update_menu_button_mouse_filter()
 
-func _on_volume_changed(value):
-	AudioServer.set_bus_volume_db(0, linear_to_db(value))
+
+func _on_keyboard_back_pressed() -> void:
+	keyboard_panel.visible = false
+	settings_panel.visible = true
+	_update_menu_button_mouse_filter()
+
+
+func _on_panel_sound_pressed() -> void:
+	if AudioSettings != null and AudioSettings.has_method("_toggle_window"):
+		AudioSettings.call("_toggle_window")
+
+
+func _on_close_settings_panel() -> void:
+	settings_panel.visible = false
+	keyboard_panel.visible = false
+	_update_menu_button_mouse_filter()
+
+
+func _update_menu_button_mouse_filter() -> void:
+	var block_main_buttons: bool = settings_panel.visible or keyboard_panel.visible
+	var next_filter: int = Control.MOUSE_FILTER_IGNORE if block_main_buttons else Control.MOUSE_FILTER_STOP
+	start_button.mouse_filter = next_filter
+	continue_button.mouse_filter = next_filter
+	quit_button.mouse_filter = next_filter
 
 
 func _input(event: InputEvent) -> void:
-	if settings_panel.visible:
+	if settings_panel.visible or keyboard_panel.visible:
 		return
 
 	if event.is_action_pressed("ui_up"):
