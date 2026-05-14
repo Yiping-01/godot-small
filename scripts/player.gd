@@ -60,9 +60,9 @@ signal respawned
 
 @export_category("Lighting")
 @export var enable_player_light := true
-@export var scene_darkness := Color(0.24, 0.28, 0.34, 1.0)
+@export var scene_darkness := Color(0.84, 0.86, 0.90, 1.0)
 @export var player_light_radius: float = 250.0
-@export var player_light_energy: float = 0.32
+@export var player_light_energy: float = 0.36
 @export var player_light_color := Color(0.74, 0.92, 1.0, 1.0)
 
 const CAMERA_UNBOUNDED_LIMIT := 10000000
