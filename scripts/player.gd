@@ -35,9 +35,9 @@ signal respawned
 @export var underwater_swim_acceleration: float = 1350.0
 @export var underwater_drag: float = 1050.0
 @export var underwater_dash_speed: float = 720.0
-@export var underwater_dash_duration: float = 0.14
+@export var underwater_dash_duration: float = 0.24
 @export var underwater_wall_dash_speed: float = 900.0
-@export var underwater_wall_dash_duration: float = 0.22
+@export var underwater_wall_dash_duration: float = 0.34
 @export var underwater_dash_cooldown: float = 0.34
 
 @export_category("Combat")
@@ -349,18 +349,15 @@ func _handle_underwater_dash_input() -> void:
 		return
 
 	var input_vector := _get_underwater_input()
-	var wall_normal := _get_wall_jump_surface_normal()
-	var input_direction := _get_horizontal_input()
-	var is_wall_dash := not is_zero_approx(wall_normal.x) and is_equal_approx(input_direction, -signf(wall_normal.x))
+	var is_wall_dash := _is_underwater_wall_swimming()
+	if input_vector == Vector2.ZERO:
+		input_vector = Vector2(float(facing_direction), 0.0)
 
+	underwater_dash_direction = input_vector.normalized()
 	if is_wall_dash:
-		underwater_dash_direction = Vector2(signf(wall_normal.x), 0.0)
 		underwater_dash_current_speed = underwater_wall_dash_speed
 		dash_time_left = underwater_wall_dash_duration
 	else:
-		if input_vector == Vector2.ZERO:
-			input_vector = Vector2(float(facing_direction), 0.0)
-		underwater_dash_direction = input_vector.normalized()
 		underwater_dash_current_speed = underwater_dash_speed
 		dash_time_left = underwater_dash_duration
 
@@ -657,6 +654,19 @@ func _get_underwater_input() -> Vector2:
 	if input_vector.length_squared() > 1.0:
 		return input_vector.normalized()
 	return input_vector
+
+
+func _is_underwater_wall_swimming() -> bool:
+	for i in range(get_slide_collision_count()):
+		var collision := get_slide_collision(i)
+		if collision == null:
+			continue
+
+		var normal := collision.get_normal()
+		if not is_zero_approx(normal.x):
+			return true
+
+	return false
 
 
 func _update_wall_slide() -> void:
@@ -1295,13 +1305,21 @@ func _update_animation() -> void:
 		return
 
 	if is_dashing:
-		if animated_sprite.animation != "walk":
-			animated_sprite.play("walk")
+		var dash_animation := &"walk"
+		if is_underwater and animated_sprite.sprite_frames.has_animation(&"swimming"):
+			dash_animation = &"swimming"
+		if animated_sprite.animation != dash_animation:
+			animated_sprite.play(dash_animation)
 		return
 
 	if is_underwater:
-		if animated_sprite.animation != "walk":
-			animated_sprite.play("walk")
+		var underwater_animation := &"swimming"
+		if _is_underwater_wall_swimming() and animated_sprite.sprite_frames.has_animation(&"underwater_slide"):
+			underwater_animation = &"underwater_slide"
+		if not animated_sprite.sprite_frames.has_animation(underwater_animation):
+			underwater_animation = &"walk"
+		if animated_sprite.animation != underwater_animation:
+			animated_sprite.play(underwater_animation)
 		return
 
 	if not is_on_floor():

@@ -36,6 +36,13 @@
 [ext_resource type="Texture2D" uid="uid://c3sxqu1m06mmr" path="res://assets/player/AttackUp/sea0_attackup_6.png" id="31_attack_up_6"]
 [ext_resource type="Texture2D" path="res://assets/player/sea0_damage/sea0_damage_1.png" id="32_damage_1"]
 [ext_resource type="Texture2D" path="res://assets/player/sea0_damage/sea0_damage_2.png" id="33_damage_2"]
+[ext_resource type="Texture2D" path="res://assets/player/swimming/player_swimming1.png" id="34_swim_1"]
+[ext_resource type="Texture2D" path="res://assets/player/swimming/player_swimming2.png" id="35_swim_2"]
+[ext_resource type="Texture2D" path="res://assets/player/swimming/player_swimming3.png" id="36_swim_3"]
+[ext_resource type="Texture2D" path="res://assets/player/swimming/player_swimming4.png" id="37_swim_4"]
+[ext_resource type="Texture2D" path="res://assets/player/swimming/player_swimming5.png" id="38_swim_5"]
+[ext_resource type="Texture2D" path="res://assets/player/sea0_slide/sea0_slide_1.png" id="39_slide_1"]
+[ext_resource type="Texture2D" path="res://assets/player/sea0_slide/sea0_slide_2.png" id="40_slide_2"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
@@ -131,6 +138,37 @@ animations = [{
 }],
 "loop": true,
 "name": &"wait",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("34_swim_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_swim_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_swim_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_swim_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_swim_5")
+}],
+"loop": true,
+"name": &"swimming",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("39_slide_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_slide_2")
+}],
+"loop": true,
+"name": &"underwater_slide",
 "speed": 6.0
 }, {
 "frames": [{

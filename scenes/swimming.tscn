@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/map_platform.tscn" id="4_platform"]
 [ext_resource type="Texture2D" uid="uid://oghgnwu5i5fa" path="res://assets/background/deepsea_prop_plant.png" id="13_plant"]
 [ext_resource type="Texture2D" uid="uid://df8fm05wvrlx0" path="res://assets/background/radial_warm_light.png" id="14_light"]
-[ext_resource type="Script" path="res://scripts/water_zone.gd" id="15_water_zone"]
+[ext_resource type="Script" uid="uid://dxjc2kqq4tgq6" path="res://scripts/water_zone.gd" id="15_water_zone"]
 [ext_resource type="PackedScene" path="res://scenes/blue_bounce_small_enemy.tscn" id="17_blue_bounce"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_light_add"]
