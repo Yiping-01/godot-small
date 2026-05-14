@@ -35,5 +35,9 @@ func _on_pickup_area_body_entered(body: Node2D) -> void:
 	GameState.add_currency(value)
 	var ui := get_tree().get_first_node_in_group("game_ui")
 	if ui != null:
-		ui.show_toast("取得金錢 +%d" % value)
+		var localization: Node = get_node_or_null("/root/Localization")
+		var text: String = "取得金錢 +%d"
+		if localization != null and localization.has_method("text"):
+			text = String(localization.call("text", "TOAST_COIN"))
+		ui.show_toast(text % value)
 	queue_free()

@@ -7,10 +7,12 @@ var music_volume := 1.0
 var sfx_volume := 1.0
 
 var window_root: Control
+var title_label: Label
 var music_label: Label
 var sfx_label: Label
 var music_slider: HSlider
 var sfx_slider: HSlider
+var close_button: Button
 
 
 func _ready() -> void:
@@ -21,6 +23,9 @@ func _ready() -> void:
 	_apply_bus_volume(MUSIC_BUS, music_volume)
 	_apply_bus_volume(SFX_BUS, sfx_volume)
 	_build_window()
+	var localization: Node = _get_localization()
+	if localization != null:
+		localization.connect("language_changed", Callable(self, "_update_labels"))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -73,11 +78,10 @@ func _build_window() -> void:
 	content.add_theme_constant_override("separation", 10)
 	margin.add_child(content)
 
-	var title := Label.new()
-	title.text = "音量設定"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 20)
-	content.add_child(title)
+	title_label = Label.new()
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.add_theme_font_size_override("font_size", 20)
+	content.add_child(title_label)
 
 	music_label = Label.new()
 	content.add_child(music_label)
@@ -93,8 +97,7 @@ func _build_window() -> void:
 	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
 	content.add_child(sfx_slider)
 
-	var close_button := Button.new()
-	close_button.text = "關閉"
+	close_button = Button.new()
 	close_button.pressed.connect(_hide_window)
 	content.add_child(close_button)
 
@@ -141,5 +144,20 @@ func _apply_bus_volume(bus_name: String, volume: float) -> void:
 
 
 func _update_labels() -> void:
-	music_label.text = "背景音樂：%d%%" % roundi(music_volume * 100.0)
-	sfx_label.text = "音效：%d%%" % roundi(sfx_volume * 100.0)
+	if title_label != null:
+		title_label.text = _t("AUDIO_TITLE")
+	if close_button != null:
+		close_button.text = _t("MENU_CLOSE")
+	music_label.text = _t("AUDIO_MUSIC") % roundi(music_volume * 100.0)
+	sfx_label.text = _t("AUDIO_SFX") % roundi(sfx_volume * 100.0)
+
+
+func _t(key: String) -> String:
+	var localization: Node = _get_localization()
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key
+
+
+func _get_localization() -> Node:
+	return get_node_or_null("/root/Localization")

@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/game_state.gd"
 MusicPlayer="*res://scripts/music_player.gd"
 AudioSettings="*res://scripts/audio_settings.gd"
+Localization="*res://scripts/localization.gd"
 InputHelper="*uid://cholww48njaeh"
 InputSettings="*res://scripts/input_settings.gd"
 

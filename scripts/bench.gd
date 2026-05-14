@@ -48,7 +48,11 @@ func _sit_down() -> void:
 	var ui := get_tree().get_first_node_in_group("game_ui")
 	if ui != null:
 		ui.show_prompt(seated_text)
-		ui.show_toast("你坐在長椅上休息。生命回滿，敵人重生。", 2.0)
+		var localization: Node = get_node_or_null("/root/Localization")
+		var text: String = "你坐在長椅上休息。生命回滿，敵人重生。"
+		if localization != null and localization.has_method("text"):
+			text = String(localization.call("text", "TOAST_BENCH_REST"))
+		ui.show_toast(text, 2.0)
 
 	get_tree().paused = true
 

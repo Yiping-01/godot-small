@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 
 signal currency_changed(amount: int)
 signal inventory_changed(items: Dictionary)
@@ -292,18 +292,54 @@ func use_health_potion() -> bool:
 
 
 func get_item_display_name(item_name: String) -> String:
+	var localized_name: String = _get_localized_item_text(item_name, true)
+	if localized_name != "":
+		return localized_name
 	var data: Dictionary = item_database.get(item_name, {})
-	return String(data.get("display_name", item_name))
+	return _tr_raw(String(data.get("display_name", item_name)))
 
 
 func get_item_description(item_name: String) -> String:
+	var localized_description: String = _get_localized_item_text(item_name, false)
+	if localized_description != "":
+		return localized_description
 	var data: Dictionary = item_database.get(item_name, {})
-	return String(data.get("description", "尚未寫入說明。"))
+	return _tr_raw(String(data.get("description", _t("ITEM_UNKNOWN_DESC"))))
 
 
 func set_respawn_position(position: Vector2) -> void:
 	saved_respawn_position = position
 	has_saved_respawn = true
+
+
+func _get_localized_item_text(item_name: String, display_name: bool) -> String:
+	var key: String = ""
+	if is_health_potion_item(item_name):
+		key = "ITEM_HEALTH_POTION" if display_name else "ITEM_HEALTH_POTION_DESC"
+	elif item_name == STARTER_ITEM:
+		key = "ITEM_TRAVELER_NOTE" if display_name else "ITEM_TRAVELER_NOTE_DESC"
+	elif is_rough_charm_item(item_name):
+		key = "ITEM_ROUGH_CHARM" if display_name else "ITEM_ROUGH_CHARM_DESC"
+	elif item_name == "生命碎片":
+		key = "ITEM_LIFE_FRAGMENT" if display_name else "ITEM_LIFE_FRAGMENT_DESC"
+	elif item_name == "破舊地圖":
+		key = "ITEM_OLD_MAP" if display_name else "ITEM_OLD_MAP_DESC"
+
+	return "" if key == "" else _t(key)
+
+
+func _t(key: String) -> String:
+	var localization: Node = get_node_or_null("/root/Localization")
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key
+
+
+func _tr_raw(text: String) -> String:
+	var localization: Node = get_node_or_null("/root/Localization")
+	if localization != null and localization.has_method("translate_raw"):
+		return String(localization.call("translate_raw", text))
+	return text
 
 
 func get_respawn_position(default_position: Vector2) -> Vector2:

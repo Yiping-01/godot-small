@@ -168,7 +168,7 @@ func _build_skill_tooltip() -> void:
 	skill_tooltip.add_theme_stylebox_override("panel", style)
 
 	var tooltip_label := Label.new()
-	tooltip_label.text = "技能尚未取得"
+	tooltip_label.text = _t("SKILL_NOT_OWNED")
 	tooltip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tooltip_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	tooltip_label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -192,3 +192,10 @@ func _show_skill_tooltip(slot: Control) -> void:
 func _hide_skill_tooltip() -> void:
 	if skill_tooltip != null:
 		skill_tooltip.hide()
+
+
+func _t(key: String) -> String:
+	var localization: Node = get_node_or_null("/root/Localization")
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key

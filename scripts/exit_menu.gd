@@ -9,10 +9,13 @@ var sound_button: Button
 var quit_button: Button
 var pause_dim: ColorRect
 var settings_panel: Panel
+var pause_title_label: Label
+var settings_title_label: Label
 var settings_back_button: Button
 var reset_controls_button: Button
 var waiting_label: Label
 var key_buttons: Dictionary = {}
+var key_action_labels: Dictionary = {}
 var waiting_for_action := ""
 
 
@@ -25,6 +28,10 @@ func _ready() -> void:
 	var settings: Node = _get_input_settings()
 	if settings != null:
 		settings.connect("controls_changed", Callable(self, "_refresh_key_labels"))
+	var localization: Node = _get_localization()
+	if localization != null:
+		localization.connect("language_changed", Callable(self, "_update_texts"))
+	_update_texts()
 
 
 func _input(event: InputEvent) -> void:
@@ -58,9 +65,9 @@ func _capture_rebind_input(event: InputEvent) -> void:
 		if settings != null:
 			result = int(settings.call("rebind_keyboard_action", action, event))
 		if result == OK:
-			_show_waiting_message("已更新按鍵。")
+			_show_waiting_message(_t("KEYBOARD_SAVED"))
 		else:
-			_show_waiting_message("這個按鍵不能使用。")
+			_show_waiting_message(_t("KEYBOARD_FAILED"))
 		_refresh_key_labels()
 
 
@@ -106,6 +113,7 @@ func _build_pause_menu() -> void:
 	exit_panel.add_child(content)
 
 	var title := Label.new()
+	pause_title_label = title
 	title.text = "暫停"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title.add_theme_font_size_override("font_size", 26)
@@ -153,6 +161,7 @@ func _build_settings_panel() -> void:
 	settings_panel.add_child(content)
 
 	var title := Label.new()
+	settings_title_label = title
 	title.text = "按鍵設定"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
@@ -220,6 +229,7 @@ func _add_key_row(parent: VBoxContainer, action_text: String, action_name: Strin
 	action_label.add_theme_font_size_override("font_size", 17)
 	action_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.78))
 	row.add_child(action_label)
+	key_action_labels[action_name] = action_label
 
 	var key_button := _create_key_button()
 	key_button.pressed.connect(_start_rebind.bind(action_name))
@@ -295,12 +305,12 @@ func _button_style(color: Color) -> StyleBoxFlat:
 
 func _start_rebind(action_name: String) -> void:
 	waiting_for_action = action_name
-	_show_waiting_message("請按新的「%s」按鍵，Esc 取消。" % _get_action_display_name(action_name))
+	_show_waiting_message(_t("KEYBOARD_PRESS_NEW") % _get_action_display_name(action_name))
 
 
 func _cancel_rebind() -> void:
 	waiting_for_action = ""
-	_show_waiting_message("已取消更改。")
+	_show_waiting_message(_t("KEYBOARD_CANCELLED"))
 
 
 func _show_waiting_message(text: String) -> void:
@@ -314,7 +324,7 @@ func _get_action_display_name(action_name: String) -> String:
 		return action_name
 	for item in settings.call("get_actions"):
 		if String(item["action"]) == action_name:
-			return String(item["label"])
+			return _get_localized_action_name(action_name)
 	return action_name
 
 
@@ -330,11 +340,51 @@ func _on_reset_controls_pressed() -> void:
 	var settings: Node = _get_input_settings()
 	if settings != null:
 		settings.call("reset_to_defaults")
-	_show_waiting_message("已恢復預設按鍵。")
+	_show_waiting_message(_t("KEYBOARD_RESET_DONE"))
 
 
 func _get_input_settings() -> Node:
 	return get_node_or_null("/root/InputSettings")
+
+
+func _get_localization() -> Node:
+	return get_node_or_null("/root/Localization")
+
+
+func _t(key: String) -> String:
+	var localization: Node = _get_localization()
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key
+
+
+func _get_localized_action_name(action_name: String) -> String:
+	return _t("ACTION_%s" % action_name.to_upper())
+
+
+func _update_texts() -> void:
+	if pause_title_label != null:
+		pause_title_label.text = _t("PAUSE_TITLE")
+	if resume_button != null:
+		resume_button.text = _t("PAUSE_RESUME")
+	if settings_button != null:
+		settings_button.text = _t("PAUSE_SETTINGS")
+	if sound_button != null:
+		sound_button.text = _t("PAUSE_SOUND")
+	if quit_button != null:
+		quit_button.text = _t("PAUSE_MAIN_MENU")
+	if settings_title_label != null:
+		settings_title_label.text = _t("PAUSE_SETTINGS")
+	if reset_controls_button != null:
+		reset_controls_button.text = _t("KEYBOARD_RESET")
+	if settings_back_button != null:
+		settings_back_button.text = _t("MENU_BACK")
+	if waiting_label != null and waiting_for_action == "":
+		waiting_label.text = _t("KEYBOARD_WAITING")
+	for action_name in key_action_labels.keys():
+		var label: Label = key_action_labels[action_name] as Label
+		if label != null:
+			label.text = _get_localized_action_name(String(action_name))
 
 
 func _show_exit_panel() -> void:
@@ -362,7 +412,7 @@ func _show_settings_panel() -> void:
 	exit_panel.visible = false
 	settings_panel.visible = true
 	get_tree().paused = true
-	_show_waiting_message("點選右側按鍵後，按下新的鍵。Esc 取消。")
+	_show_waiting_message(_t("KEYBOARD_WAITING"))
 	_refresh_key_labels()
 	settings_back_button.grab_focus()
 

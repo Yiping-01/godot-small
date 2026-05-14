@@ -11,7 +11,9 @@ var prompt_time := 0.0
 func _ready() -> void:
 	_play_title_music()
 
+	full_text = _t("INTRO_TEXT")
 	text_label.text = ""
+	prompt_label.text = _t("INTRO_PROMPT")
 	prompt_label.modulate.a = 0.0
 	timer.wait_time = 0.055
 	timer.timeout.connect(_on_timer_timeout)
@@ -37,3 +39,10 @@ func _play_title_music() -> void:
 	var music_player := get_node_or_null("/root/MusicPlayer")
 	if music_player != null and music_player.has_method("play_title_music"):
 		music_player.play_title_music()
+
+
+func _t(key: String) -> String:
+	var localization: Node = get_node_or_null("/root/Localization")
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key

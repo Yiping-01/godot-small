@@ -461,7 +461,7 @@ anchors_preset = 0
 offset_left = 930.0
 offset_top = 120.0
 offset_right = 1120.0
-offset_bottom = 304.0
+offset_bottom = 354.0
 mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_settings_menu")
 
@@ -470,7 +470,7 @@ layout_mode = 0
 offset_left = 18.0
 offset_top = 18.0
 offset_right = 172.0
-offset_bottom = 166.0
+offset_bottom = 216.0
 theme_override_constants/separation = 12
 
 [node name="SettingsOptionButton" type="Button" parent="SettingsPanel/VBoxContainer"]
@@ -489,6 +489,15 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "聲音"
+flat = true
+
+[node name="LanguageOptionButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 0.9)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "語言"
 flat = true
 
 [node name="QuitOptionButton" type="Button" parent="SettingsPanel/VBoxContainer"]

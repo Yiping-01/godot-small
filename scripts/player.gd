@@ -819,14 +819,14 @@ func _try_use_health_potion() -> bool:
 	if is_dead or GameState.input_locked or _has_visible_interaction_prompt():
 		return false
 	if current_health >= float(max_health):
-		_show_game_toast("血量是滿的")
+		_show_game_toast(_t("TOAST_HEALTH_FULL"))
 		return false
 	if not GameState.use_health_potion():
-		_show_game_toast("沒有回血飲料了")
+		_show_game_toast(_t("TOAST_NO_POTION"))
 		return false
 
 	heal(health_potion_heal_amount)
-	_show_game_toast("使用回血飲料")
+	_show_game_toast(_t("TOAST_POTION_USED"))
 	return true
 
 
@@ -841,6 +841,13 @@ func _show_game_toast(text: String) -> void:
 	var ui := get_tree().get_first_node_in_group("game_ui")
 	if ui != null and ui.has_method("show_toast"):
 		ui.call("show_toast", text, 1.2)
+
+
+func _t(key: String) -> String:
+	var localization: Node = get_node_or_null("/root/Localization")
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key
 
 
 func _play_game_music() -> void:

@@ -1,0 +1,28 @@
+keys,zh,en
+MENU_START,開始新篇章,Start
+MENU_CONTINUE,繼續遊戲,Continue
+MENU_QUIT,離開遊戲,Quit
+MENU_SETTINGS,設置,Settings
+MENU_SOUND,聲音,Sound
+MENU_LANGUAGE,語言,Language
+MENU_CLOSE,離開,Close
+KEYBOARD_TITLE,鍵盤,Keyboard
+KEYBOARD_WAITING,點擊要修改的按鍵，或按 Esc 返回。,Click a key setting or press Esc to go back.
+KEYBOARD_CANCELLED,已取消修改。,Canceled.
+KEYBOARD_SAVED,按鍵已修改。,Key changed.
+KEYBOARD_FAILED,這個按鍵無法使用。,This key cannot be used.
+KEYBOARD_RESET,重置,Reset
+KEYBOARD_RESET_DONE,已重置按鍵。,Controls reset.
+MENU_BACK,返回,Back
+ACTION_MOVE_UP,上,Up
+ACTION_MOVE_DOWN,下,Down
+ACTION_MOVE_LEFT,左,Left
+ACTION_MOVE_RIGHT,右,Right
+ACTION_JUMP,跳躍,Jump
+ACTION_ATTACK,攻擊,Attack
+ACTION_DASH,衝刺,Dash
+ACTION_FAR_ATTACK,水槍,Water Shot
+ACTION_INTERACT,互動 / 使用藥水,Interact / Potion
+ACTION_MAP,地圖,Map
+ACTION_INVENTORY,物品欄,Inventory
+ACTION_AUDIO_SETTINGS,聲音,Sound

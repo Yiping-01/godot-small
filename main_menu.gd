@@ -9,6 +9,7 @@ extends Control
 @onready var settings_panel = $SettingsPanel
 @onready var panel_settings_button = $SettingsPanel/VBoxContainer/SettingsOptionButton
 @onready var panel_sound_button = $SettingsPanel/VBoxContainer/SoundOptionButton
+@onready var panel_language_button = $SettingsPanel/VBoxContainer/LanguageOptionButton
 @onready var panel_quit_button = $SettingsPanel/VBoxContainer/QuitOptionButton
 @onready var keyboard_panel = $KeyboardPanel
 @onready var keyboard_back_button = $KeyboardPanel/BackButton
@@ -19,6 +20,7 @@ var key_buttons: Dictionary = {}
 var key_rows: Dictionary = {}
 var waiting_for_action := ""
 var waiting_label: Label
+var keyboard_title_label: Label
 var reset_controls_button: Button
 
 
@@ -35,8 +37,10 @@ func _ready():
 	settings_button.pressed.connect(_on_settings_pressed)
 	panel_settings_button.pressed.connect(_on_panel_settings_pressed)
 	panel_sound_button.pressed.connect(_on_panel_sound_pressed)
+	panel_language_button.pressed.connect(_on_language_pressed)
 	panel_quit_button.pressed.connect(_on_close_settings_panel)
 	_build_keyboard_rebind_panel()
+	_update_texts()
 
 	settings_panel.visible = false
 	keyboard_panel.visible = false
@@ -47,6 +51,9 @@ func _ready():
 	var input_settings: Node = _get_input_settings()
 	if input_settings != null:
 		input_settings.connect("controls_changed", Callable(self, "_refresh_key_labels"))
+	var localization: Node = _get_localization()
+	if localization != null:
+		localization.connect("language_changed", Callable(self, "_update_texts"))
 
 func _on_start_pressed():
 	if FileAccess.file_exists("user://save_game.json"):
@@ -76,7 +83,7 @@ func _on_panel_settings_pressed() -> void:
 	settings_panel.visible = false
 	keyboard_panel.visible = true
 	waiting_for_action = ""
-	_show_waiting_message("點選右側按鍵後，按下新的鍵。Esc 取消。")
+	_show_waiting_message(_t("KEYBOARD_WAITING"))
 	_refresh_key_labels()
 	_update_menu_button_mouse_filter()
 
@@ -92,6 +99,13 @@ func _on_panel_sound_pressed() -> void:
 		AudioSettings.call("_toggle_window")
 
 
+func _on_language_pressed() -> void:
+	var localization: Node = _get_localization()
+	if localization != null:
+		localization.call("toggle_language")
+	_update_texts()
+
+
 func _on_close_settings_panel() -> void:
 	settings_panel.visible = false
 	keyboard_panel.visible = false
@@ -104,6 +118,38 @@ func _update_menu_button_mouse_filter() -> void:
 	start_button.mouse_filter = next_filter
 	continue_button.mouse_filter = next_filter
 	quit_button.mouse_filter = next_filter
+
+
+func _update_texts() -> void:
+	start_button.text = _t("MENU_START")
+	continue_button.text = _t("MENU_CONTINUE")
+	quit_button.text = _t("MENU_QUIT")
+	panel_settings_button.text = _t("MENU_SETTINGS")
+	panel_sound_button.text = _t("MENU_SOUND")
+	panel_language_button.text = _t("MENU_LANGUAGE")
+	panel_quit_button.text = _t("MENU_CLOSE")
+	if keyboard_title_label != null:
+		keyboard_title_label.text = _t("KEYBOARD_TITLE")
+	if reset_controls_button != null:
+		reset_controls_button.text = _t("KEYBOARD_RESET")
+	if keyboard_back_button != null:
+		keyboard_back_button.text = _t("MENU_BACK")
+	if waiting_label != null and waiting_for_action == "":
+		waiting_label.text = _t("KEYBOARD_WAITING")
+	for action_name in key_rows.keys():
+		var row: Control = key_rows[action_name] as Control
+		if row == null:
+			continue
+		var action_label: Label = row.find_child("ActionLabel", true, false) as Label
+		if action_label != null:
+			action_label.text = _get_localized_action_name(String(action_name))
+
+
+func _t(key: String) -> String:
+	var localization: Node = _get_localization()
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key
 
 
 func _input(event: InputEvent) -> void:
@@ -184,7 +230,7 @@ func _capture_rebind_input(event: InputEvent) -> void:
 		_mark_input_handled()
 		if event.keycode == KEY_ESCAPE:
 			waiting_for_action = ""
-			_show_waiting_message("已取消更改。")
+			_show_waiting_message(_t("KEYBOARD_CANCELLED"))
 			return
 
 		var action := waiting_for_action
@@ -194,9 +240,9 @@ func _capture_rebind_input(event: InputEvent) -> void:
 		if input_settings != null:
 			result = int(input_settings.call("rebind_keyboard_action", action, event))
 		if result == OK:
-			_show_waiting_message("已更新按鍵。")
+			_show_waiting_message(_t("KEYBOARD_SAVED"))
 		else:
-			_show_waiting_message("這個按鍵不能使用。")
+			_show_waiting_message(_t("KEYBOARD_FAILED"))
 		_refresh_key_labels()
 
 
@@ -222,6 +268,7 @@ func _build_keyboard_rebind_panel() -> void:
 	keyboard_panel.add_child(content)
 
 	var title := Label.new()
+	keyboard_title_label = title
 	title.text = "按鍵設定"
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -258,18 +305,19 @@ func _build_keyboard_rebind_panel() -> void:
 	var actions: Array = [] if input_settings == null else input_settings.call("get_actions")
 	for i in range(actions.size()):
 		var target_column: VBoxContainer = left_column if i < 6 else right_column
-		_add_key_row(target_column, String(actions[i]["label"]), String(actions[i]["action"]))
+		var action_name: String = String(actions[i]["action"])
+		_add_key_row(target_column, _get_localized_action_name(action_name), action_name)
 
 	var bottom_row := HBoxContainer.new()
 	bottom_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	bottom_row.add_theme_constant_override("separation", 12)
 	content.add_child(bottom_row)
 
-	reset_controls_button = _create_panel_button("恢復預設")
+	reset_controls_button = _create_panel_button(_t("KEYBOARD_RESET"))
 	reset_controls_button.pressed.connect(_on_reset_controls_pressed)
 	bottom_row.add_child(reset_controls_button)
 
-	keyboard_back_button = _create_panel_button("返回")
+	keyboard_back_button = _create_panel_button(_t("MENU_BACK"))
 	keyboard_back_button.pressed.connect(_on_keyboard_back_pressed)
 	bottom_row.add_child(keyboard_back_button)
 
@@ -300,6 +348,7 @@ func _add_key_row(parent: VBoxContainer, action_text: String, action_name: Strin
 	row.add_child(row_content)
 
 	var action_label := Label.new()
+	action_label.name = "ActionLabel"
 	action_label.text = action_text
 	action_label.custom_minimum_size = Vector2(144.0, 34.0)
 	action_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -370,7 +419,7 @@ func _create_panel_button(text: String) -> Button:
 
 func _start_rebind(action_name: String) -> void:
 	waiting_for_action = action_name
-	_show_waiting_message("請按新的「%s」按鍵，Esc 取消。" % _get_action_display_name(action_name))
+	_show_waiting_message(_t("KEYBOARD_PRESS_NEW") % _get_action_display_name(action_name))
 
 
 func _on_key_row_gui_input(event: InputEvent, action_name: String) -> void:
@@ -400,8 +449,12 @@ func _get_action_display_name(action_name: String) -> String:
 		return action_name
 	for item in input_settings.call("get_actions"):
 		if String(item["action"]) == action_name:
-			return String(item["label"])
+			return _get_localized_action_name(action_name)
 	return action_name
+
+
+func _get_localized_action_name(action_name: String) -> String:
+	return _t("ACTION_%s" % action_name.to_upper())
 
 
 func _refresh_key_labels() -> void:
@@ -421,11 +474,15 @@ func _on_reset_controls_pressed() -> void:
 	var input_settings: Node = _get_input_settings()
 	if input_settings != null:
 		input_settings.call("reset_to_defaults")
-	_show_waiting_message("已恢復預設按鍵。")
+	_show_waiting_message(_t("KEYBOARD_RESET_DONE"))
 
 
 func _get_input_settings() -> Node:
 	return get_node_or_null("/root/InputSettings")
+
+
+func _get_localization() -> Node:
+	return get_node_or_null("/root/Localization")
 
 
 func _on_background_video_finished():

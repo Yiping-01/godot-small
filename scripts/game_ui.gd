@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var dialogue_text_label: Label = $DialoguePanel/VBoxContainer/DialogueLabel
 @onready var dialogue_hint_label: Label = $DialoguePanel/VBoxContainer/HintLabel
 @onready var inventory_panel: Panel = $InventoryPanel
+@onready var inventory_title_label: Label = $InventoryPanel/VBoxContainer/TitleLabel
 @onready var inventory_currency_label: Label = $InventoryPanel/VBoxContainer/CurrencyLabel
 @onready var inventory_list: VBoxContainer = $InventoryPanel/VBoxContainer/InventoryScroll/InventoryList
 @onready var shop_panel: Panel = $ShopPanel
@@ -72,12 +73,16 @@ func _ready() -> void:
 	GameState.inventory_changed.connect(_on_inventory_changed)
 	GameState.first_item_obtained.connect(_on_first_item_obtained)
 	GameState.map_room_changed.connect(_on_map_room_changed)
+	var localization: Node = _get_localization()
+	if localization != null:
+		localization.connect("language_changed", Callable(self, "_refresh_localized_texts"))
 
 	for i in range(shop_item_buttons.size()):
 		shop_item_buttons[i].pressed.connect(_on_shop_item_pressed.bind(i))
 
 	_on_currency_changed(GameState.currency)
 	_on_inventory_changed(GameState.inventory)
+	_refresh_localized_texts()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -108,7 +113,7 @@ func show_prompt(text: String) -> void:
 	if dialogue_panel.visible or shop_panel.visible or inventory_panel.visible or map_panel.visible:
 		return
 
-	prompt_label.text = _format_action_text(text)
+	prompt_label.text = _format_action_text(_tr_raw(text))
 	prompt_label.show()
 
 
@@ -127,7 +132,7 @@ func open_npc_dialogue(npc: Node) -> void:
 	hide_prompt()
 	GameState.set_input_locked(true)
 
-	dialogue_name_label.text = npc.display_name
+	dialogue_name_label.text = _tr_raw(npc.display_name)
 	dialogue_panel.show()
 	_show_dialogue_line()
 
@@ -188,8 +193,8 @@ func has_prompt() -> bool:
 
 
 func show_area_title(main_title: String, sub_title: String) -> void:
-	area_main_title_label.text = main_title
-	area_subtitle_label.text = sub_title
+	area_main_title_label.text = _tr_raw(main_title)
+	area_subtitle_label.text = _tr_raw(sub_title)
 	area_title_panel.show()
 
 	if area_title_tween != null:
@@ -204,7 +209,7 @@ func show_area_title(main_title: String, sub_title: String) -> void:
 
 
 func show_toast(text: String, duration: float = 2.0) -> void:
-	toast_label.text = _format_action_text(text)
+	toast_label.text = _format_action_text(_tr_raw(text))
 	toast_label.show()
 
 	if toast_tween != null:
@@ -252,14 +257,14 @@ func _fade_to(alpha: float, duration: float) -> void:
 
 
 func _show_dialogue_line() -> void:
-	dialogue_text_label.text = "..." if dialogue_lines.is_empty() else _format_action_text(dialogue_lines[dialogue_index])
+	dialogue_text_label.text = "..." if dialogue_lines.is_empty() else _format_action_text(_tr_raw(dialogue_lines[dialogue_index]))
 
 	var can_open_shop: bool = active_npc != null and active_npc.opens_shop and dialogue_index >= dialogue_lines.size() - 1
 
 	if can_open_shop:
-		dialogue_hint_label.text = _format_action_text("{interact}：打開商店 / Esc：關閉")
+		dialogue_hint_label.text = _format_action_text(_t("DIALOGUE_SHOP_HINT"))
 	else:
-		dialogue_hint_label.text = _format_action_text("{interact}：下一句 / Esc：關閉")
+		dialogue_hint_label.text = _format_action_text(_t("DIALOGUE_NEXT_HINT"))
 
 
 func _advance_dialogue() -> void:
@@ -285,18 +290,18 @@ func _open_shop(npc: Node) -> void:
 		shop_items.assign(npc.get_shop_items())
 	else:
 		shop_items.assign(npc.shop_items)
-	shop_title_label.text = "%s 的商店" % npc.display_name
+	shop_title_label.text = _t("SHOP_TITLE") % _tr_raw(npc.display_name)
 
 	shop_panel.show()
 
 	GameState.has_shown_inventory_tutorial = true
-	show_toast("購買的物品會放進背包，按 {inventory} 可以查看。", 3.0)
+	show_toast(_t("SHOP_INVENTORY_HINT"), 3.0)
 
 	_update_shop()
 
 
 func _update_shop() -> void:
-	shop_currency_label.text = "金錢：%d" % GameState.currency
+	shop_currency_label.text = _t("CURRENCY_AMOUNT") % GameState.currency
 
 	for i in range(shop_item_buttons.size()):
 		var button := shop_item_buttons[i]
@@ -310,28 +315,28 @@ func _update_shop() -> void:
 		var price := int(item["price"])
 		var description := String(item["description"])
 		var owned := GameState.has_item(item_name)
-		var status_text := "（已擁有）" if owned else ""
+		var status_text: String = _t("SHOP_OWNED") if owned else ""
 		if GameState.is_health_potion_item(item_name):
 			owned = GameState.has_bought_scene_health_potion()
 			if not GameState.can_add_health_potion():
 				owned = true
-				status_text = "（已達到購買上限）"
+				status_text = _t("SHOP_LIMIT")
 			elif owned:
-				status_text = "（已擁有）"
+				status_text = _t("SHOP_OWNED")
 		elif GameState.is_rough_charm_item(item_name):
 			owned = GameState.has_bought_scene_rough_charm()
-			status_text = "（已擁有）" if owned else ""
+			status_text = _t("SHOP_OWNED") if owned else ""
 
 		button.show()
 		button.disabled = owned
-		button.text = "%s - %d 金錢%s\n%s" % [
+		button.text = _t("SHOP_ITEM_LINE") % [
 			GameState.get_item_display_name(item_name),
 			price,
 			status_text,
-			description,
+			_tr_raw(description),
 		]
 
-	shop_close_hint_label.text = _format_action_text("點選購買 / {inventory} 或 Esc：關閉")
+	shop_close_hint_label.text = _format_action_text(_t("SHOP_HINT"))
 
 
 func _rebuild_map() -> void:
@@ -346,8 +351,8 @@ func _rebuild_map() -> void:
 
 	var rooms := GameState.get_map_rooms(scene_path)
 
-	map_title_label.text = "區域地圖"
-	map_hint_label.text = _format_action_text("{map} 或 Esc：關閉")
+	map_title_label.text = _t("MAP_TITLE")
+	map_hint_label.text = _format_action_text(_t("MAP_HINT"))
 
 	if rooms.is_empty():
 		_add_map_empty_label()
@@ -361,7 +366,7 @@ func _rebuild_map() -> void:
 
 		_add_map_room(
 			String(room_id),
-			String(data.get("display_name", room_id)),
+			_tr_raw(String(data.get("display_name", room_id))),
 			room_rect,
 			visited,
 			is_current
@@ -405,7 +410,7 @@ func _set_control_rect(control: Control, rect: Rect2) -> void:
 
 func _add_map_empty_label() -> void:
 	var label := Label.new()
-	label.text = "這個場景還沒有地圖房間標記。"
+	label.text = _t("MAP_EMPTY")
 	label.add_theme_font_size_override("font_size", 12 if map_display_mode == MAP_MODE_MINI else 18)
 	label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	label.clip_text = true
@@ -492,23 +497,23 @@ func _on_shop_item_pressed(index: int) -> void:
 	var purchase_item_name := GameState.HEALTH_POSITION_ITEM if is_health_potion else item_name
 
 	if is_health_potion and GameState.has_bought_scene_health_potion():
-		show_toast("已擁有：%s" % GameState.get_item_display_name(purchase_item_name))
+		show_toast(_t("SHOP_ALREADY_HAVE") % GameState.get_item_display_name(purchase_item_name))
 		return
 
 	if is_health_potion and not GameState.can_add_health_potion():
-		show_toast("回復藥水已達上限")
+		show_toast(_t("SHOP_POTION_LIMIT"))
 		return
 
 	if is_rough_charm and GameState.has_bought_scene_rough_charm():
-		show_toast("已擁有：%s" % GameState.get_item_display_name(item_name))
+		show_toast(_t("SHOP_ALREADY_HAVE") % GameState.get_item_display_name(item_name))
 		return
 
 	if not is_health_potion and not is_rough_charm and GameState.has_item(item_name):
-		show_toast("已擁有：%s" % GameState.get_item_display_name(item_name))
+		show_toast(_t("SHOP_ALREADY_HAVE") % GameState.get_item_display_name(item_name))
 		return
 
 	if not GameState.spend_currency(price):
-		show_toast("金錢不足")
+		show_toast(_t("SHOP_NOT_ENOUGH_MONEY"))
 		return
 
 	if is_health_potion:
@@ -521,14 +526,14 @@ func _on_shop_item_pressed(index: int) -> void:
 		GameState.add_item(item_name)
 	GameState.save_game()
 
-	show_toast("取得：%s" % GameState.get_item_display_name(purchase_item_name))
+	show_toast(_t("SHOP_GOT_ITEM") % GameState.get_item_display_name(purchase_item_name))
 	_update_shop()
 
 
 func _on_currency_changed(amount: int) -> void:
-	hud_currency_label.text = "金錢：%d" % amount
-	inventory_currency_label.text = "金錢：%d" % amount
-	shop_currency_label.text = "金錢：%d" % amount
+	hud_currency_label.text = _t("CURRENCY_AMOUNT") % amount
+	inventory_currency_label.text = _t("CURRENCY_AMOUNT") % amount
+	shop_currency_label.text = _t("CURRENCY_AMOUNT") % amount
 
 
 func _on_inventory_changed(items: Dictionary) -> void:
@@ -541,7 +546,7 @@ func _on_first_item_obtained(_item_name: String) -> void:
 		return
 
 	GameState.has_shown_inventory_tutorial = true
-	show_toast("獲得物品後可按 {inventory} 打開背包。", 3.2)
+	show_toast(_t("INVENTORY_FIRST_HINT"), 3.2)
 
 
 func _format_action_text(text: String) -> String:
@@ -549,6 +554,41 @@ func _format_action_text(text: String) -> String:
 	if input_settings == null:
 		return text
 	return String(input_settings.call("format_action_text", text))
+
+
+func _t(key: String) -> String:
+	var localization: Node = _get_localization()
+	if localization != null and localization.has_method("text"):
+		return String(localization.call("text", key))
+	return key
+
+
+func _tr_raw(text: String) -> String:
+	var localization: Node = _get_localization()
+	if localization != null and localization.has_method("translate_raw"):
+		return String(localization.call("translate_raw", text))
+	return text
+
+
+func _get_localization() -> Node:
+	return get_node_or_null("/root/Localization")
+
+
+func _refresh_localized_texts() -> void:
+	inventory_title_label.text = _t("INVENTORY_TITLE")
+	map_title_label.text = _t("MAP_TITLE")
+	map_hint_label.text = _format_action_text(_t("MAP_HINT"))
+	_on_currency_changed(GameState.currency)
+	if dialogue_panel.visible:
+		if active_npc != null:
+			dialogue_name_label.text = _tr_raw(active_npc.display_name)
+		_show_dialogue_line()
+	if inventory_panel.visible:
+		_update_inventory_text(GameState.inventory)
+	if shop_panel.visible:
+		_update_shop()
+	if map_panel.visible:
+		_rebuild_map()
 
 
 func _on_map_room_changed(_scene_path: String, _room_id: String) -> void:
@@ -570,7 +610,7 @@ func _update_inventory_text(items: Dictionary) -> void:
 
 func _add_inventory_empty_row() -> void:
 	var label := Label.new()
-	label.text = "背包目前是空的。"
+	label.text = _t("INVENTORY_EMPTY")
 	label.add_theme_font_size_override("font_size", 18)
 
 	inventory_list.add_child(label)
