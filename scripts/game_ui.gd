@@ -1,5 +1,43 @@
 extends CanvasLayer
 
+const POTION_TEXTURE := preload("res://assets/some/Health_Potion.png")
+const ITEM_TEXTURE := preload("res://assets/enemy/enemy2.png")
+const SKILL_TEXTURE := preload("res://assets/player/attack_far/far_1.png")
+const INVENTORY_TAB_KEYS := ["INV_TAB_CHARACTER", "INV_TAB_BAG", "INV_TAB_SKILLS", "INV_TAB_MAP", "INV_TAB_SYSTEM"]
+const INVENTORY_CATEGORY_KEYS := ["INV_CAT_ALL", "INV_CAT_CONSUMABLE", "INV_CAT_MATERIAL", "INV_CAT_SKILL", "INV_CAT_IMPORTANT"]
+const GRID_SLOT_COUNT := 48
+const EQUIPPED_SKILL_SLOT_COUNT := 4
+const SKILL_LIBRARY := [
+	{
+		"id": "water_dash",
+		"name_key": "INV_SKILL_WATER_DASH",
+		"type_key": "INV_CAT_SKILL",
+		"description_key": "INV_SKILL_WATER_DASH_DESC",
+		"texture": "res://assets/player/attack_far/far_1.png",
+	},
+	{
+		"id": "wall_burst",
+		"name_key": "INV_SKILL_WALL_BURST",
+		"type_key": "INV_CAT_SKILL",
+		"description_key": "INV_SKILL_WALL_BURST_DESC",
+		"texture": "res://assets/player/attack_far/far_2.png",
+	},
+	{
+		"id": "water_shot",
+		"name_key": "INV_SKILL_WATER_SHOT",
+		"type_key": "INV_CAT_SKILL",
+		"description_key": "INV_SKILL_WATER_SHOT_DESC",
+		"texture": "res://assets/player/attack_far/far_3.png",
+	},
+	{
+		"id": "quick_map",
+		"name_key": "INV_SKILL_QUICK_MAP",
+		"type_key": "INV_CAT_SKILL",
+		"description_key": "INV_SKILL_QUICK_MAP_DESC",
+		"texture": "res://assets/player/attack_far/far_4.png",
+	},
+]
+
 @onready var prompt_label: Label = $PromptLabel
 @onready var toast_label: Label = $ToastLabel
 @onready var hud_currency_label: Label = $CurrencyLabel
@@ -10,7 +48,6 @@ extends CanvasLayer
 @onready var inventory_panel: Panel = $InventoryPanel
 @onready var inventory_title_label: Label = $InventoryPanel/VBoxContainer/TitleLabel
 @onready var inventory_currency_label: Label = $InventoryPanel/VBoxContainer/CurrencyLabel
-@onready var inventory_list: VBoxContainer = $InventoryPanel/VBoxContainer/InventoryScroll/InventoryList
 @onready var shop_panel: Panel = $ShopPanel
 @onready var shop_title_label: Label = $ShopPanel/VBoxContainer/TitleLabel
 @onready var shop_currency_label: Label = $ShopPanel/VBoxContainer/CurrencyLabel
@@ -39,6 +76,19 @@ var toast_tween: Tween
 var area_title_tween: Tween
 var fade_tween: Tween
 var map_display_mode := 0
+var inventory_profile_label: Label
+var inventory_grid: GridContainer
+var inventory_detail_title: Label
+var inventory_detail_type: Label
+var inventory_detail_description: Label
+var inventory_equipped_title_label: Label
+var inventory_hint_label: Label
+var inventory_category_buttons: Array[Button] = []
+var inventory_tab_buttons: Array[Button] = []
+var equipped_skill_slots: Array[Button] = []
+var equipped_skills: Array[Dictionary] = []
+var selected_inventory_tab_key := "INV_TAB_BAG"
+var selected_inventory_category_key := "INV_CAT_ALL"
 
 const MAP_MODE_CLOSED := 0
 const MAP_MODE_MINI := 1
@@ -55,6 +105,8 @@ const MAP_MINI_SCALE := Vector2(0.33, 0.33)
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("game_ui")
+	_build_inventory_window()
+	_reset_equipped_skills()
 
 	prompt_label.hide()
 	toast_label.hide()
@@ -596,62 +648,426 @@ func _on_map_room_changed(_scene_path: String, _room_id: String) -> void:
 		_rebuild_map()
 
 
-func _update_inventory_text(items: Dictionary) -> void:
-	for child in inventory_list.get_children():
+func _build_inventory_window() -> void:
+	for child in inventory_panel.get_children():
 		child.queue_free()
 
-	if items.is_empty():
-		_add_inventory_empty_row()
+	inventory_tab_buttons.clear()
+	inventory_category_buttons.clear()
+	equipped_skill_slots.clear()
+
+	_set_control_rect(inventory_panel, Rect2(76.0, 54.0, 1060.0, 548.0))
+	inventory_panel.add_theme_stylebox_override("panel", _make_style(Color(0.025, 0.03, 0.04, 0.94), Color(0.58, 0.72, 0.84, 0.85), 2, 4))
+
+	var root := VBoxContainer.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.offset_left = 14.0
+	root.offset_top = 12.0
+	root.offset_right = -14.0
+	root.offset_bottom = -12.0
+	root.add_theme_constant_override("separation", 8)
+	inventory_panel.add_child(root)
+
+	var tabs := HBoxContainer.new()
+	tabs.custom_minimum_size = Vector2(0, 36)
+	tabs.add_theme_constant_override("separation", 6)
+	root.add_child(tabs)
+	for tab_key in INVENTORY_TAB_KEYS:
+		var tab_button := _make_tab_button(_t(tab_key))
+		tab_button.set_meta("locale_key", tab_key)
+		tab_button.pressed.connect(_select_inventory_tab.bind(tab_key))
+		tabs.add_child(tab_button)
+		inventory_tab_buttons.append(tab_button)
+
+	var body := HBoxContainer.new()
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 12)
+	root.add_child(body)
+
+	var profile_panel := VBoxContainer.new()
+	profile_panel.custom_minimum_size = Vector2(230, 0)
+	profile_panel.add_theme_constant_override("separation", 8)
+	body.add_child(profile_panel)
+
+	inventory_title_label = Label.new()
+	inventory_title_label.text = _t("INV_TAB_CHARACTER")
+	inventory_title_label.add_theme_font_size_override("font_size", 24)
+	profile_panel.add_child(inventory_title_label)
+
+	inventory_profile_label = Label.new()
+	inventory_profile_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	inventory_profile_label.add_theme_font_size_override("font_size", 16)
+	inventory_profile_label.clip_text = true
+	inventory_profile_label.custom_minimum_size = Vector2(0, 196)
+	profile_panel.add_child(inventory_profile_label)
+
+	inventory_equipped_title_label = Label.new()
+	inventory_equipped_title_label.text = _t("INV_EQUIPPED_SKILLS")
+	inventory_equipped_title_label.add_theme_font_size_override("font_size", 17)
+	profile_panel.add_child(inventory_equipped_title_label)
+
+	var equipped_grid := GridContainer.new()
+	equipped_grid.columns = 2
+	equipped_grid.add_theme_constant_override("h_separation", 8)
+	equipped_grid.add_theme_constant_override("v_separation", 8)
+	profile_panel.add_child(equipped_grid)
+	for i in range(EQUIPPED_SKILL_SLOT_COUNT):
+		var slot := _make_slot_button(_t("INV_SKILL_SLOT") % (i + 1), Vector2(100, 58))
+		slot.pressed.connect(_clear_equipped_skill.bind(i))
+		equipped_grid.add_child(slot)
+		equipped_skill_slots.append(slot)
+
+	var center := VBoxContainer.new()
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.add_theme_constant_override("separation", 8)
+	body.add_child(center)
+
+	var category_row := HBoxContainer.new()
+	category_row.custom_minimum_size = Vector2(0, 34)
+	category_row.add_theme_constant_override("separation", 6)
+	center.add_child(category_row)
+	for category_key in INVENTORY_CATEGORY_KEYS:
+		var category_button := _make_tab_button(_t(category_key))
+		category_button.set_meta("locale_key", category_key)
+		category_button.pressed.connect(_select_inventory_category.bind(category_key))
+		category_row.add_child(category_button)
+		inventory_category_buttons.append(category_button)
+
+	inventory_grid = GridContainer.new()
+	inventory_grid.columns = 8
+	inventory_grid.add_theme_constant_override("h_separation", 6)
+	inventory_grid.add_theme_constant_override("v_separation", 6)
+	center.add_child(inventory_grid)
+
+	var right_panel := VBoxContainer.new()
+	right_panel.custom_minimum_size = Vector2(245, 0)
+	right_panel.add_theme_constant_override("separation", 8)
+	body.add_child(right_panel)
+
+	inventory_currency_label = Label.new()
+	inventory_currency_label.add_theme_font_size_override("font_size", 17)
+	right_panel.add_child(inventory_currency_label)
+
+	inventory_detail_title = Label.new()
+	inventory_detail_title.add_theme_font_size_override("font_size", 22)
+	right_panel.add_child(inventory_detail_title)
+
+	inventory_detail_type = Label.new()
+	inventory_detail_type.add_theme_font_size_override("font_size", 15)
+	right_panel.add_child(inventory_detail_type)
+
+	inventory_detail_description = Label.new()
+	inventory_detail_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	inventory_detail_description.add_theme_font_size_override("font_size", 15)
+	inventory_detail_description.clip_text = true
+	right_panel.add_child(inventory_detail_description)
+
+	inventory_hint_label = Label.new()
+	inventory_hint_label.text = _format_action_text(_t("INV_HINT"))
+	inventory_hint_label.add_theme_font_size_override("font_size", 14)
+	inventory_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	right_panel.add_child(inventory_hint_label)
+
+
+func _reset_equipped_skills() -> void:
+	equipped_skills.clear()
+	for _i in range(EQUIPPED_SKILL_SLOT_COUNT):
+		equipped_skills.append({})
+
+
+func _select_inventory_tab(tab_key: String) -> void:
+	selected_inventory_tab_key = tab_key
+	if tab_key == "INV_TAB_MAP":
+		close_all_windows()
+		_show_full_map()
+		return
+	_update_inventory_text(GameState.inventory)
+
+
+func _select_inventory_category(category_key: String) -> void:
+	selected_inventory_category_key = category_key
+	_update_inventory_text(GameState.inventory)
+
+
+func _update_inventory_text(items: Dictionary) -> void:
+	if inventory_grid == null:
 		return
 
-	for item_name in items.keys():
-		_add_inventory_row(String(item_name), int(items[item_name]))
+	_refresh_inventory_header()
+	_refresh_inventory_buttons()
+	_refresh_equipped_skill_slots()
+	_rebuild_inventory_grid(items)
 
 
-func _add_inventory_empty_row() -> void:
-	var label := Label.new()
-	label.text = _t("INVENTORY_EMPTY")
-	label.add_theme_font_size_override("font_size", 18)
+func _refresh_inventory_header() -> void:
+	var player := get_tree().get_first_node_in_group("player")
+	var hp_text := "?"
+	var max_hp_text := "?"
+	if player != null:
+		hp_text = "%s" % player.current_health
+		max_hp_text = "%s" % player.max_health
 
-	inventory_list.add_child(label)
+	inventory_title_label.text = _t(selected_inventory_tab_key)
+	if inventory_equipped_title_label != null:
+		inventory_equipped_title_label.text = _t("INV_EQUIPPED_SKILLS")
+	if inventory_hint_label != null:
+		inventory_hint_label.text = _format_action_text(_t("INV_HINT"))
+	inventory_profile_label.text = _t("INV_PROFILE_TEXT") % [
+		hp_text,
+		max_hp_text,
+		GameState.currency,
+		EQUIPPED_SKILL_SLOT_COUNT,
+	]
+	inventory_currency_label.text = _t("CURRENCY_AMOUNT") % GameState.currency
+	inventory_detail_title.text = _t(selected_inventory_tab_key)
+	inventory_detail_type.text = _t("INV_SELECT_ITEM")
+	inventory_detail_description.text = _t("INV_DEFAULT_DESC")
 
 
-func _add_inventory_row(item_name: String, amount: int) -> void:
-	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 72)
-	row.add_theme_constant_override("separation", 10)
+func _refresh_inventory_buttons() -> void:
+	for button in inventory_tab_buttons:
+		var tab_key := String(button.get_meta("locale_key", ""))
+		button.text = _t(tab_key)
+		button.button_pressed = tab_key == selected_inventory_tab_key
+	for button in inventory_category_buttons:
+		var category_key := String(button.get_meta("locale_key", ""))
+		button.text = _t(category_key)
+		button.button_pressed = category_key == selected_inventory_category_key
+		button.visible = selected_inventory_tab_key == "INV_TAB_BAG"
 
-	var icon_slot := CenterContainer.new()
-	icon_slot.custom_minimum_size = Vector2(56, 56)
-	row.add_child(icon_slot)
 
-	var icon := TextureRect.new()
-	icon.custom_minimum_size = Vector2(45, 45)
+func _refresh_equipped_skill_slots() -> void:
+	for i in range(equipped_skill_slots.size()):
+		var slot := equipped_skill_slots[i]
+		var skill: Dictionary = equipped_skills[i]
+		if skill.is_empty():
+			slot.text = _t("INV_SKILL_SLOT_EMPTY") % (i + 1)
+			slot.icon = null
+		else:
+			slot.text = _t("INV_SKILL_SLOT_EQUIPPED") % [i + 1, _entry_name(skill)]
+			slot.icon = _load_texture(String(skill["texture"]), SKILL_TEXTURE)
 
+
+func _rebuild_inventory_grid(items: Dictionary) -> void:
+	for child in inventory_grid.get_children():
+		child.queue_free()
+
+	if selected_inventory_tab_key == "INV_TAB_SKILLS":
+		inventory_grid.columns = 1
+		inventory_grid.add_child(_make_skill_tree_panel())
+		return
+
+	inventory_grid.columns = 8
+	var entries := _get_inventory_entries(items)
+	for i in range(GRID_SLOT_COUNT):
+		if i < entries.size():
+			var entry: Dictionary = entries[i]
+			inventory_grid.add_child(_make_inventory_cell(entry))
+		else:
+			inventory_grid.add_child(_make_empty_cell())
+
+
+func _get_inventory_entries(items: Dictionary) -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	if selected_inventory_tab_key == "INV_TAB_CHARACTER":
+		entries.append({"name_key": "INV_CHARACTER_DATA", "type_key": "INV_TAB_CHARACTER", "description": inventory_profile_label.text, "kind": "info", "texture": ""})
+		entries.append({"name_key": "INV_FUTURE_STATS", "type_key": "INV_TAB_CHARACTER", "description_key": "INV_FUTURE_STATS_DESC", "kind": "info", "texture": ""})
+	elif selected_inventory_tab_key == "INV_TAB_SKILLS":
+		for skill in SKILL_LIBRARY:
+			entries.append(skill.duplicate(true).merged({"kind": "skill"}))
+	elif selected_inventory_tab_key == "INV_TAB_BAG":
+		for item_name in items.keys():
+			var raw_name := String(item_name)
+			var item_type_key := _get_item_type_key(raw_name)
+			if selected_inventory_category_key != "INV_CAT_ALL" and selected_inventory_category_key != item_type_key:
+				continue
+			entries.append({
+				"name": GameState.get_item_display_name(raw_name),
+				"raw_name": raw_name,
+				"amount": int(items[item_name]),
+				"type_key": item_type_key,
+				"description": GameState.get_item_description(raw_name),
+				"kind": "item",
+				"texture": "res://assets/some/Health_Potion.png" if GameState.is_health_potion_item(raw_name) else "res://assets/enemy/enemy2.png",
+			})
+	elif selected_inventory_tab_key == "INV_TAB_SYSTEM":
+		entries.append({"name_key": "INV_CONTROLS", "type_key": "INV_TAB_SYSTEM", "description_key": "INV_CONTROLS_DESC", "kind": "info", "texture": ""})
+
+	return entries
+
+
+func _make_skill_tree_panel() -> Control:
+	var panel := Control.new()
+	panel.custom_minimum_size = Vector2(600, 360)
+
+	var ring := Panel.new()
+	ring.position = Vector2(118, 18)
+	ring.size = Vector2(360, 320)
+	ring.add_theme_stylebox_override("panel", _make_style(Color(0.025, 0.018, 0.022, 0.72), Color(0.62, 0.14, 0.17, 0.85), 2, 4))
+	panel.add_child(ring)
+
+	var title := Label.new()
+	title.text = _t("INV_SKILL_TREE")
+	title.position = Vector2(246, 30)
+	title.size = Vector2(104, 26)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 18)
+	panel.add_child(title)
+
+	var center := Button.new()
+	center.text = _t("INV_SKILL_CORE_LOCKED")
+	center.position = Vector2(254, 148)
+	center.custom_minimum_size = Vector2(88, 64)
+	center.size = Vector2(88, 64)
+	center.disabled = true
+	center.add_theme_font_size_override("font_size", 13)
+	center.add_theme_stylebox_override("disabled", _make_style(Color(0.12, 0.025, 0.035, 0.96), Color(0.85, 0.25, 0.28, 1.0), 2, 4))
+	panel.add_child(center)
+
+	var positions := [
+		Vector2(254, 68),
+		Vector2(378, 126),
+		Vector2(330, 246),
+		Vector2(178, 246),
+		Vector2(130, 126),
+	]
+	for i in range(min(SKILL_LIBRARY.size(), positions.size())):
+		var skill: Dictionary = SKILL_LIBRARY[i]
+		var skill_button := _make_skill_node_button(skill)
+		skill_button.position = positions[i]
+		skill_button.pressed.connect(_on_inventory_entry_pressed.bind(skill.duplicate(true).merged({"kind": "skill"})))
+		panel.add_child(skill_button)
+
+	return panel
+
+
+func _make_skill_node_button(skill: Dictionary) -> Button:
+	var button := Button.new()
+	button.text = _entry_name(skill)
+	button.icon = _load_texture(String(skill.get("texture", "")), SKILL_TEXTURE)
+	button.custom_minimum_size = Vector2(90, 58)
+	button.size = Vector2(90, 58)
+	button.expand_icon = true
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	button.clip_text = true
+	button.add_theme_font_size_override("font_size", 12)
+	button.add_theme_stylebox_override("normal", _make_style(Color(0.035, 0.02, 0.024, 0.94), Color(0.45, 0.12, 0.15, 0.95), 2, 4))
+	button.add_theme_stylebox_override("hover", _make_style(Color(0.08, 0.035, 0.04, 0.98), Color(0.86, 0.28, 0.3, 1.0), 2, 4))
+	button.add_theme_stylebox_override("pressed", _make_style(Color(0.14, 0.04, 0.045, 1.0), Color(0.95, 0.42, 0.34, 1.0), 2, 4))
+	return button
+
+
+func _get_item_type_key(item_name: String) -> String:
 	if GameState.is_health_potion_item(item_name):
-		icon.texture = preload("res://assets/some/Health_Potion.png")
-	else:
-		icon.texture = preload("res://assets/enemy/enemy2.png")
+		return "INV_CAT_CONSUMABLE"
+	if GameState.is_rough_charm_item(item_name):
+		return "INV_CAT_IMPORTANT"
+	if item_name.to_lower().contains("skill"):
+		return "INV_CAT_SKILL"
+	return "INV_CAT_MATERIAL"
 
-	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
-	icon_slot.add_child(icon)
+func _make_inventory_cell(entry: Dictionary) -> Button:
+	var button := _make_slot_button("", Vector2(58, 58))
+	button.text = "%s\nx%d" % [_entry_name(entry), int(entry.get("amount", 1))] if entry.get("kind", "item") == "item" else _entry_name(entry)
+	button.icon = _load_texture(String(entry.get("texture", "")), SKILL_TEXTURE if entry.get("kind") == "skill" else ITEM_TEXTURE)
+	button.add_theme_font_size_override("font_size", 12)
+	button.pressed.connect(_on_inventory_entry_pressed.bind(entry))
+	return button
 
-	var text_box := VBoxContainer.new()
-	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	var name_label := Label.new()
-	name_label.add_theme_font_size_override("font_size", 18)
-	name_label.text = "%s x%d" % [GameState.get_item_display_name(item_name), amount]
+func _make_empty_cell() -> Panel:
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(58, 58)
+	panel.add_theme_stylebox_override("panel", _make_style(Color(0.01, 0.012, 0.016, 0.55), Color(0.28, 0.34, 0.38, 0.55), 1, 2))
+	return panel
 
-	var desc_label := Label.new()
-	desc_label.add_theme_font_size_override("font_size", 14)
-	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_label.text = GameState.get_item_description(item_name)
 
-	text_box.add_child(name_label)
-	text_box.add_child(desc_label)
+func _on_inventory_entry_pressed(entry: Dictionary) -> void:
+	inventory_detail_title.text = _entry_name(entry)
+	inventory_detail_type.text = _entry_type(entry)
+	inventory_detail_description.text = _entry_description(entry)
+	if entry.get("kind") == "skill":
+		_equip_skill(entry)
 
-	row.add_child(text_box)
-	inventory_list.add_child(row)
+
+func _equip_skill(skill: Dictionary) -> void:
+	var target_index := 0
+	for i in range(equipped_skills.size()):
+		if equipped_skills[i].is_empty():
+			target_index = i
+			break
+	equipped_skills[target_index] = skill.duplicate(true)
+	_refresh_equipped_skill_slots()
+
+
+func _clear_equipped_skill(index: int) -> void:
+	if index < 0 or index >= equipped_skills.size():
+		return
+	equipped_skills[index] = {}
+	_refresh_equipped_skill_slots()
+
+
+func _make_tab_button(text: String) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.toggle_mode = true
+	button.custom_minimum_size = Vector2(100, 32)
+	button.add_theme_font_size_override("font_size", 15)
+	button.add_theme_stylebox_override("normal", _make_style(Color(0.04, 0.05, 0.065, 0.9), Color(0.26, 0.34, 0.42, 0.9), 1, 2))
+	button.add_theme_stylebox_override("pressed", _make_style(Color(0.12, 0.025, 0.035, 0.95), Color(0.82, 0.22, 0.24, 1.0), 2, 2))
+	return button
+
+
+func _make_slot_button(text: String, min_size: Vector2) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.custom_minimum_size = min_size
+	button.clip_text = true
+	button.expand_icon = true
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	button.add_theme_font_size_override("font_size", 12)
+	button.add_theme_stylebox_override("normal", _make_style(Color(0.01, 0.012, 0.016, 0.85), Color(0.33, 0.39, 0.45, 0.9), 2, 2))
+	button.add_theme_stylebox_override("hover", _make_style(Color(0.045, 0.06, 0.075, 0.95), Color(0.78, 0.88, 0.95, 1.0), 2, 2))
+	button.add_theme_stylebox_override("pressed", _make_style(Color(0.1, 0.035, 0.045, 0.96), Color(0.85, 0.25, 0.28, 1.0), 2, 2))
+	return button
+
+
+func _entry_name(entry: Dictionary) -> String:
+	if entry.has("name_key"):
+		return _t(String(entry["name_key"]))
+	return _tr_raw(String(entry.get("name", "")))
+
+
+func _entry_type(entry: Dictionary) -> String:
+	if entry.has("type_key"):
+		return _t(String(entry["type_key"]))
+	return _tr_raw(String(entry.get("type", "Item")))
+
+
+func _entry_description(entry: Dictionary) -> String:
+	if entry.has("description_key"):
+		return _t(String(entry["description_key"]))
+	return _tr_raw(String(entry.get("description", "")))
+
+
+func _make_style(bg: Color, border: Color, border_width: int, radius: int) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.set_border_width_all(border_width)
+	style.set_corner_radius_all(radius)
+	style.content_margin_left = 6
+	style.content_margin_right = 6
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	return style
+
+
+func _load_texture(path: String, fallback: Texture2D) -> Texture2D:
+	if path == "":
+		return fallback
+	var texture := load(path)
+	return texture if texture is Texture2D else fallback
