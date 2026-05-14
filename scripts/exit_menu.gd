@@ -10,6 +10,10 @@ var quit_button: Button
 var pause_dim: ColorRect
 var settings_panel: Panel
 var settings_back_button: Button
+var reset_controls_button: Button
+var waiting_label: Label
+var key_buttons: Dictionary = {}
+var waiting_for_action := ""
 
 
 func _ready() -> void:
@@ -18,9 +22,16 @@ func _ready() -> void:
 	_build_pause_menu()
 	_build_settings_panel()
 	_hide_exit_panel()
+	var settings: Node = _get_input_settings()
+	if settings != null:
+		settings.connect("controls_changed", Callable(self, "_refresh_key_labels"))
 
 
 func _input(event: InputEvent) -> void:
+	if waiting_for_action != "":
+		_capture_rebind_input(event)
+		return
+
 	if event.is_action_pressed("ui_cancel"):
 		if settings_panel != null and settings_panel.visible:
 			_hide_settings_panel()
@@ -31,6 +42,26 @@ func _input(event: InputEvent) -> void:
 		else:
 			_show_exit_panel()
 		get_viewport().set_input_as_handled()
+
+
+func _capture_rebind_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		get_viewport().set_input_as_handled()
+		if event.keycode == KEY_ESCAPE:
+			_cancel_rebind()
+			return
+
+		var action := waiting_for_action
+		waiting_for_action = ""
+		var settings: Node = _get_input_settings()
+		var result: int = ERR_UNAVAILABLE
+		if settings != null:
+			result = int(settings.call("rebind_keyboard_action", action, event))
+		if result == OK:
+			_show_waiting_message("已更新按鍵。")
+		else:
+			_show_waiting_message("這個按鍵不能使用。")
+		_refresh_key_labels()
 
 
 func _build_pause_menu() -> void:
@@ -64,38 +95,6 @@ func _build_pause_menu() -> void:
 	panel_style.border_width_right = 1
 	exit_panel.add_theme_stylebox_override("panel", panel_style)
 
-	var right_line := ColorRect.new()
-	right_line.name = "RightLine"
-	right_line.color = Color(0.82, 0.78, 0.66, 0.36)
-	right_line.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
-	right_line.offset_left = -18.0
-	right_line.offset_top = 118.0
-	right_line.offset_right = -17.0
-	right_line.offset_bottom = -118.0
-	exit_panel.add_child(right_line)
-
-	var top_diamond := Label.new()
-	top_diamond.text = "*"
-	top_diamond.add_theme_font_size_override("font_size", 10)
-	top_diamond.add_theme_color_override("font_color", Color(0.82, 0.78, 0.66, 0.36))
-	top_diamond.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	top_diamond.offset_left = -23.0
-	top_diamond.offset_top = 108.0
-	top_diamond.offset_right = -9.0
-	top_diamond.offset_bottom = 124.0
-	exit_panel.add_child(top_diamond)
-
-	var bottom_diamond := Label.new()
-	bottom_diamond.text = "*"
-	bottom_diamond.add_theme_font_size_override("font_size", 10)
-	bottom_diamond.add_theme_color_override("font_color", Color(0.82, 0.78, 0.66, 0.36))
-	bottom_diamond.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	bottom_diamond.offset_left = -23.0
-	bottom_diamond.offset_top = -124.0
-	bottom_diamond.offset_right = -9.0
-	bottom_diamond.offset_bottom = -108.0
-	exit_panel.add_child(bottom_diamond)
-
 	var content := VBoxContainer.new()
 	content.name = "MenuContent"
 	content.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -113,10 +112,10 @@ func _build_pause_menu() -> void:
 	title.add_theme_color_override("font_color", Color(0.94, 0.92, 0.86, 0.94))
 	content.add_child(title)
 
-	resume_button = _create_menu_button("返回遊戲")
-	settings_button = _create_menu_button("設置")
+	resume_button = _create_menu_button("繼續遊戲")
+	settings_button = _create_menu_button("按鍵設定")
 	sound_button = _create_menu_button("聲音")
-	quit_button = _create_menu_button("離開")
+	quit_button = _create_menu_button("回主選單")
 
 	content.add_child(resume_button)
 	content.add_child(settings_button)
@@ -138,7 +137,7 @@ func _build_settings_panel() -> void:
 	add_child(settings_panel)
 
 	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.03, 0.045, 0.055, 0.72)
+	panel_style.bg_color = Color(0.03, 0.045, 0.055, 0.74)
 	panel_style.border_color = Color(1.0, 1.0, 1.0, 0.18)
 	panel_style.set_border_width_all(1)
 	settings_panel.add_theme_stylebox_override("panel", panel_style)
@@ -146,89 +145,100 @@ func _build_settings_panel() -> void:
 	var content := VBoxContainer.new()
 	content.name = "KeyboardContent"
 	content.set_anchors_preset(Control.PRESET_CENTER)
-	content.offset_left = -310.0
-	content.offset_top = -220.0
-	content.offset_right = 310.0
-	content.offset_bottom = 220.0
-	content.add_theme_constant_override("separation", 16)
+	content.offset_left = -340.0
+	content.offset_top = -250.0
+	content.offset_right = 340.0
+	content.offset_bottom = 250.0
+	content.add_theme_constant_override("separation", 14)
 	settings_panel.add_child(content)
 
 	var title := Label.new()
-	title.text = "鍵盤"
+	title.text = "按鍵設定"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
 	title.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
 	content.add_child(title)
 
+	waiting_label = Label.new()
+	waiting_label.text = "點選右側按鍵後，按下新的鍵。Esc 取消。"
+	waiting_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	waiting_label.add_theme_font_size_override("font_size", 16)
+	waiting_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.72))
+	content.add_child(waiting_label)
+
 	var separator := ColorRect.new()
-	separator.custom_minimum_size = Vector2(520.0, 1.0)
+	separator.custom_minimum_size = Vector2(600.0, 1.0)
 	separator.color = Color(1.0, 1.0, 1.0, 0.36)
 	content.add_child(separator)
 
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 64)
+	columns.add_theme_constant_override("separation", 40)
 	content.add_child(columns)
 
 	var left_column := VBoxContainer.new()
-	left_column.custom_minimum_size = Vector2(260.0, 0.0)
-	left_column.add_theme_constant_override("separation", 10)
+	left_column.custom_minimum_size = Vector2(300.0, 0.0)
+	left_column.add_theme_constant_override("separation", 8)
 	columns.add_child(left_column)
 
 	var right_column := VBoxContainer.new()
-	right_column.custom_minimum_size = Vector2(260.0, 0.0)
-	right_column.add_theme_constant_override("separation", 10)
+	right_column.custom_minimum_size = Vector2(300.0, 0.0)
+	right_column.add_theme_constant_override("separation", 8)
 	columns.add_child(right_column)
 
-	_add_key_row(left_column, "上", "W / ↑")
-	_add_key_row(left_column, "下", "S / ↓")
-	_add_key_row(left_column, "左", "A / ←")
-	_add_key_row(left_column, "右", "D / →")
-	_add_key_row(left_column, "跳躍", "Z")
-	_add_key_row(left_column, "攻擊", "X")
+	var settings: Node = _get_input_settings()
+	var actions: Array = [] if settings == null else settings.call("get_actions")
+	for i in range(actions.size()):
+		var target_column: VBoxContainer = left_column if i < 6 else right_column
+		_add_key_row(target_column, String(actions[i]["label"]), String(actions[i]["action"]))
 
-	_add_key_row(right_column, "衝刺", "C")
-	_add_key_row(right_column, "水槍", "F")
-	_add_key_row(right_column, "互動 / 使用藥水", "E")
-	_add_key_row(right_column, "地圖", "M")
-	_add_key_row(right_column, "物品欄", "I")
-	_add_key_row(right_column, "聲音", "P")
+	var bottom_row := HBoxContainer.new()
+	bottom_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	bottom_row.add_theme_constant_override("separation", 12)
+	content.add_child(bottom_row)
 
-	var back_row := HBoxContainer.new()
-	back_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_child(back_row)
+	reset_controls_button = _create_settings_button("恢復預設")
+	reset_controls_button.pressed.connect(_on_reset_controls_pressed)
+	bottom_row.add_child(reset_controls_button)
 
-	settings_back_button = _create_settings_back_button()
+	settings_back_button = _create_settings_button("返回")
 	settings_back_button.pressed.connect(_hide_settings_panel)
-	back_row.add_child(settings_back_button)
+	bottom_row.add_child(settings_back_button)
+
+	_refresh_key_labels()
 
 
-func _add_key_row(parent: VBoxContainer, action_text: String, key_text: String) -> void:
+func _add_key_row(parent: VBoxContainer, action_text: String, action_name: String) -> void:
 	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(240.0, 30.0)
+	row.custom_minimum_size = Vector2(292.0, 32.0)
 	row.add_theme_constant_override("separation", 14)
 	parent.add_child(row)
 
 	var action_label := Label.new()
 	action_label.text = action_text
-	action_label.custom_minimum_size = Vector2(122.0, 30.0)
+	action_label.custom_minimum_size = Vector2(142.0, 32.0)
 	action_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	action_label.add_theme_font_size_override("font_size", 17)
 	action_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.78))
 	row.add_child(action_label)
 
-	var key_panel := Panel.new()
-	key_panel.custom_minimum_size = Vector2(78.0, 30.0)
-	key_panel.add_theme_stylebox_override("panel", _key_style())
-	row.add_child(key_panel)
+	var key_button := _create_key_button()
+	key_button.pressed.connect(_start_rebind.bind(action_name))
+	row.add_child(key_button)
+	key_buttons[action_name] = key_button
 
-	var key_label := Label.new()
-	key_label.text = key_text
-	key_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	key_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	key_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	key_label.add_theme_font_size_override("font_size", 15)
-	key_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
-	key_panel.add_child(key_label)
+
+func _create_key_button() -> Button:
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(104.0, 32.0)
+	button.focus_mode = Control.FOCUS_ALL
+	button.add_theme_font_size_override("font_size", 15)
+	button.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
+	button.add_theme_color_override("font_hover_color", Color(1.0, 0.96, 0.78, 1.0))
+	button.add_theme_stylebox_override("normal", _key_style())
+	button.add_theme_stylebox_override("hover", _button_style(Color(1.0, 1.0, 1.0, 0.13)))
+	button.add_theme_stylebox_override("focus", _button_style(Color(1.0, 1.0, 1.0, 0.18)))
+	button.add_theme_stylebox_override("pressed", _button_style(Color(1.0, 1.0, 1.0, 0.22)))
+	return button
 
 
 func _key_style() -> StyleBoxFlat:
@@ -240,10 +250,10 @@ func _key_style() -> StyleBoxFlat:
 	return style
 
 
-func _create_settings_back_button() -> Button:
+func _create_settings_button(text: String) -> Button:
 	var button := Button.new()
-	button.text = "返回"
-	button.custom_minimum_size = Vector2(88.0, 30.0)
+	button.text = text
+	button.custom_minimum_size = Vector2(110.0, 32.0)
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.add_theme_font_size_override("font_size", 16)
 	button.add_theme_color_override("font_color", Color(0.92, 0.9, 0.84, 0.88))
@@ -261,7 +271,7 @@ func _create_menu_button(text: String) -> Button:
 	button.flat = true
 	button.focus_mode = Control.FOCUS_ALL
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.custom_minimum_size = Vector2(140.0, 25.0)
+	button.custom_minimum_size = Vector2(150.0, 25.0)
 	button.add_theme_font_size_override("font_size", 16)
 	button.add_theme_color_override("font_color", Color(0.92, 0.9, 0.84, 0.78))
 	button.add_theme_color_override("font_hover_color", Color(1.0, 0.98, 0.9, 1.0))
@@ -283,6 +293,50 @@ func _button_style(color: Color) -> StyleBoxFlat:
 	return style
 
 
+func _start_rebind(action_name: String) -> void:
+	waiting_for_action = action_name
+	_show_waiting_message("請按新的「%s」按鍵，Esc 取消。" % _get_action_display_name(action_name))
+
+
+func _cancel_rebind() -> void:
+	waiting_for_action = ""
+	_show_waiting_message("已取消更改。")
+
+
+func _show_waiting_message(text: String) -> void:
+	if waiting_label != null:
+		waiting_label.text = text
+
+
+func _get_action_display_name(action_name: String) -> String:
+	var settings: Node = _get_input_settings()
+	if settings == null:
+		return action_name
+	for item in settings.call("get_actions"):
+		if String(item["action"]) == action_name:
+			return String(item["label"])
+	return action_name
+
+
+func _refresh_key_labels() -> void:
+	for action_name in key_buttons.keys():
+		var button := key_buttons[action_name] as Button
+		var settings: Node = _get_input_settings()
+		if settings != null:
+			button.text = String(settings.call("get_label_for_action", String(action_name)))
+
+
+func _on_reset_controls_pressed() -> void:
+	var settings: Node = _get_input_settings()
+	if settings != null:
+		settings.call("reset_to_defaults")
+	_show_waiting_message("已恢復預設按鍵。")
+
+
+func _get_input_settings() -> Node:
+	return get_node_or_null("/root/InputSettings")
+
+
 func _show_exit_panel() -> void:
 	pause_dim.visible = true
 	exit_panel.visible = true
@@ -293,6 +347,7 @@ func _show_exit_panel() -> void:
 
 
 func _hide_exit_panel() -> void:
+	waiting_for_action = ""
 	if pause_dim != null:
 		pause_dim.visible = false
 	if exit_panel != null:
@@ -307,10 +362,13 @@ func _show_settings_panel() -> void:
 	exit_panel.visible = false
 	settings_panel.visible = true
 	get_tree().paused = true
+	_show_waiting_message("點選右側按鍵後，按下新的鍵。Esc 取消。")
+	_refresh_key_labels()
 	settings_back_button.grab_focus()
 
 
 func _hide_settings_panel() -> void:
+	waiting_for_action = ""
 	settings_panel.visible = false
 	pause_dim.visible = true
 	exit_panel.visible = true

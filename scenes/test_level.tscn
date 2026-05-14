@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://0jam8o6gwigo" path="res://scenes/enemy.tscn" id="2_enemy_scene"]
 [ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="3_health_ui"]
 [ext_resource type="Script" uid="uid://hid4uidnrebp" path="res://scripts/respawn_point.gd" id="4_respawn_point"]
-[ext_resource type="PackedScene" path="res://scenes/game_ui.tscn" id="5_game_ui"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="5_game_ui"]
 [ext_resource type="PackedScene" path="res://scenes/npc_shopkeeper.tscn" id="6_npc"]
 [ext_resource type="PackedScene" path="res://scenes/area_title_trigger.tscn" id="7_area_title"]
 [ext_resource type="PackedScene" path="res://scenes/breakable_wall.tscn" id="8_breakable_wall"]

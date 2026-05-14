@@ -8,7 +8,6 @@
 
 config_version=5
 
-"ï»¿config_version"=5
 
 [application]
 
@@ -22,6 +21,12 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/game_state.gd"
 MusicPlayer="*res://scripts/music_player.gd"
 AudioSettings="*res://scripts/audio_settings.gd"
+InputHelper="*uid://cholww48njaeh"
+InputSettings="*res://scripts/input_settings.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/input_helper/plugin.cfg")
 
 [input]
 
