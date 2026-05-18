@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ElectricWire.gd" id="1_wire_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wire"]
+size = Vector2(44, 620)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wire"]
+bg_color = Color(0.1, 0.95, 0.78, 0.72)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wire_core"]
+bg_color = Color(1, 1, 1, 0.75)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ElectricWire" type="Area2D"]
+z_index = 80
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_wire_script")
+
+[node name="Visual" type="Panel" parent="."]
+offset_left = -22.0
+offset_top = -560.0
+offset_right = 22.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_wire")
+
+[node name="CoreLine" type="Panel" parent="."]
+offset_left = -5.0
+offset_top = -570.0
+offset_right = 5.0
+offset_bottom = 70.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_wire_core")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_wire")

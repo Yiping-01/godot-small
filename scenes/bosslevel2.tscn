@@ -1,0 +1,454 @@
+[gd_scene format=3 uid="uid://bsxkwk0t8evas"]
+
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="1_wall"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="2_floor"]
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="Texture2D" uid="uid://b173ha6kc107h" path="res://assets/bosslevel_bgtitle/bosslevelbg1.png" id="5_bg"]
+[ext_resource type="Texture2D" uid="uid://cko54hf6fqwua" path="res://assets/enemy/boss.png" id="6_octopus"]
+[ext_resource type="Script" uid="uid://bfn0hh8qvtxm2" path="res://scripts/BossManager.gd" id="7_boss_manager"]
+[ext_resource type="Script" uid="uid://i3v61v6ihpea" path="res://scripts/Tentacle.gd" id="8_tentacle"]
+[ext_resource type="Script" path="res://scripts/BossCore.gd" id="9_boss_core"]
+[ext_resource type="PackedScene" path="res://scenes/electric_wire.tscn" id="10_wire_scene"]
+[ext_resource type="PackedScene" path="res://scenes/lightning_area.tscn" id="11_lightning_scene"]
+[ext_resource type="Texture2D" uid="uid://buofxylu76flk" path="res://assets/enemy/bosshand_attack/boss02_attack_1.png" id="12_tentacle_attack_1"]
+[ext_resource type="Texture2D" uid="uid://bo15lasm58kid" path="res://assets/enemy/bosshand_attack/boss02_attack_2.png" id="13_tentacle_attack_2"]
+[ext_resource type="Texture2D" uid="uid://yt84cii1tbib" path="res://assets/enemy/bosshand_attack/boss02_attack_3.png" id="14_tentacle_attack_3"]
+[ext_resource type="Texture2D" uid="uid://c7lr2mfdq5sdf" path="res://assets/enemy/boss_attacklong_first/boss01_v2_walk_1.png" id="15_bottom_left_1"]
+[ext_resource type="Texture2D" uid="uid://dcjmxb6kov73i" path="res://assets/enemy/boss_attacklong_first/boss01_v2_walk_2.png" id="16_bottom_left_2"]
+[ext_resource type="Texture2D" uid="uid://bphx3j7cne3ht" path="res://assets/enemy/boss_attacklong_first/boss01_v2_walk_3.png" id="17_bottom_left_3"]
+[ext_resource type="Texture2D" uid="uid://gbua3nvuqemh" path="res://assets/enemy/boss_attacklong_first/boss01_v2_walk_4.png" id="18_bottom_left_4"]
+[ext_resource type="Texture2D" uid="uid://jyggtxrs5bid" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_5.png" id="19_corner_left_1"]
+[ext_resource type="Texture2D" uid="uid://5c1pyrt416hr" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_6.png" id="20_corner_left_2"]
+[ext_resource type="Texture2D" uid="uid://dtma84tdcg66q" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_7.png" id="21_corner_left_3"]
+[ext_resource type="Texture2D" uid="uid://clpkj6l24dsnr" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_8.png" id="22_corner_left_4"]
+[ext_resource type="Texture2D" uid="uid://du0yt3co3n8qp" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_01.png" id="23_long_end_1"]
+[ext_resource type="Texture2D" uid="uid://dujwygb1qk4lo" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_02.png" id="24_long_end_2"]
+[ext_resource type="Texture2D" uid="uid://n3cdvyuxf3ux" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_03.png" id="25_long_end_3"]
+[ext_resource type="Texture2D" uid="uid://bkcdciquf3a7r" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_04.png" id="26_long_end_4"]
+[ext_resource type="Texture2D" uid="uid://cngivvqhrhsnn" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_05.png" id="27_long_end_5"]
+[ext_resource type="Texture2D" uid="uid://dxfqsgoub3rqx" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_06.png" id="28_long_end_6"]
+[ext_resource type="Texture2D" uid="uid://cyfv5oh181m2x" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_07.png" id="29_long_end_7"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_1.png" id="30_long_end_left_1"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_2.png" id="31_long_end_left_2"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_3.png" id="32_long_end_left_3"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_4.png" id="33_long_end_left_4"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_5.png" id="34_long_end_left_5"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_6.png" id="35_long_end_left_6"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_7.png" id="36_long_end_left_7"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_8.png" id="37_long_end_left_8"]
+[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_9.png" id="38_long_end_left_9"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_corner_left_tentacle"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_corner_left_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_corner_left_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_corner_left_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_corner_left_4")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tentacle"]
+size = Vector2(75, 235)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_long_end_attack"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("26_long_end_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_long_end_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_long_end_6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_long_end_7")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 9.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_long_end_left_attack"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("30_long_end_left_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_long_end_left_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_long_end_left_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_long_end_left_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_long_end_left_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_long_end_left_6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_long_end_left_7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_long_end_left_8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_long_end_left_9")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 9.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bottom_left_tentacle"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_bottom_left_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_bottom_left_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_bottom_left_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_bottom_left_4")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tentacle_attack"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_tentacle_attack_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_tentacle_attack_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_tentacle_attack_3")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 9.0
+}]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_core"]
+bg_color = Color(1, 0.48, 0.18, 0.9)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 0.9)
+corner_radius_top_left = 42
+corner_radius_top_right = 42
+corner_radius_bottom_right = 42
+corner_radius_bottom_left = 42
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_core"]
+radius = 42.0
+
+[node name="BossLevel2" type="Node2D" unique_id=652491282]
+
+[node name="Background" type="Node2D" parent="." unique_id=1500059683]
+z_index = -100
+
+[node name="SeaBackground" type="Sprite2D" parent="Background" unique_id=773526373]
+position = Vector2(482, 533)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("5_bg")
+
+[node name="OctopusBody" type="Sprite2D" parent="Background" unique_id=1825574875]
+modulate = Color(1, 1, 1, 0.75)
+z_index = 5
+position = Vector2(625, 553)
+texture = ExtResource("6_octopus")
+
+[node name="Platforms" type="Node2D" parent="." unique_id=256295]
+
+[node name="map_floor" parent="Platforms" unique_id=1735638670 instance=ExtResource("2_floor")]
+position = Vector2(640, 780)
+scale = Vector2(7.2, 2)
+
+[node name="map_left" parent="Platforms" unique_id=820229886 instance=ExtResource("1_wall")]
+position = Vector2(40, 465)
+scale = Vector2(1.3, 3.2)
+
+[node name="map_right" parent="Platforms" unique_id=1022279808 instance=ExtResource("1_wall")]
+position = Vector2(1240, 465)
+scale = Vector2(1.3, 3.2)
+
+[node name="PlatformLeft" parent="Platforms" unique_id=1037423704 instance=ExtResource("2_floor")]
+position = Vector2(257.99997, 527)
+scale = Vector2(1.7, 0.45)
+
+[node name="PlatformRight" parent="Platforms" unique_id=1762244674 instance=ExtResource("2_floor")]
+position = Vector2(1012.99994, 538.00006)
+scale = Vector2(1.7, 0.45)
+
+[node name="PlatformCenter" parent="Platforms" unique_id=142223936 instance=ExtResource("2_floor")]
+position = Vector2(640, 650)
+scale = Vector2(1.35, 0.45)
+
+[node name="BossManager" type="Node2D" parent="." unique_id=1741513387]
+script = ExtResource("7_boss_manager")
+debug_start_phase_two = true
+electric_wire_scene = ExtResource("10_wire_scene")
+lightning_area_scene = ExtResource("11_lightning_scene")
+tentacles_path = NodePath("../Tentacles")
+boss_core_path = NodePath("../BossCore")
+wire_spawn_points_path = NodePath("../WireSpawnPoints")
+lightning_spawn_points_path = NodePath("../LightningSpawnPoints")
+
+[node name="Tentacles" type="Node2D" parent="." unique_id=63715134]
+
+[node name="Tentacle_TopLeft" type="Area2D" parent="Tentacles" unique_id=1234679052]
+position = Vector2(285, 255)
+script = ExtResource("8_tentacle")
+attack_warning_time = 0.0
+attack_active_time = 0.8
+top_tentacle = true
+timed_cycle_enabled = true
+attack_visual_tint = false
+align_attack_visual_to_visual = true
+hide_visual_during_attack = true
+
+[node name="Visual" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopLeft" unique_id=1449693542]
+position = Vector2(-45.000008, 47.000008)
+rotation = 3.1415927
+scale = Vector2(0.289436, 0.289436)
+sprite_frames = SubResource("SpriteFrames_corner_left_tentacle")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Tentacles/Tentacle_TopLeft" unique_id=71574855]
+position = Vector2(0.5, 42.5)
+shape = SubResource("RectangleShape2D_tentacle")
+
+[node name="AttackWarning" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopLeft" unique_id=1179236782]
+visible = false
+position = Vector2(-36, 156)
+rotation = 0.24
+scale = Vector2(0.34, 0.34)
+sprite_frames = SubResource("SpriteFrames_tentacle_attack")
+animation = &"attack"
+
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopLeft"]
+visible = false
+position = Vector2(-45.000008, 47.000008)
+rotation = 3.1415927
+scale = Vector2(0.289436, 0.289436)
+sprite_frames = SubResource("SpriteFrames_long_end_attack")
+animation = &"attack"
+
+[node name="AttackArea" type="Area2D" parent="Tentacles/Tentacle_TopLeft" unique_id=1627323855]
+monitoring = false
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tentacles/Tentacle_TopLeft/AttackArea" unique_id=1260351625]
+polygon = PackedVector2Array(0, 0, -210, 80, -145, 205, 120, 205, 190, 80)
+disabled = true
+
+[node name="Tentacle_TopRight" type="Area2D" parent="Tentacles" unique_id=1869455604]
+position = Vector2(995, 255)
+script = ExtResource("8_tentacle")
+attack_warning_time = 0.0
+attack_active_time = 0.8
+top_tentacle = true
+timed_cycle_enabled = true
+timed_cycle_hidden_time = 7.0
+timed_cycle_idle_time = 8.0
+attack_visual_tint = false
+align_attack_visual_to_visual = true
+hide_visual_during_attack = true
+
+[node name="Visual" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopRight" unique_id=1000811353]
+position = Vector2(28.999996, 64.99999)
+rotation = 3.1415927
+scale = Vector2(-0.34, 0.34)
+sprite_frames = SubResource("SpriteFrames_bottom_left_tentacle")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Tentacles/Tentacle_TopRight" unique_id=2120487394]
+position = Vector2(48, 91)
+shape = SubResource("RectangleShape2D_tentacle")
+
+[node name="AttackWarning" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopRight" unique_id=1161800239]
+visible = false
+position = Vector2(36, 156)
+rotation = -0.24
+scale = Vector2(-0.34, 0.34)
+sprite_frames = SubResource("SpriteFrames_tentacle_attack")
+animation = &"attack"
+
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopRight"]
+visible = false
+position = Vector2(28.999996, 64.99999)
+rotation = 3.1415927
+scale = Vector2(-0.34, 0.34)
+sprite_frames = SubResource("SpriteFrames_long_end_left_attack")
+animation = &"attack"
+
+[node name="AttackArea" type="Area2D" parent="Tentacles/Tentacle_TopRight" unique_id=181527012]
+monitoring = false
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tentacles/Tentacle_TopRight/AttackArea" unique_id=1757468462]
+polygon = PackedVector2Array(0, 0, -190, 80, -120, 205, 145, 205, 210, 80)
+disabled = true
+
+[node name="Tentacle_BottomLeft" type="Area2D" parent="Tentacles" unique_id=776464345]
+position = Vector2(280, 670)
+script = ExtResource("8_tentacle")
+attack_warning_time = 0.0
+attack_active_time = 0.8
+attack_interval_min = 3.0
+attack_interval_max = 5.8
+timed_cycle_enabled = true
+attack_visual_tint = false
+timed_cycle_hidden_time = 7.0
+timed_cycle_idle_time = 8.0
+align_attack_visual_to_visual = true
+hide_visual_during_attack = true
+
+[node name="Visual" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=1124385807]
+position = Vector2(4, 11.999998)
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_bottom_left_tentacle")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=938962913]
+shape = SubResource("RectangleShape2D_tentacle")
+
+[node name="AttackWarning" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=317942379]
+visible = false
+position = Vector2(158, -58)
+rotation = -1.16
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_tentacle_attack")
+animation = &"attack"
+
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomLeft"]
+visible = false
+position = Vector2(4, 11.999998)
+scale = Vector2(0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_long_end_left_attack")
+animation = &"attack"
+
+[node name="AttackArea" type="Area2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=181113822]
+monitoring = false
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tentacles/Tentacle_BottomLeft/AttackArea" unique_id=67461749]
+polygon = PackedVector2Array(0, 0, 120, -180, 310, -140, 275, 45, 80, 75)
+disabled = true
+
+[node name="Tentacle_BottomRight" type="Area2D" parent="Tentacles" unique_id=1487815930]
+position = Vector2(1000, 670)
+script = ExtResource("8_tentacle")
+attack_warning_time = 0.0
+attack_active_time = 0.8
+attack_interval_min = 3.0
+attack_interval_max = 5.8
+timed_cycle_enabled = true
+attack_visual_tint = false
+align_attack_visual_to_visual = true
+hide_visual_during_attack = true
+
+[node name="Visual" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomRight" unique_id=1336864312]
+position = Vector2(0, -18)
+scale = Vector2(0.34, 0.34)
+sprite_frames = SubResource("SpriteFrames_corner_left_tentacle")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Tentacles/Tentacle_BottomRight" unique_id=1175457574]
+position = Vector2(-52, -6)
+shape = SubResource("RectangleShape2D_tentacle")
+
+[node name="AttackWarning" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomRight" unique_id=1481060778]
+visible = false
+position = Vector2(-158, -58)
+rotation = 1.16
+scale = Vector2(-0.3, 0.3)
+sprite_frames = SubResource("SpriteFrames_tentacle_attack")
+animation = &"attack"
+
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomRight"]
+visible = false
+position = Vector2(0, -18)
+scale = Vector2(0.34, 0.34)
+sprite_frames = SubResource("SpriteFrames_long_end_attack")
+animation = &"attack"
+
+[node name="AttackArea" type="Area2D" parent="Tentacles/Tentacle_BottomRight" unique_id=230259220]
+monitoring = false
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Tentacles/Tentacle_BottomRight/AttackArea" unique_id=1860468386]
+polygon = PackedVector2Array(0, 0, -120, -180, -310, -140, -275, 45, -80, 75)
+disabled = true
+
+[node name="BossCore" type="Area2D" parent="." unique_id=1008065651]
+position = Vector2(640, 470)
+script = ExtResource("9_boss_core")
+
+[node name="Visual" type="Panel" parent="BossCore" unique_id=888488720]
+offset_left = -42.0
+offset_top = -42.0
+offset_right = 42.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_core")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BossCore" unique_id=1316138946]
+shape = SubResource("CircleShape2D_core")
+
+[node name="WireSpawnPoints" type="Node2D" parent="." unique_id=830234770]
+
+[node name="Point1" type="Marker2D" parent="WireSpawnPoints" unique_id=3437637]
+position = Vector2(285, 710)
+rotation = -0.32
+
+[node name="Point2" type="Marker2D" parent="WireSpawnPoints" unique_id=300265909]
+position = Vector2(640, 700)
+rotation = 0.18
+
+[node name="Point3" type="Marker2D" parent="WireSpawnPoints" unique_id=1265439123]
+position = Vector2(995, 710)
+rotation = 0.32
+
+[node name="LightningSpawnPoints" type="Node2D" parent="." unique_id=186885573]
+
+[node name="Point1" type="Marker2D" parent="LightningSpawnPoints" unique_id=1521925817]
+position = Vector2(330, 430)
+
+[node name="Point2" type="Marker2D" parent="LightningSpawnPoints" unique_id=595523350]
+position = Vector2(640, 430)
+
+[node name="Point3" type="Marker2D" parent="LightningSpawnPoints" unique_id=1181585540]
+position = Vector2(950, 430)
+
+[node name="Player" parent="." unique_id=367612949 instance=ExtResource("3_player")]
+position = Vector2(631, 703)
+
+[node name="GameUI" parent="." unique_id=215559834 instance=ExtResource("4_game_ui")]
+visible = false

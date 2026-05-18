@@ -1,0 +1,665 @@
+[gd_scene format=3 uid="uid://dqccsmddpmj2w"]
+
+[ext_resource type="PackedScene" path="res://scenes/map_wall.tscn" id="1_ivf3x"]
+[ext_resource type="PackedScene" path="res://scenes/map_floor.tscn" id="2_apo74"]
+[ext_resource type="PackedScene" uid="uid://skg25sikhd5u" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://dgcm5rlgbtx5k" path="res://scenes/game_ui.tscn" id="4_game_ui"]
+[ext_resource type="Texture2D" uid="uid://b173ha6kc107h" path="res://assets/bosslevel_bgtitle/bosslevelbg1.png" id="7_boss_bg"]
+[ext_resource type="Texture2D" uid="uid://ditms5q8lp52i" path="res://assets/bosslevel_bgtitle/bosslevel_title.png" id="8_boss_title"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="9_health_ui"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="10_exit_menu"]
+[ext_resource type="PackedScene" path="res://scenes/map_room_marker.tscn" id="11_ct8uc"]
+[ext_resource type="Script" uid="uid://doykn5e872tg5" path="res://scripts/boss_cord.gd" id="12_boss_cord"]
+[ext_resource type="Script" uid="uid://b6mfic21h1oca" path="res://scripts/boss_hand_attack.gd" id="13_boss_hand_attack"]
+[ext_resource type="Texture2D" uid="uid://buofxylu76flk" path="res://assets/enemy/bosshand_attack/boss02_attack_1.png" id="14_boss_hand_1"]
+[ext_resource type="Script" uid="uid://ddls65beutq0i" path="res://scripts/boss_intro_light.gd" id="14_boss_intro_light"]
+[ext_resource type="Texture2D" uid="uid://bo15lasm58kid" path="res://assets/enemy/bosshand_attack/boss02_attack_2.png" id="15_boss_hand_2"]
+[ext_resource type="Texture2D" uid="uid://yt84cii1tbib" path="res://assets/enemy/bosshand_attack/boss02_attack_3.png" id="16_boss_hand_3"]
+[ext_resource type="Texture2D" uid="uid://qmrsx2mud3oh" path="res://assets/enemy/bosshand_attackout/boss_attack_effcet_1.png" id="17_attackout_1"]
+[ext_resource type="Texture2D" uid="uid://cyw82nl81uc0u" path="res://assets/enemy/bosshand_attackout/boss_attack_effcet_2.png" id="18_attackout_2"]
+[ext_resource type="Texture2D" uid="uid://ce6samb027xn2" path="res://assets/enemy/bosshand_attackout/boss_attack_effcet_3.png" id="19_attackout_3"]
+[ext_resource type="Texture2D" uid="uid://b2g5c5ywo7qfi" path="res://assets/enemy/bosshand_attackout/boss_attack_effcet_4.png" id="20_attackout_4"]
+[ext_resource type="Texture2D" uid="uid://dir7vxqqcrd0p" path="res://assets/enemy/bossbg_attack/bossbg_attack1.png" id="21_bossbg_attack_1"]
+[ext_resource type="Texture2D" uid="uid://b6umrlv81dyls" path="res://assets/enemy/bossbg_attack/bossbg_attack2.png" id="22_bossbg_attack_2"]
+[ext_resource type="Texture2D" uid="uid://dr5l2f703edle" path="res://assets/enemy/bossbg_attack/bossbg_attack3.png" id="23_bossbg_attack_3"]
+[ext_resource type="Texture2D" uid="uid://cl6737l5v2fw3" path="res://assets/enemy/bossbg_attack/bossbg_attack4.png" id="24_bossbg_attack_4"]
+[ext_resource type="Script" uid="uid://dylib6nrqltwi" path="res://scripts/boss_background_target.gd" id="25_boss_background_target"]
+[ext_resource type="Texture2D" uid="uid://yccyng203xwn" path="res://assets/enemy/boss_ha.png" id="26_boss_ha"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss_bg_attack"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("21_bossbg_attack_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_bossbg_attack_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_bossbg_attack_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_bossbg_attack_4")
+}],
+"loop": true,
+"name": &"attack",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("26_boss_ha")
+}],
+"loop": true,
+"name": &"stunned",
+"speed": 1.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_background_target"]
+size = Vector2(680, 420)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss_hand_attack"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_boss_hand_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_boss_hand_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_boss_hand_3")
+}],
+"loop": false,
+"name": &"slam",
+"speed": 13.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss_hand_attackout"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_attackout_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_attackout_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_attackout_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_attackout_4")
+}],
+"loop": false,
+"name": &"out",
+"speed": 16.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_hand_damage"]
+size = Vector2(350, 210)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_cord_left"]
+size = Vector2(70, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_cord_middle"]
+size = Vector2(70, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_cord_right"]
+size = Vector2(70, 70)
+
+[node name="Bosslevel" type="Node2D" unique_id=1054835420]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1238368204]
+script = ExtResource("9_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=163147142]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=136503295]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=987469001]
+process_mode = 3
+layer = 20
+script = ExtResource("10_exit_menu")
+
+[node name="GameUI" parent="." unique_id=1098441461 instance=ExtResource("4_game_ui")]
+visible = false
+
+[node name="BossBackground" type="Sprite2D" parent="." unique_id=301488957]
+z_index = -100
+position = Vector2(482, 533)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("7_boss_bg")
+
+[node name="BossBackVisual" type="AnimatedSprite2D" parent="." unique_id=643269305]
+z_index = -95
+position = Vector2(597, 679)
+scale = Vector2(0.78, 0.78)
+sprite_frames = SubResource("SpriteFrames_boss_bg_attack")
+animation = &"attack"
+autoplay = "attack"
+
+[node name="BossIntroLight" type="Node2D" parent="." unique_id=890239222]
+z_index = 200
+position = Vector2(597, 679)
+script = ExtResource("14_boss_intro_light")
+
+[node name="BossBackgroundTarget" type="Area2D" parent="." unique_id=895117370]
+position = Vector2(597, 650)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("25_boss_background_target")
+visual_path = NodePath("../BossBackVisual")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BossBackgroundTarget" unique_id=1239293898]
+shape = SubResource("RectangleShape2D_boss_background_target")
+
+[node name="BossHandAttack" type="Node2D" parent="." unique_id=1493888022]
+z_index = -68
+position = Vector2(129, 745)
+script = ExtResource("13_boss_hand_attack")
+
+[node name="HandSprite" type="AnimatedSprite2D" parent="BossHandAttack" unique_id=1474505328]
+scale = Vector2(0.32, 0.32)
+sprite_frames = SubResource("SpriteFrames_boss_hand_attack")
+animation = &"slam"
+
+[node name="AttackOutSprite" type="AnimatedSprite2D" parent="BossHandAttack" unique_id=31872284]
+visible = false
+z_index = -1
+scale = Vector2(0.32, 0.32)
+sprite_frames = SubResource("SpriteFrames_boss_hand_attackout")
+animation = &"out"
+
+[node name="DamageArea" type="Area2D" parent="BossHandAttack" unique_id=948175853]
+position = Vector2(-34, -84.99999)
+scale = Vector2(0.6, 0.6)
+collision_layer = 32
+collision_mask = 16
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BossHandAttack/DamageArea" unique_id=651672915]
+shape = SubResource("RectangleShape2D_boss_hand_damage")
+disabled = true
+
+[node name="map_left" parent="." unique_id=2078946100 instance=ExtResource("1_ivf3x")]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(67, 436)
+scale = Vector2(1.3490925, 3.0206344)
+
+[node name="map_floor" parent="." unique_id=432150940 instance=ExtResource("2_apo74")]
+modulate = Color(1, 1, 1, 0.02745098)
+position = Vector2(838, 778)
+scale = Vector2(6.36, 2)
+
+[node name="Player" parent="." unique_id=1348616487 instance=ExtResource("3_player")]
+position = Vector2(266, 680)
+
+[node name="map_right" parent="." unique_id=776427194 instance=ExtResource("1_ivf3x")]
+modulate = Color(1, 1, 1, 0.17254902)
+position = Vector2(1091, 475)
+scale = Vector2(1.3, 3)
+
+[node name="view" type="Node2D" parent="." unique_id=1805410352]
+position = Vector2(334, 713)
+
+[node name="BossLevelTitle46" type="Sprite2D" parent="view" unique_id=1758222445]
+z_index = -90
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(629.68164, 614.6824, 33.954712, 66.02301)
+
+[node name="BossLevelTitle45" type="Sprite2D" parent="view" unique_id=734508279]
+z_index = -90
+position = Vector2(168, 10)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(629.68164, 614.6824, 33.954712, 66.02301)
+
+[node name="BossLevelTitle44" type="Sprite2D" parent="view" unique_id=1536739115]
+z_index = -90
+position = Vector2(247, -34)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(1357.8213, 580.72766, 71.68213, 111.29596)
+
+[node name="BossLevelTitle43" type="Sprite2D" parent="view" unique_id=2069450184]
+z_index = -90
+position = Vector2(-253, -34)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(741.0069, 704.5675, 48.186768, 79.366455)
+
+[node name="BossLevelTitle42" type="Sprite2D" parent="view" unique_id=1424963093]
+z_index = -90
+position = Vector2(675, -25)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(934.3402, 554.228, 77.94916, 124.71863)
+
+[node name="BossLevelTitle41" type="Sprite2D" parent="view" unique_id=21078568]
+z_index = -90
+position = Vector2(309, -12)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(548.719, 581.96216, 74.5365, 101.15662)
+
+[node name="BossLevelTitle40" type="Sprite2D" parent="view" unique_id=1457720833]
+z_index = -90
+position = Vector2(-178, -62)
+scale = Vector2(2.25, 2.25)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(548.719, 581.96216, 74.5365, 101.15662)
+
+[node name="BossLevelTitle39" type="Sprite2D" parent="view" unique_id=690487128]
+z_index = -90
+position = Vector2(679.9999, -457)
+rotation = -3.07587
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(1118.9468, 451.39697, 108.22693, 121.11096)
+
+[node name="BossLevelTitle38" type="Sprite2D" parent="view" unique_id=802696820]
+z_index = -90
+position = Vector2(-7, -450)
+rotation = -3.1008525
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(1118.9468, 451.39697, 108.22693, 121.11096)
+
+[node name="BossLevelTitle37" type="Sprite2D" parent="view" unique_id=1970044407]
+z_index = -90
+position = Vector2(426, -466)
+rotation = 3.0677314
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(430.1137, 195.95113, 146.37695, 96.66405)
+
+[node name="BossLevelTitle36" type="Sprite2D" parent="view" unique_id=745131538]
+z_index = -90
+position = Vector2(692, -464)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(917.48083, 429.6574, 46.301758, 118.3266)
+
+[node name="BossLevelTitle35" type="Sprite2D" parent="view" unique_id=1394482253]
+z_index = -90
+position = Vector2(487, -478)
+rotation = -2.9427514
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(23.369858, 887.6123, 112.2466, 56.12329)
+
+[node name="BossLevelTitle34" type="Sprite2D" parent="view" unique_id=870618234]
+z_index = -90
+position = Vector2(88.00003, -485.99997)
+rotation = 3.1012123
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(23.369858, 887.6123, 112.2466, 56.12329)
+
+[node name="BossLevelTitle33" type="Sprite2D" parent="view" unique_id=659879847]
+z_index = -90
+position = Vector2(-104, -485)
+rotation = 2.7998824
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(23.369858, 887.6123, 112.2466, 56.12329)
+
+[node name="BossLevelTitle32" type="Sprite2D" parent="view" unique_id=817392105]
+z_index = -90
+position = Vector2(253, -451)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(13.384701, 441.04678, 238.52393, 113.80551)
+
+[node name="BossLevelTitle31" type="Sprite2D" parent="view" unique_id=1731725061]
+z_index = -90
+position = Vector2(720, -442)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(965.3258, 436.77524, 56.025024, 126.5751)
+
+[node name="BossLevelTitle30" type="Sprite2D" parent="view" unique_id=50171515]
+z_index = -90
+position = Vector2(-274, -422)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(965.3258, 436.77524, 56.025024, 126.5751)
+
+[node name="BossLevelTitle29" type="Sprite2D" parent="view" unique_id=2063018248]
+z_index = -90
+position = Vector2(-254, -443)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(965.3258, 436.77524, 56.025024, 126.5751)
+
+[node name="BossLevelTitle28" type="Sprite2D" parent="view" unique_id=1860582010]
+z_index = -90
+position = Vector2(575, -441)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(265.06946, 451.427, 139.48926, 121.38757)
+
+[node name="BossLevelTitle27" type="Sprite2D" parent="view" unique_id=1268855142]
+z_index = -90
+position = Vector2(-177, -445)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(265.06946, 451.427, 139.48926, 121.38757)
+
+[node name="BossLevelTitle26" type="Sprite2D" parent="view" unique_id=1725088426]
+z_index = -90
+position = Vector2(133, -446)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(841.938, 438.4524, 63.888184, 134.16528)
+
+[node name="BossLevelTitle25" type="Sprite2D" parent="view" unique_id=1493433024]
+z_index = -90
+position = Vector2(519, -440)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(841.938, 438.4524, 63.888184, 134.16528)
+
+[node name="BossLevelTitle24" type="Sprite2D" parent="view" unique_id=1068014262]
+z_index = -90
+position = Vector2(-238, -434)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(841.938, 438.4524, 63.888184, 134.16528)
+
+[node name="boundary" type="Node2D" parent="." unique_id=232177234]
+
+[node name="BossLevelTitle27" type="Sprite2D" parent="boundary" unique_id=264483304]
+z_index = -90
+position = Vector2(13.924768, 421.48233)
+rotation = -0.027347565
+scale = Vector2(0.6844692, 1)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(153.79622, 194.60585, 120.72783, 169.77348)
+
+[node name="BossLevelTitle24" type="Sprite2D" parent="boundary" unique_id=2096619964]
+z_index = -90
+position = Vector2(1059, 207)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(288.66992, 204.3675, 143.79742, 123.254974)
+
+[node name="BossLevelTitle23" type="Sprite2D" parent="boundary" unique_id=1585669479]
+z_index = -90
+position = Vector2(1154, 226)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle22" type="Sprite2D" parent="boundary" unique_id=1220035491]
+z_index = -90
+position = Vector2(1153, 387)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle21" type="Sprite2D" parent="boundary" unique_id=1581237804]
+z_index = -90
+position = Vector2(1152, 557)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle20" type="Sprite2D" parent="boundary" unique_id=1863608347]
+z_index = -90
+position = Vector2(1114, 696)
+rotation = 3.1415925
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(288.66992, 204.3675, 143.79742, 123.254974)
+
+[node name="BossLevelTitle16" type="Sprite2D" parent="boundary" unique_id=2027123536]
+z_index = -90
+position = Vector2(141, 171)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle17" type="Sprite2D" parent="boundary" unique_id=2083753407]
+z_index = -90
+position = Vector2(307, 171)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle18" type="Sprite2D" parent="boundary" unique_id=401921286]
+z_index = -90
+position = Vector2(473, 171)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle19" type="Sprite2D" parent="boundary" unique_id=26791190]
+z_index = -90
+position = Vector2(642, 171)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle25" type="Sprite2D" parent="boundary" unique_id=1939944948]
+z_index = -90
+position = Vector2(812, 173)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle26" type="Sprite2D" parent="boundary" unique_id=825164759]
+z_index = -90
+position = Vector2(981, 169)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle12" type="Sprite2D" parent="boundary" unique_id=1176206059]
+z_index = -90
+position = Vector2(35, 244)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(288.66992, 204.3675, 143.79742, 123.254974)
+
+[node name="BossLevelTitle13" type="Sprite2D" parent="boundary" unique_id=964099743]
+z_index = -90
+position = Vector2(-11, 469)
+rotation = 3.1415925
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle15" type="Sprite2D" parent="boundary" unique_id=590488085]
+z_index = -90
+position = Vector2(3, 280)
+rotation = 3.1415925
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle28" type="Sprite2D" parent="boundary" unique_id=1804883959]
+z_index = -90
+position = Vector2(20.829298, 537.7696)
+rotation = 3.1286683
+scale = Vector2(0.7028202, 1)
+texture = ExtResource("8_boss_title")
+flip_h = true
+region_enabled = true
+region_rect = Rect2(153.79622, 194.60585, 120.72783, 169.77348)
+
+[node name="BossLevelTitle11" type="Sprite2D" parent="boundary" unique_id=1792553008]
+z_index = -90
+position = Vector2(90, 751)
+rotation = -1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(288.66992, 204.3675, 143.79742, 123.254974)
+
+[node name="BossLevelTitle10" type="Sprite2D" parent="boundary" unique_id=1573919147]
+z_index = -90
+position = Vector2(1121, 784)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle9" type="Sprite2D" parent="boundary" unique_id=1272985506]
+z_index = -90
+position = Vector2(953, 784)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle8" type="Sprite2D" parent="boundary" unique_id=561222]
+z_index = -90
+position = Vector2(783, 783)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle14" type="Sprite2D" parent="boundary" unique_id=157515231]
+z_index = -90
+position = Vector2(15.000002, 673.87)
+rotation = 3.1415925
+scale = Vector2(1, 0.861613)
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle7" type="Sprite2D" parent="boundary" unique_id=675280239]
+z_index = -90
+position = Vector2(612, 782)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle6" type="Sprite2D" parent="boundary" unique_id=1722487931]
+z_index = -90
+position = Vector2(445, 782)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle5" type="Sprite2D" parent="boundary" unique_id=149323083]
+z_index = -90
+position = Vector2(275, 780)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossLevelTitle4" type="Sprite2D" parent="boundary" unique_id=518102447]
+z_index = -90
+position = Vector2(110, 782)
+rotation = 1.5707964
+texture = ExtResource("8_boss_title")
+region_enabled = true
+region_rect = Rect2(676.154, 11.576821, 121.110596, 186.81953)
+
+[node name="BossCords" type="Node2D" parent="." unique_id=239248068]
+z_index = -92
+
+[node name="CordLeftLine" type="Line2D" parent="BossCords" unique_id=706396531]
+position = Vector2(41, 68)
+points = PackedVector2Array(130, 120, 335, 680)
+default_color = Color(0.285, 0.76, 0.565, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="CordLeftHitbox" type="Area2D" parent="BossCords" unique_id=2007783473]
+position = Vector2(171, 188)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("12_boss_cord")
+visual_path = NodePath("../CordLeftLine")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BossCords/CordLeftHitbox" unique_id=355330051]
+shape = SubResource("RectangleShape2D_boss_cord_left")
+
+[node name="CordMiddleLine" type="Line2D" parent="BossCords" unique_id=539406028]
+position = Vector2(-17, 100)
+points = PackedVector2Array(760, 80, 690, 680)
+default_color = Color(0.285, 0.76, 0.565, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="CordMiddleKnot" type="Line2D" parent="BossCords" unique_id=1081055883]
+position = Vector2(-51, 280)
+points = PackedVector2Array(732, 319, 752, 319)
+width = 22.0
+default_color = Color(0.285, 0.76, 0.565, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="CordMiddleHitbox" type="Area2D" parent="BossCords" unique_id=883925984]
+position = Vector2(696, 590)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("12_boss_cord")
+visual_path = NodePath("../CordMiddleLine")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BossCords/CordMiddleHitbox" unique_id=735831383]
+shape = SubResource("RectangleShape2D_boss_cord_middle")
+
+[node name="CordRightLine" type="Line2D" parent="BossCords" unique_id=689392]
+position = Vector2(-11, 121)
+points = PackedVector2Array(1030, 100, 950, 680)
+default_color = Color(0.285, 0.76, 0.565, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="CordRightKnot" type="Line2D" parent="BossCords" unique_id=8912574]
+points = PackedVector2Array(985, 415, 1005, 415)
+width = 22.0
+default_color = Color(0.285, 0.76, 0.565, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="CordRightHitbox" type="Area2D" parent="BossCords" unique_id=163867196]
+position = Vector2(981, 455)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("12_boss_cord")
+visual_path = NodePath("../CordRightLine")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BossCords/CordRightHitbox" unique_id=228967101]
+position = Vector2(17, -34)
+shape = SubResource("RectangleShape2D_boss_cord_right")
+
+[node name="MapRooms" type="Node2D" parent="." unique_id=236934027]
+visible = false
+position = Vector2(583, 454)
+
+[node name="BossRoomMarker" parent="MapRooms" unique_id=1366671650 instance=ExtResource("11_ct8uc")]
+position = Vector2(8, 4)
+scale = Vector2(1.8, 1.5)
+room_id = "boss_room"
+display_name = "Boss房"
+map_rect = Rect2(240, 140, 220, 90)

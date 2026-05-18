@@ -852,7 +852,8 @@ func face_position(target_position: Vector2) -> void:
 		return
 
 	facing_direction = int(new_direction)
-	animated_sprite.flip_h = facing_direction > 0
+	if animated_sprite != null:
+		animated_sprite.flip_h = facing_direction > 0
 	_update_attack_area_side()
 
 
