@@ -3,6 +3,20 @@ extends Node
 signal controls_changed
 
 const SAVE_PATH := "user://input_settings.cfg"
+const FALLBACK_KEYCODES := {
+	"move_up": KEY_W,
+	"move_down": KEY_S,
+	"move_left": KEY_A,
+	"move_right": KEY_D,
+	"jump": KEY_Z,
+	"attack": KEY_X,
+	"dash": KEY_C,
+	"far_attack": KEY_F,
+	"interact": KEY_E,
+	"map": KEY_M,
+	"inventory": KEY_I,
+	"audio_settings": KEY_P,
+}
 const ACTIONS := [
 	{"action": "move_up", "label": "上"},
 	{"action": "move_down", "label": "下"},
@@ -23,6 +37,7 @@ var _loaded := false
 
 func _ready() -> void:
 	load_bindings()
+	_ensure_required_bindings()
 
 
 func get_actions() -> Array:
@@ -116,3 +131,29 @@ func load_bindings() -> void:
 
 	InputHelper.deserialize_inputs_for_actions(bindings)
 	controls_changed.emit()
+
+
+func _ensure_required_bindings() -> void:
+	var changed := false
+	for action in FALLBACK_KEYCODES.keys():
+		if not InputMap.has_action(action):
+			continue
+
+		var keycode := FALLBACK_KEYCODES[action] as Key
+		var has_fallback_key := false
+		for event in InputMap.action_get_events(action):
+			if event is InputEventKey and event.keycode == keycode:
+				has_fallback_key = true
+				break
+		if has_fallback_key:
+			continue
+
+		var event := InputEventKey.new()
+		event.keycode = keycode
+		event.pressed = false
+		InputMap.action_add_event(action, event)
+		changed = true
+
+	if changed:
+		save_bindings()
+		controls_changed.emit()

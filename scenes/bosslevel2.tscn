@@ -11,6 +11,8 @@
 [ext_resource type="Script" path="res://scripts/BossCore.gd" id="9_boss_core"]
 [ext_resource type="PackedScene" path="res://scenes/electric_wire.tscn" id="10_wire_scene"]
 [ext_resource type="PackedScene" path="res://scenes/lightning_area.tscn" id="11_lightning_scene"]
+[ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="12_health_ui"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="13_exit_menu"]
 [ext_resource type="Texture2D" uid="uid://buofxylu76flk" path="res://assets/enemy/bosshand_attack/boss02_attack_1.png" id="12_tentacle_attack_1"]
 [ext_resource type="Texture2D" uid="uid://bo15lasm58kid" path="res://assets/enemy/bosshand_attack/boss02_attack_2.png" id="13_tentacle_attack_2"]
 [ext_resource type="Texture2D" uid="uid://yt84cii1tbib" path="res://assets/enemy/bosshand_attack/boss02_attack_3.png" id="14_tentacle_attack_3"]
@@ -170,6 +172,29 @@ corner_radius_bottom_left = 42
 radius = 42.0
 
 [node name="BossLevel2" type="Node2D" unique_id=652491282]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1238368204]
+script = ExtResource("12_health_ui")
+
+[node name="HealthPips" type="HBoxContainer" parent="HUD" unique_id=163147142]
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 58.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=136503295]
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 18
+text = "HP: 5 / 5"
+
+[node name="ExitMenu" type="CanvasLayer" parent="." unique_id=987469001]
+process_mode = 3
+layer = 20
+script = ExtResource("13_exit_menu")
 
 [node name="Background" type="Node2D" parent="." unique_id=1500059683]
 z_index = -100

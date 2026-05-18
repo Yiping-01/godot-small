@@ -160,6 +160,7 @@ var far_attack_frames: SpriteFrames
 
 
 func _ready() -> void:
+	_ensure_player_input_bindings()
 	_play_game_music()
 	GameState.refill_health_potions()
 	current_health = float(max_health)
@@ -433,6 +434,27 @@ func _handle_underwater_attack_input() -> void:
 	if Input.is_action_just_pressed("attack"):
 		_cancel_attack_charge()
 		_try_attack()
+
+
+func _ensure_player_input_bindings() -> void:
+	_ensure_input_key("jump", KEY_Z)
+	_ensure_input_key("attack", KEY_X)
+	_ensure_input_key("dash", KEY_C)
+	_ensure_input_key("far_attack", KEY_F)
+
+
+func _ensure_input_key(action: StringName, keycode: Key) -> void:
+	if not InputMap.has_action(action):
+		return
+
+	for event in InputMap.action_get_events(action):
+		if event is InputEventKey and event.keycode == keycode:
+			return
+
+	var event := InputEventKey.new()
+	event.keycode = keycode
+	event.pressed = false
+	InputMap.action_add_event(action, event)
 
 
 func _handle_far_attack_input() -> void:
