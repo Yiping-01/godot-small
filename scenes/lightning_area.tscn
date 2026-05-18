@@ -1,6 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/LightningArea.gd" id="1_lightning_script"]
+[ext_resource type="Texture2D" path="res://assets/other/lei1.png" id="2_lei1"]
+[ext_resource type="Texture2D" path="res://assets/other/lei2.png" id="3_lei2"]
+[ext_resource type="Texture2D" path="res://assets/other/lei3.png" id="4_lei3"]
+[ext_resource type="Texture2D" path="res://assets/other/lei4.png" id="5_lei4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lightning"]
 size = Vector2(150, 760)
@@ -13,13 +17,25 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 1, 1, 0.55)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lightning"]
-bg_color = Color(0.8, 0.95, 1, 0.82)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
-border_color = Color(1, 1, 1, 1)
+[sub_resource type="SpriteFrames" id="SpriteFrames_lightning"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_lei1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_lei2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_lei3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_lei4")
+}],
+"loop": true,
+"name": &"strike",
+"speed": 16.0
+}]
 
 [node name="LightningArea" type="Node2D"]
 script = ExtResource("1_lightning_script")
@@ -31,13 +47,11 @@ offset_right = 75.0
 offset_bottom = 380.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_warning")
 
-[node name="LightningVisual" type="Panel" parent="."]
+[node name="LightningVisual" type="AnimatedSprite2D" parent="."]
 visible = false
-offset_left = -75.0
-offset_top = -380.0
-offset_right = 75.0
-offset_bottom = 380.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_lightning")
+scale = Vector2(0.38, 0.62)
+sprite_frames = SubResource("SpriteFrames_lightning")
+animation = &"strike"
 
 [node name="DamageArea" type="Area2D" parent="."]
 collision_layer = 32

@@ -14,6 +14,7 @@ signal boss_defeated
 @export var lightning_area_scene: PackedScene
 @export var tentacles_path: NodePath
 @export var boss_core_path: NodePath
+@export var boss_body_path: NodePath
 @export var wire_spawn_points_path: NodePath
 @export var lightning_spawn_points_path: NodePath
 
@@ -25,6 +26,7 @@ var _wire_loop_running := false
 
 @onready var tentacles_root: Node = get_node_or_null(tentacles_path)
 @onready var boss_core: Node = get_node_or_null(boss_core_path)
+@onready var boss_body: CanvasItem = get_node_or_null(boss_body_path) as CanvasItem
 @onready var wire_spawn_points: Node = get_node_or_null(wire_spawn_points_path)
 @onready var lightning_spawn_points: Node = get_node_or_null(lightning_spawn_points_path)
 
@@ -56,6 +58,7 @@ func damage_boss(amount: int) -> void:
 		return
 
 	health = maxi(health - amount, 0)
+	print("Boss HP: %d / %d" % [health, max_health])
 	boss_health_changed.emit(health, max_health)
 	if health <= 0:
 		_die()
@@ -188,4 +191,6 @@ func _die() -> void:
 	_set_tentacles_active(false)
 	if boss_core != null and boss_core.has_method("close_core"):
 		boss_core.call("close_core")
+	if boss_body != null:
+		boss_body.visible = false
 	boss_defeated.emit()

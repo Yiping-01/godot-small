@@ -12,8 +12,8 @@
 [ext_resource type="PackedScene" path="res://scenes/electric_wire.tscn" id="10_wire_scene"]
 [ext_resource type="PackedScene" path="res://scenes/lightning_area.tscn" id="11_lightning_scene"]
 [ext_resource type="Script" uid="uid://kga12lvq78rr" path="res://scripts/health_ui.gd" id="12_health_ui"]
-[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="13_exit_menu"]
 [ext_resource type="Texture2D" uid="uid://buofxylu76flk" path="res://assets/enemy/bosshand_attack/boss02_attack_1.png" id="12_tentacle_attack_1"]
+[ext_resource type="Script" uid="uid://cj6uw7db1aek6" path="res://scripts/exit_menu.gd" id="13_exit_menu"]
 [ext_resource type="Texture2D" uid="uid://bo15lasm58kid" path="res://assets/enemy/bosshand_attack/boss02_attack_2.png" id="13_tentacle_attack_2"]
 [ext_resource type="Texture2D" uid="uid://yt84cii1tbib" path="res://assets/enemy/bosshand_attack/boss02_attack_3.png" id="14_tentacle_attack_3"]
 [ext_resource type="Texture2D" uid="uid://c7lr2mfdq5sdf" path="res://assets/enemy/boss_attacklong_first/boss01_v2_walk_1.png" id="15_bottom_left_1"]
@@ -24,22 +24,19 @@
 [ext_resource type="Texture2D" uid="uid://5c1pyrt416hr" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_6.png" id="20_corner_left_2"]
 [ext_resource type="Texture2D" uid="uid://dtma84tdcg66q" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_7.png" id="21_corner_left_3"]
 [ext_resource type="Texture2D" uid="uid://clpkj6l24dsnr" path="res://assets/enemy/boss_attacklong_first_left/boss01_v2_walk_8.png" id="22_corner_left_4"]
-[ext_resource type="Texture2D" uid="uid://du0yt3co3n8qp" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_01.png" id="23_long_end_1"]
-[ext_resource type="Texture2D" uid="uid://dujwygb1qk4lo" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_02.png" id="24_long_end_2"]
-[ext_resource type="Texture2D" uid="uid://n3cdvyuxf3ux" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_03.png" id="25_long_end_3"]
 [ext_resource type="Texture2D" uid="uid://bkcdciquf3a7r" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_04.png" id="26_long_end_4"]
 [ext_resource type="Texture2D" uid="uid://cngivvqhrhsnn" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_05.png" id="27_long_end_5"]
 [ext_resource type="Texture2D" uid="uid://dxfqsgoub3rqx" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_06.png" id="28_long_end_6"]
 [ext_resource type="Texture2D" uid="uid://cyfv5oh181m2x" path="res://assets/enemy/boss_attacklong_end/boss01_v2_attack_07.png" id="29_long_end_7"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_1.png" id="30_long_end_left_1"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_2.png" id="31_long_end_left_2"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_3.png" id="32_long_end_left_3"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_4.png" id="33_long_end_left_4"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_5.png" id="34_long_end_left_5"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_6.png" id="35_long_end_left_6"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_7.png" id="36_long_end_left_7"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_8.png" id="37_long_end_left_8"]
-[ext_resource type="Texture2D" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_9.png" id="38_long_end_left_9"]
+[ext_resource type="Texture2D" uid="uid://eh7gjkn2gcff" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_1.png" id="30_long_end_left_1"]
+[ext_resource type="Texture2D" uid="uid://bwje46un6un2j" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_2.png" id="31_long_end_left_2"]
+[ext_resource type="Texture2D" uid="uid://ceho7jbakqqso" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_3.png" id="32_long_end_left_3"]
+[ext_resource type="Texture2D" uid="uid://ckjhupf2pwcax" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_4.png" id="33_long_end_left_4"]
+[ext_resource type="Texture2D" uid="uid://bh1k81qfmwoxv" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_5.png" id="34_long_end_left_5"]
+[ext_resource type="Texture2D" uid="uid://d167qmpvfwitp" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_6.png" id="35_long_end_left_6"]
+[ext_resource type="Texture2D" uid="uid://bb8eouiapagfd" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_7.png" id="36_long_end_left_7"]
+[ext_resource type="Texture2D" uid="uid://bg0pjhxbg5qwl" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_8.png" id="37_long_end_left_8"]
+[ext_resource type="Texture2D" uid="uid://d4dx27oenqvsm" path="res://assets/enemy/bossbg_attack/boss_attacklong_end_left/boss01_v2_attack_effcet_9.png" id="38_long_end_left_9"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_corner_left_tentacle"]
 animations = [{
@@ -64,6 +61,23 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tentacle"]
 size = Vector2(75, 235)
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_tentacle_attack"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_tentacle_attack_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_tentacle_attack_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_tentacle_attack_3")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 9.0
+}]
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_long_end_attack"]
 animations = [{
 "frames": [{
@@ -82,6 +96,26 @@ animations = [{
 "loop": false,
 "name": &"attack",
 "speed": 9.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bottom_left_tentacle"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_bottom_left_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_bottom_left_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_bottom_left_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_bottom_left_4")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
 }]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_long_end_left_attack"]
@@ -113,43 +147,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("38_long_end_left_9")
-}],
-"loop": false,
-"name": &"attack",
-"speed": 9.0
-}]
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_bottom_left_tentacle"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("15_bottom_left_1")
-}, {
-"duration": 1.0,
-"texture": ExtResource("16_bottom_left_2")
-}, {
-"duration": 1.0,
-"texture": ExtResource("17_bottom_left_3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("18_bottom_left_4")
-}],
-"loop": true,
-"name": &"idle",
-"speed": 6.0
-}]
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_tentacle_attack"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("12_tentacle_attack_1")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_tentacle_attack_2")
-}, {
-"duration": 1.0,
-"texture": ExtResource("14_tentacle_attack_3")
 }],
 "loop": false,
 "name": &"attack",
@@ -243,6 +240,7 @@ electric_wire_scene = ExtResource("10_wire_scene")
 lightning_area_scene = ExtResource("11_lightning_scene")
 tentacles_path = NodePath("../Tentacles")
 boss_core_path = NodePath("../BossCore")
+boss_body_path = NodePath("../Background/OctopusBody")
 wire_spawn_points_path = NodePath("../WireSpawnPoints")
 lightning_spawn_points_path = NodePath("../LightningSpawnPoints")
 
@@ -251,7 +249,7 @@ lightning_spawn_points_path = NodePath("../LightningSpawnPoints")
 [node name="Tentacle_TopLeft" type="Area2D" parent="Tentacles" unique_id=1234679052]
 position = Vector2(285, 255)
 script = ExtResource("8_tentacle")
-attack_warning_time = 0.0
+attack_warning_time = 0.6
 attack_active_time = 0.8
 top_tentacle = true
 timed_cycle_enabled = true
@@ -279,7 +277,7 @@ scale = Vector2(0.34, 0.34)
 sprite_frames = SubResource("SpriteFrames_tentacle_attack")
 animation = &"attack"
 
-[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopLeft"]
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopLeft" unique_id=1469536192]
 visible = false
 position = Vector2(-45.000008, 47.000008)
 rotation = 3.1415927
@@ -294,15 +292,19 @@ monitoring = false
 polygon = PackedVector2Array(0, 0, -210, 80, -145, 205, 120, 205, 190, 80)
 disabled = true
 
+[node name="FanWarning" type="Polygon2D" parent="Tentacles/Tentacle_TopLeft" unique_id=2057129463]
+visible = false
+color = Color(1, 0.25, 0.15, 0.45)
+polygon = PackedVector2Array(0, 0, -210, 80, -145, 205, 120, 205, 190, 80)
+
 [node name="Tentacle_TopRight" type="Area2D" parent="Tentacles" unique_id=1869455604]
 position = Vector2(995, 255)
 script = ExtResource("8_tentacle")
-attack_warning_time = 0.0
+attack_warning_time = 0.6
 attack_active_time = 0.8
 top_tentacle = true
 timed_cycle_enabled = true
 timed_cycle_hidden_time = 7.0
-timed_cycle_idle_time = 8.0
 attack_visual_tint = false
 align_attack_visual_to_visual = true
 hide_visual_during_attack = true
@@ -327,7 +329,7 @@ scale = Vector2(-0.34, 0.34)
 sprite_frames = SubResource("SpriteFrames_tentacle_attack")
 animation = &"attack"
 
-[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopRight"]
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_TopRight" unique_id=1117852081]
 visible = false
 position = Vector2(28.999996, 64.99999)
 rotation = 3.1415927
@@ -342,17 +344,21 @@ monitoring = false
 polygon = PackedVector2Array(0, 0, -190, 80, -120, 205, 145, 205, 210, 80)
 disabled = true
 
+[node name="FanWarning" type="Polygon2D" parent="Tentacles/Tentacle_TopRight" unique_id=1950570629]
+visible = false
+color = Color(1, 0.25, 0.15, 0.45)
+polygon = PackedVector2Array(0, 0, -190, 80, -120, 205, 145, 205, 210, 80)
+
 [node name="Tentacle_BottomLeft" type="Area2D" parent="Tentacles" unique_id=776464345]
 position = Vector2(280, 670)
 script = ExtResource("8_tentacle")
-attack_warning_time = 0.0
-attack_active_time = 0.8
 attack_interval_min = 3.0
 attack_interval_max = 5.8
+attack_warning_time = 0.6
+attack_active_time = 0.8
 timed_cycle_enabled = true
-attack_visual_tint = false
 timed_cycle_hidden_time = 7.0
-timed_cycle_idle_time = 8.0
+attack_visual_tint = false
 align_attack_visual_to_visual = true
 hide_visual_during_attack = true
 
@@ -374,7 +380,7 @@ scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_tentacle_attack")
 animation = &"attack"
 
-[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomLeft"]
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=886081911]
 visible = false
 position = Vector2(4, 11.999998)
 scale = Vector2(0.3, 0.3)
@@ -388,13 +394,18 @@ monitoring = false
 polygon = PackedVector2Array(0, 0, 120, -180, 310, -140, 275, 45, 80, 75)
 disabled = true
 
+[node name="FanWarning" type="Polygon2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=302497852]
+visible = false
+color = Color(1, 0.25, 0.15, 0.45)
+polygon = PackedVector2Array(0, 0, 120, -180, 310, -140, 275, 45, 80, 75)
+
 [node name="Tentacle_BottomRight" type="Area2D" parent="Tentacles" unique_id=1487815930]
 position = Vector2(1000, 670)
 script = ExtResource("8_tentacle")
-attack_warning_time = 0.0
-attack_active_time = 0.8
 attack_interval_min = 3.0
 attack_interval_max = 5.8
+attack_warning_time = 0.6
+attack_active_time = 0.8
 timed_cycle_enabled = true
 attack_visual_tint = false
 align_attack_visual_to_visual = true
@@ -419,7 +430,7 @@ scale = Vector2(-0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_tentacle_attack")
 animation = &"attack"
 
-[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomRight"]
+[node name="CornerAttack" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomRight" unique_id=1667522701]
 visible = false
 position = Vector2(0, -18)
 scale = Vector2(0.34, 0.34)
@@ -433,8 +444,13 @@ monitoring = false
 polygon = PackedVector2Array(0, 0, -120, -180, -310, -140, -275, 45, -80, 75)
 disabled = true
 
+[node name="FanWarning" type="Polygon2D" parent="Tentacles/Tentacle_BottomRight" unique_id=538437672]
+visible = false
+color = Color(1, 0.25, 0.15, 0.45)
+polygon = PackedVector2Array(0, 0, -120, -180, -310, -140, -275, 45, -80, 75)
+
 [node name="BossCore" type="Area2D" parent="." unique_id=1008065651]
-position = Vector2(640, 470)
+position = Vector2(638, 538)
 script = ExtResource("9_boss_core")
 
 [node name="Visual" type="Panel" parent="BossCore" unique_id=888488720]

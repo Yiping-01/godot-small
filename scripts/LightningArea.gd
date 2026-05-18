@@ -8,6 +8,7 @@ var _hit_targets := {}
 
 @onready var warning_visual: CanvasItem = get_node_or_null("WarningVisual") as CanvasItem
 @onready var lightning_visual: CanvasItem = get_node_or_null("LightningVisual") as CanvasItem
+@onready var lightning_animation: AnimatedSprite2D = get_node_or_null("LightningVisual") as AnimatedSprite2D
 @onready var damage_area: Area2D = get_node_or_null("DamageArea") as Area2D
 @onready var damage_shape: CollisionShape2D = get_node_or_null("DamageArea/CollisionShape2D") as CollisionShape2D
 
@@ -33,6 +34,8 @@ func _strike() -> void:
 		warning_visual.visible = false
 	if lightning_visual != null:
 		lightning_visual.visible = true
+	if lightning_animation != null:
+		lightning_animation.play("strike")
 
 	_set_damage_enabled(true)
 	await get_tree().physics_frame

@@ -297,6 +297,9 @@ func _get_attack_collision_node() -> Node:
 
 
 func _show_attack_warning() -> void:
+	if fan_warning_visual != null:
+		fan_warning_visual.visible = true
+		fan_warning_visual.modulate = warning_color
 	if attack_visual == null:
 		return
 	attack_visual.visible = true
@@ -308,6 +311,9 @@ func _show_attack_warning() -> void:
 
 
 func _activate_attack_visual() -> void:
+	if fan_warning_visual != null:
+		fan_warning_visual.visible = true
+		fan_warning_visual.modulate = active_color
 	if attack_visual == null:
 		return
 	attack_visual.modulate = active_color if attack_visual_tint else Color.WHITE
@@ -318,6 +324,8 @@ func _activate_attack_visual() -> void:
 
 
 func _hide_attack_visual() -> void:
+	if fan_warning_visual != null:
+		fan_warning_visual.visible = false
 	if attack_visual == null:
 		return
 	if attack_visual is AnimatedSprite2D:
