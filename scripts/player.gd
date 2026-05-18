@@ -172,6 +172,7 @@ func _ready() -> void:
 	default_camera_zoom = camera_follow_zoom
 	default_camera_smoothing_speed = camera_follow_smoothing_speed
 	_configure_follow_camera()
+	_apply_pending_camera_shake()
 	_setup_player_light()
 	normal_z_index = z_index
 	attack_offset_x = absf(attack_area.position.x)
@@ -1307,6 +1308,17 @@ func _build_radial_light_texture(size: int) -> ImageTexture:
 func _start_camera_shake(duration: float, strength: float) -> void:
 	shake_time_left = maxf(shake_time_left, duration)
 	shake_strength = maxf(shake_strength, strength)
+
+
+func _apply_pending_camera_shake() -> void:
+	if not GameState.has_method("consume_pending_camera_shake"):
+		return
+
+	var pending_shake := GameState.consume_pending_camera_shake()
+	var duration := float(pending_shake.get("duration", 0.0))
+	var strength := float(pending_shake.get("strength", 0.0))
+	if duration > 0.0 and strength > 0.0:
+		_start_camera_shake(duration, strength)
 
 
 func _update_camera_shake(delta: float) -> void:

@@ -235,7 +235,6 @@ scale = Vector2(1.35, 0.45)
 
 [node name="BossManager" type="Node2D" parent="." unique_id=1741513387]
 script = ExtResource("7_boss_manager")
-debug_start_phase_two = true
 electric_wire_scene = ExtResource("10_wire_scene")
 lightning_area_scene = ExtResource("11_lightning_scene")
 tentacles_path = NodePath("../Tentacles")
@@ -350,17 +349,15 @@ color = Color(1, 0.25, 0.15, 0.45)
 polygon = PackedVector2Array(0, 0, -190, 80, -120, 205, 145, 205, 210, 80)
 
 [node name="Tentacle_BottomLeft" type="Area2D" parent="Tentacles" unique_id=776464345]
-position = Vector2(280, 670)
+position = Vector2(189, 653)
 script = ExtResource("8_tentacle")
 attack_interval_min = 3.0
 attack_interval_max = 5.8
 attack_warning_time = 0.6
 attack_active_time = 0.8
-timed_cycle_enabled = true
 timed_cycle_hidden_time = 7.0
 attack_visual_tint = false
 align_attack_visual_to_visual = true
-hide_visual_during_attack = true
 
 [node name="Visual" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomLeft" unique_id=1124385807]
 position = Vector2(4, 11.999998)
@@ -400,16 +397,14 @@ color = Color(1, 0.25, 0.15, 0.45)
 polygon = PackedVector2Array(0, 0, 120, -180, 310, -140, 275, 45, 80, 75)
 
 [node name="Tentacle_BottomRight" type="Area2D" parent="Tentacles" unique_id=1487815930]
-position = Vector2(1000, 670)
+position = Vector2(1143, 692)
 script = ExtResource("8_tentacle")
 attack_interval_min = 3.0
 attack_interval_max = 5.8
 attack_warning_time = 0.6
 attack_active_time = 0.8
-timed_cycle_enabled = true
 attack_visual_tint = false
 align_attack_visual_to_visual = true
-hide_visual_during_attack = true
 
 [node name="Visual" type="AnimatedSprite2D" parent="Tentacles/Tentacle_BottomRight" unique_id=1336864312]
 position = Vector2(0, -18)

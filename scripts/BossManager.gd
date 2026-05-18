@@ -7,8 +7,11 @@ signal boss_defeated
 @export var phase_two_threshold := 60
 @export var core_open_duration := 6.0
 @export var tentacle_respawn_delay := 1.2
-@export var wire_spawn_min_delay := 5.0
-@export var wire_spawn_max_delay := 9.0
+@export var wire_round_count := 3
+@export var wire_round_time := 15.0
+@export var wire_round_cooldown := 3.0
+@export var lightning_strike_count := 3
+@export var lightning_strike_interval := 0.8
 @export var debug_start_phase_two := false
 @export var electric_wire_scene: PackedScene
 @export var lightning_area_scene: PackedScene
@@ -22,7 +25,9 @@ var health := 0
 var phase := 1
 var boss_dead := false
 var core_open := false
-var _wire_loop_running := false
+var active_wires: Array[Node] = []
+var wire_round_running := false
+var phase_two_started := false
 
 @onready var tentacles_root: Node = get_node_or_null(tentacles_path)
 @onready var boss_core: Node = get_node_or_null(boss_core_path)
@@ -68,16 +73,17 @@ func damage_boss(amount: int) -> void:
 		_enter_phase_two()
 
 
-func trigger_lightning(strike_position: Vector2 = Vector2.ZERO) -> void:
+func trigger_lightning(strike_position: Variant = null) -> void:
 	if boss_dead or lightning_area_scene == null:
 		return
 
 	var lightning: Node = lightning_area_scene.instantiate()
 	add_child(lightning)
 	if lightning is Node2D:
-		if strike_position == Vector2.ZERO:
-			strike_position = _pick_spawn_position(lightning_spawn_points)
-		(lightning as Node2D).global_position = strike_position
+		var target_position := _pick_spawn_position(lightning_spawn_points)
+		if strike_position is Vector2:
+			target_position = strike_position
+		(lightning as Node2D).global_position = target_position
 
 
 func _open_core() -> void:
@@ -134,35 +140,108 @@ func _all_tentacles_dead() -> bool:
 
 
 func _enter_phase_two() -> void:
+	if phase_two_started:
+		return
 	phase = 2
-	_spawn_wire()
-	if not _wire_loop_running:
-		_wire_loop_running = true
-		call_deferred("_wire_spawn_loop")
+	phase_two_started = true
+	print("Boss phase 2 started")
+	call_deferred("_start_wire_round_loop")
 
 
-func _wire_spawn_loop() -> void:
-	while is_inside_tree() and not boss_dead and phase >= 2:
-		await get_tree().create_timer(randf_range(wire_spawn_min_delay, wire_spawn_max_delay)).timeout
-		if boss_dead or phase < 2:
-			break
-		_spawn_wire()
+func _start_wire_round_loop() -> void:
+	while is_inside_tree() and phase_two_started and not boss_dead:
+		await _run_wire_round()
+		if boss_dead:
+			return
+		await get_tree().create_timer(wire_round_cooldown).timeout
 
 
-func _spawn_wire() -> void:
+func _run_wire_round() -> void:
+	if boss_dead or electric_wire_scene == null:
+		return
+
+	wire_round_running = true
+	active_wires.clear()
+	_spawn_wire_round()
+
+	var elapsed := 0.0
+	while elapsed < wire_round_time and not boss_dead:
+		_clean_active_wires()
+		if active_wires.is_empty():
+			wire_round_running = false
+			print("Wire round cleared")
+			if not boss_dead:
+				await _open_core()
+			return
+		var wait_time := minf(0.1, wire_round_time - elapsed)
+		await get_tree().create_timer(wait_time).timeout
+		elapsed += wait_time
+
+	if boss_dead:
+		return
+
+	_clean_active_wires()
+	if not active_wires.is_empty():
+		for wire in active_wires:
+			if is_instance_valid(wire):
+				wire.queue_free()
+		active_wires.clear()
+		await _start_lightning_sequence()
+
+	wire_round_running = false
+
+
+func _spawn_wire_round() -> void:
 	if electric_wire_scene == null:
 		return
-	var wire: Node = electric_wire_scene.instantiate()
-	if wire.has_method("set_manager"):
-		wire.call("set_manager", self)
-	add_child(wire)
-	if wire is Node2D:
-		var spawn_point := _pick_spawn_point(wire_spawn_points)
-		if spawn_point != null:
+	var points := _get_spawn_points(wire_spawn_points)
+	points.shuffle()
+	var count: int = mini(wire_round_count, points.size())
+
+	for i in range(count):
+		var spawn_point := points[i]
+		var wire: Node = electric_wire_scene.instantiate()
+		if wire.has_method("set_manager"):
+			wire.call("set_manager", self)
+		add_child(wire)
+		active_wires.append(wire)
+		if wire is Node2D:
 			(wire as Node2D).global_position = spawn_point.global_position
 			(wire as Node2D).global_rotation = spawn_point.global_rotation
-		else:
-			(wire as Node2D).global_position = global_position
+
+
+func on_wire_destroyed(wire: Node) -> void:
+	active_wires.erase(wire)
+	if wire_round_running and active_wires.is_empty():
+		print("Wire round cleared")
+
+
+func _start_lightning_sequence() -> void:
+	if boss_dead:
+		return
+	for i in range(lightning_strike_count):
+		if boss_dead:
+			return
+		trigger_lightning()
+		await get_tree().create_timer(lightning_strike_interval).timeout
+
+
+func _clean_active_wires() -> void:
+	var remaining_wires: Array[Node] = []
+	for wire in active_wires:
+		if is_instance_valid(wire):
+			remaining_wires.append(wire)
+	active_wires = remaining_wires
+
+
+func _get_spawn_points(points_root: Node) -> Array[Node2D]:
+	var points: Array[Node2D] = []
+	if points_root == null:
+		return points
+	for child in points_root.get_children():
+		if child is Node2D:
+			points.append(child as Node2D)
+	return points
 
 
 func _pick_spawn_position(points_root: Node) -> Vector2:
@@ -187,7 +266,13 @@ func _pick_spawn_point(points_root: Node) -> Node2D:
 
 func _die() -> void:
 	boss_dead = true
+	phase_two_started = false
+	wire_round_running = false
 	core_open = false
+	for wire in active_wires:
+		if is_instance_valid(wire):
+			wire.queue_free()
+	active_wires.clear()
 	_set_tentacles_active(false)
 	if boss_core != null and boss_core.has_method("close_core"):
 		boss_core.call("close_core")

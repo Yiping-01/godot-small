@@ -96,6 +96,13 @@ const THROW_FRAME_PATHS: Array[String] = [
 @export var intro_sfx_volume_db: float = 6.0
 @export var ink_sfx: AudioStream = preload("res://scores/boss_attack1.wav")
 @export var ink_sfx_volume_db: float = 0.0
+@export var next_scene_after_death := "res://scenes/bosslevel2.tscn"
+@export var death_scene_delay := 0.55
+@export var death_transition_shake_duration := 1.5
+@export var death_transition_shake_strength := 22.0
+@export var next_scene_shake_duration := 1.5
+@export var next_scene_shake_strength := 22.0
+@export var death_flash_fade_time := 0.45
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -136,6 +143,7 @@ var intro_audio: AudioStreamPlayer
 var body_contact_area: Area2D
 var body_contact_shape: CollisionShape2D
 var target: Node2D
+var dead := false
 
 
 func _ready() -> void:
@@ -197,6 +205,9 @@ func _physics_process(delta: float) -> void:
 
 
 func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO) -> void:
+	if dead:
+		return
+
 	health -= amount
 	var push_direction := signf(global_position.x - from_position.x)
 	if is_zero_approx(push_direction):
@@ -207,7 +218,60 @@ func take_damage(amount: int, from_position: Vector2 = Vector2.ZERO) -> void:
 	_flash()
 
 	if health <= 0:
+		_die()
+
+
+func _die() -> void:
+	if dead:
+		return
+
+	dead = true
+	velocity = Vector2.ZERO
+	GameState.set_input_locked(true)
+	set_physics_process(false)
+	_set_damage_area_enabled(false)
+	if collision_shape != null:
+		collision_shape.set_deferred("disabled", true)
+	if damage_shape != null:
+		damage_shape.set_deferred("disabled", true)
+	call_deferred("_change_to_next_scene_after_death")
+
+
+func _change_to_next_scene_after_death() -> void:
+	var player := _find_player()
+	if player != null and player.has_method("_start_camera_shake"):
+		player.call("_start_camera_shake", death_transition_shake_duration, death_transition_shake_strength)
+	_start_death_flash()
+
+	if death_scene_delay > 0.0:
+		await get_tree().create_timer(death_scene_delay).timeout
+	if next_scene_after_death == "":
+		GameState.set_input_locked(false)
 		queue_free()
+		return
+
+	GameState.set_pending_camera_shake(next_scene_shake_duration, next_scene_shake_strength)
+	GameState.set_input_locked(false)
+	GameState.save_continue_scene(next_scene_after_death, Vector2.ZERO, false)
+	GameState.save_game()
+	get_tree().change_scene_to_file(next_scene_after_death)
+
+
+func _start_death_flash() -> void:
+	var canvas_layer := CanvasLayer.new()
+	canvas_layer.layer = 100
+	add_child(canvas_layer)
+
+	var flash := ColorRect.new()
+	flash.color = Color(1.0, 1.0, 1.0, 0.0)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	canvas_layer.add_child(flash)
+
+	var tween := create_tween()
+	tween.tween_property(flash, "color:a", 0.9, 0.08)
+	tween.tween_property(flash, "color:a", 0.0, death_flash_fade_time)
+	tween.tween_callback(canvas_layer.queue_free)
 
 
 func _update_idle(_delta: float) -> void:

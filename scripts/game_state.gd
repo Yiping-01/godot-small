@@ -68,6 +68,8 @@ var continue_player_position := Vector2.ZERO
 var has_continue_player_position := false
 var continue_spawn_marker_name := ""
 var has_continue_spawn_marker := false
+var pending_camera_shake_duration := 0.0
+var pending_camera_shake_strength := 0.0
 
 
 func _ready() -> void:
@@ -112,6 +114,21 @@ func set_input_locked(locked: bool) -> void:
 
 	input_locked = locked
 	input_lock_changed.emit(input_locked)
+
+
+func set_pending_camera_shake(duration: float, strength: float) -> void:
+	pending_camera_shake_duration = maxf(duration, 0.0)
+	pending_camera_shake_strength = maxf(strength, 0.0)
+
+
+func consume_pending_camera_shake() -> Dictionary:
+	var shake := {
+		"duration": pending_camera_shake_duration,
+		"strength": pending_camera_shake_strength,
+	}
+	pending_camera_shake_duration = 0.0
+	pending_camera_shake_strength = 0.0
+	return shake
 
 
 func add_currency(amount: int) -> void:

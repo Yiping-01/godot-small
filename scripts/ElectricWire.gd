@@ -1,8 +1,6 @@
 extends Area2D
 
 @export var max_health := 3
-@export var countdown_time := 60.0
-@export var lightning_offset := Vector2.ZERO
 
 var health := 0
 var manager: Node
@@ -17,7 +15,6 @@ func _ready() -> void:
 	health = max_health
 	collision_layer = 4
 	collision_mask = 0
-	call_deferred("_countdown")
 
 
 func set_manager(new_manager: Node) -> void:
@@ -33,19 +30,16 @@ func take_damage(amount: int, _from_position: Vector2 = Vector2.ZERO) -> void:
 		_flash_hit()
 		return
 
-	_destroyed = true
-	queue_free()
+	_destroy()
 
 
-func _countdown() -> void:
-	await get_tree().create_timer(countdown_time).timeout
+func _destroy() -> void:
 	if _destroyed:
 		return
 
 	_destroyed = true
-	var boss_manager := _find_boss_manager()
-	if boss_manager != null:
-		boss_manager.call("trigger_lightning", global_position + lightning_offset)
+	if manager != null and manager.has_method("on_wire_destroyed"):
+		manager.call("on_wire_destroyed", self)
 	queue_free()
 
 
@@ -62,14 +56,3 @@ func _flash_hit() -> void:
 	if core_line != null:
 		_flash_tween.parallel().tween_property(core_line, "modulate", Color.WHITE, 0.12)
 
-
-func _find_boss_manager() -> Node:
-	if manager != null and manager.has_method("trigger_lightning"):
-		return manager
-
-	var current := get_parent()
-	while current != null:
-		if current.has_method("trigger_lightning"):
-			return current
-		current = current.get_parent()
-	return null
