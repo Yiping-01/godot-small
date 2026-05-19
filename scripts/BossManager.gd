@@ -89,6 +89,7 @@ func trigger_lightning(strike_position: Variant = null) -> void:
 func _open_core() -> void:
 	core_open = true
 	_set_tentacles_active(false)
+	_set_boss_body_core_open(true)
 	if boss_core != null and boss_core.has_method("open_core"):
 		boss_core.call("open_core")
 
@@ -99,6 +100,7 @@ func _open_core() -> void:
 
 func _close_core_and_respawn() -> void:
 	core_open = false
+	_set_boss_body_core_open(false)
 	if boss_core != null and boss_core.has_method("close_core"):
 		boss_core.call("close_core")
 	_respawn_tentacles()
@@ -120,6 +122,20 @@ func _set_tentacles_active(active: bool) -> void:
 	for child in tentacles_root.get_children():
 		if child.has_method("set_active"):
 			child.call("set_active", active)
+
+
+func _set_boss_body_core_open(is_core_open: bool) -> void:
+	if boss_body != null:
+		if is_core_open:
+			boss_body.modulate = Color(0.45, 0.45, 0.45, 0.65)
+		else:
+			boss_body.modulate = Color(1.0, 1.0, 1.0, 0.75)
+	if boss_body is AnimatedSprite2D:
+		var boss_sprite := boss_body as AnimatedSprite2D
+		if is_core_open:
+			boss_sprite.play("core_open")
+		else:
+			boss_sprite.play("idle")
 
 
 func _connect_tentacles() -> void:
@@ -168,10 +184,8 @@ func _run_wire_round() -> void:
 	while elapsed < wire_round_time and not boss_dead:
 		_clean_active_wires()
 		if active_wires.is_empty():
-			wire_round_running = false
 			print("Wire round cleared")
-			if not boss_dead:
-				await _open_core()
+			wire_round_running = false
 			return
 		var wait_time := minf(0.1, wire_round_time - elapsed)
 		await get_tree().create_timer(wait_time).timeout
@@ -214,6 +228,7 @@ func on_wire_destroyed(wire: Node) -> void:
 	active_wires.erase(wire)
 	if wire_round_running and active_wires.is_empty():
 		print("Wire round cleared")
+		wire_round_running = false
 
 
 func _start_lightning_sequence() -> void:

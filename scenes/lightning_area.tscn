@@ -1,18 +1,11 @@
-[gd_scene format=3 uid="uid://cncda60j68tun"]
+[gd_scene load_steps=9 format=3 uid="uid://cncda60j68tun"]
 
 [ext_resource type="Script" uid="uid://dg8j0qeof8myr" path="res://scripts/LightningArea.gd" id="1_lightning_script"]
 [ext_resource type="Texture2D" uid="uid://bmp7peqhqorc1" path="res://assets/other/lei1.png" id="2_lei1"]
 [ext_resource type="Texture2D" uid="uid://cjk8fly2dx4c6" path="res://assets/other/lei2.png" id="3_lei2"]
 [ext_resource type="Texture2D" uid="uid://im4jfol5rwgt" path="res://assets/other/lei3.png" id="4_lei3"]
 [ext_resource type="Texture2D" uid="uid://xvml0kbyl0be" path="res://assets/other/lei4.png" id="5_lei4"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_warning"]
-bg_color = Color(1, 0.9, 0.1, 0.28)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 1, 1, 0.55)
+[ext_resource type="Script" path="res://scripts/LightningWarning.gd" id="6_warning_script"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lightning"]
 animations = [{
@@ -41,12 +34,8 @@ size = Vector2(150, 900)
 position = Vector2(547, 282)
 script = ExtResource("1_lightning_script")
 
-[node name="WarningVisual" type="Panel" parent="." unique_id=2034536305]
-offset_left = -75.0
-offset_top = -450.0
-offset_right = 75.0
-offset_bottom = 450.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_warning")
+[node name="WarningVisual" type="Node2D" parent="." unique_id=2034536305]
+script = ExtResource("6_warning_script")
 
 [node name="LightningVisual" type="AnimatedSprite2D" parent="." unique_id=1709523551]
 visible = false

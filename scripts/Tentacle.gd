@@ -24,6 +24,7 @@ var health := 0
 var manager: Node
 var _dead := false
 var _active := true
+var show_fan_warning := false
 var _hit_targets := {}
 var _touch_targets := {}
 var _flash_tween: Tween
@@ -47,9 +48,10 @@ func _ready() -> void:
 		area_exited.connect(_on_touch_area_exited)
 	if attack_area != null:
 		attack_area.collision_layer = 32
-		attack_area.collision_mask = 16
+		attack_area.collision_mask = 18
 		attack_area.monitoring = false
 		attack_area.area_entered.connect(_on_attack_area_entered)
+		attack_area.body_entered.connect(_on_attack_body_entered)
 	if attack_shape != null:
 		attack_shape.set("disabled", true)
 	if attack_visual != null:
@@ -132,7 +134,10 @@ func _attack_loop() -> void:
 	while is_inside_tree():
 		await get_tree().create_timer(randf_range(attack_interval_min, attack_interval_max)).timeout
 		if _active and not _dead and visible:
-			await _attack_once()
+			if corner_attack_visual != null:
+				await _corner_attack_once()
+			else:
+				await _attack_once()
 
 
 func _attack_once() -> void:
@@ -198,13 +203,6 @@ func _timed_cycle_loop(cycle_token: int) -> void:
 		await get_tree().create_timer(timed_cycle_idle_time).timeout
 		if cycle_token != _cycle_version or _dead:
 			return
-		if _active and visible:
-			if corner_attack_visual != null:
-				await _corner_attack_once()
-			else:
-				await _attack_once()
-		if cycle_token != _cycle_version or _dead:
-			return
 
 		_set_attack_enabled(false)
 		_hide_attack_visual()
@@ -232,6 +230,12 @@ func _on_attack_area_entered(area: Area2D) -> void:
 	_damage_target(area)
 
 
+func _on_attack_body_entered(body: Node2D) -> void:
+	if _dead or not _active:
+		return
+	_damage_target(body)
+
+
 func _on_touch_area_entered(area: Area2D) -> void:
 	if _dead or not _active:
 		return
@@ -257,6 +261,8 @@ func _damage_current_overlaps() -> void:
 		return
 	for area in attack_area.get_overlapping_areas():
 		_damage_target(area)
+	for body in attack_area.get_overlapping_bodies():
+		_damage_target(body)
 
 
 func _damage_target(target: Node) -> void:
@@ -297,7 +303,7 @@ func _get_attack_collision_node() -> Node:
 
 
 func _show_attack_warning() -> void:
-	if fan_warning_visual != null:
+	if show_fan_warning and fan_warning_visual != null:
 		fan_warning_visual.visible = true
 		fan_warning_visual.modulate = warning_color
 	if attack_visual == null:
@@ -311,7 +317,7 @@ func _show_attack_warning() -> void:
 
 
 func _activate_attack_visual() -> void:
-	if fan_warning_visual != null:
+	if show_fan_warning and fan_warning_visual != null:
 		fan_warning_visual.visible = true
 		fan_warning_visual.modulate = active_color
 	if attack_visual == null:
@@ -351,15 +357,35 @@ func _corner_attack_once() -> void:
 	if corner_attack_visual == null:
 		return
 	_align_corner_attack_visual()
-	if hide_visual_during_attack and visual != null:
+	if visual != null:
+		visual.visible = true
+		visual.modulate = Color(1.0, 0.22, 0.22)
+	_hit_targets.clear()
+	if show_fan_warning and fan_warning_visual != null:
+		fan_warning_visual.visible = true
+		fan_warning_visual.modulate = warning_color
+	await get_tree().create_timer(attack_warning_time).timeout
+	if _dead or not _active or not visible:
+		_hide_corner_attack_visual()
+		return
+	if visual != null:
 		visual.visible = false
+		visual.modulate = Color.WHITE
+	if show_fan_warning and fan_warning_visual != null:
+		fan_warning_visual.visible = true
+		fan_warning_visual.modulate = active_color
 	corner_attack_visual.visible = true
 	corner_attack_visual.modulate = Color.WHITE
 	if corner_attack_visual is AnimatedSprite2D:
 		var corner_sprite := corner_attack_visual as AnimatedSprite2D
+		corner_sprite.stop()
 		corner_sprite.frame = 0
 		corner_sprite.play("attack")
+	_set_attack_enabled(true)
+	await get_tree().physics_frame
+	_damage_current_overlaps()
 	await get_tree().create_timer(attack_active_time).timeout
+	_set_attack_enabled(false)
 	_hide_corner_attack_visual()
 
 
@@ -369,7 +395,9 @@ func _hide_corner_attack_visual() -> void:
 			var corner_sprite := corner_attack_visual as AnimatedSprite2D
 			corner_sprite.stop()
 		corner_attack_visual.visible = false
-	if hide_visual_during_attack and visual != null and visible and not _dead:
+	if fan_warning_visual != null:
+		fan_warning_visual.visible = false
+	if visual != null and visible and not _dead:
 		visual.visible = true
 
 
@@ -383,4 +411,3 @@ func _align_corner_attack_visual() -> void:
 		var corner_node := corner_attack_visual as Node2D
 		corner_node.position = visual_node.position
 		corner_node.rotation = visual_node.rotation
-		corner_node.scale = visual_node.scale

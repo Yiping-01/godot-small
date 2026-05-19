@@ -29,7 +29,7 @@ func open_core() -> void:
 		collision_shape.disabled = false
 	if visual != null:
 		visual.visible = true
-		visual.modulate = Color.WHITE
+		visual.modulate = Color(1.35, 1.35, 1.35, 1.0)
 
 
 func close_core() -> void:
@@ -56,6 +56,6 @@ func _flash_hit() -> void:
 		return
 	if _flash_tween != null:
 		_flash_tween.kill()
-	visual.modulate = Color(1.0, 0.35, 0.35)
+	visual.modulate = Color(1.45, 0.55, 0.55, 1.0)
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(visual, "modulate", Color.WHITE, 0.12)
+	_flash_tween.tween_property(visual, "modulate", Color(1.35, 1.35, 1.35, 1.0), 0.12)
